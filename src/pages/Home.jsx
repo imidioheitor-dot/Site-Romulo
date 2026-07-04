@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { SiNike, SiAdidas, SiPuma, SiNewbalance, SiReebok, SiJordan, SiFila, SiUnderarmour } from 'react-icons/si';
 import { FiArrowRight, FiArrowUpRight, FiFeather, FiZap, FiShield, FiRefreshCw, FiTruck, FiCreditCard, FiHeadphones } from 'react-icons/fi';
@@ -48,7 +48,9 @@ export default function Home() {
   const navigate = useNavigate();
   const destaques = products.filter(p => p.destaque).slice(0, 4);
   const techProduct = products.find(p => p.id === 'rsf-supernova') || products[0];
-  const designProduct = products.find(p => p.id === 'rsf-jordan-mint') || products[2] || products[0];
+  const designProduct = products.find(p => p.id === 'rsf-jordan-menta') || products[3] || products[0];
+
+  const heroRef = useRef(null);
 
   useReveal([products.length]);
 
@@ -56,50 +58,84 @@ export default function Home() {
     window.scrollTo(0, 0);
   }, []);
 
+  // progresso de scroll do hero (0 → 1) dirigindo o efeito cinematográfico
+  useEffect(() => {
+    const el = heroRef.current;
+    if (!el) return;
+    let raf = 0;
+    const onScroll = () => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => {
+        const total = el.offsetHeight - window.innerHeight;
+        const p = total > 0 ? Math.min(1, Math.max(0, -el.getBoundingClientRect().top / total)) : 0;
+        el.style.setProperty('--p', p.toFixed(4));
+      });
+    };
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll);
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onScroll);
+      cancelAnimationFrame(raf);
+    };
+  }, []);
+
   return (
     <div className="home">
-      {/* ===================== HERO ===================== */}
-      <section className="hero">
-        <HeroBackground />
+      {/* ===================== HERO SCROLÁVEL ===================== */}
+      <section className="hero" ref={heroRef}>
+        <div className="hero__sticky">
+          <HeroBackground />
 
-        <div className="hero__metaballs" aria-hidden="true">
-          <MetaBalls color="#4d86ff" cursorBallColor="#9ccdf5" ballCount={11} animationSize={26} speed={0.28} clumpFactor={0.9} cursorBallSize={2} enableTransparency />
-        </div>
-
-        <div className="container hero__inner">
-          <div className="hero__eyebrow rise">
-            <span className="tag">Coleção 2026 · Rômulo Santos Flores</span>
+          <div className="hero__metaballs" aria-hidden="true">
+            <MetaBalls color="#4d86ff" cursorBallColor="#9ccdf5" ballCount={11} animationSize={26} speed={0.28} clumpFactor={0.9} cursorBallSize={2} enableTransparency />
           </div>
 
-          <BlurText
-            text="Sinta a leveza."
-            className="hero__title"
-            animateBy="words"
-            delay={180}
-            stepDuration={0.5}
-          />
+          {/* Camada 1 — entrada */}
+          <div className="container hero__inner hero__layer hero__layer--1">
+            <div className="hero__eyebrow rise">
+              <span className="tag">Coleção 2026 · Rômulo Santos Flores</span>
+            </div>
 
-          <p className="hero__sub rise rise-2">
-            Sapatos para o dia a dia que mantêm a <em>elegância</em> — selecionados a dedo,
-            com o conforto que te acompanha e o preço que cabe no bolso.
-          </p>
+            <BlurText
+              text="Sinta a leveza."
+              className="hero__title"
+              animateBy="words"
+              delay={180}
+              stepDuration={0.5}
+            />
 
-          <div className="hero__cta rise rise-3">
-            <button className="btn btn-primary cursor-target" onClick={() => navigate('/catalogo')}>
-              Ver catálogo <FiArrowRight />
-            </button>
-            <Link to="/localizacao" className="btn btn-ghost cursor-target">
-              Visitar a loja
-            </Link>
+            <p className="hero__sub rise rise-2">
+              Sapatos para o dia a dia que mantêm a <em>elegância</em> — selecionados a dedo,
+              com o conforto que te acompanha e o preço que cabe no bolso.
+            </p>
+
+            <div className="hero__cta rise rise-3">
+              <button className="btn btn-primary cursor-target" onClick={() => navigate('/catalogo')}>
+                Ver catálogo <FiArrowRight />
+              </button>
+              <Link to="/localizacao" className="btn btn-ghost cursor-target">
+                Visitar a loja
+              </Link>
+            </div>
           </div>
 
-          <div className="hero__scroll rise rise-4">
-            <span className="hero__scroll-line" />
+          {/* Camada 2 — revela no meio do scroll */}
+          <div className="container hero__inner hero__layer hero__layer--2" aria-hidden="true">
+            <span className="hero__kicker">Do casual ao social</span>
+            <h2 className="hero__statement">
+              O <em className="h-serif">par certo</em><br />para cada passo do seu dia.
+            </h2>
+          </div>
+
+          <div className="hero__scrollcue">
+            <span className="hero__scrollcue-track"><span /></span>
             <span>Role para descobrir</span>
           </div>
-        </div>
 
-        <GradualBlur target="parent" position="bottom" height="8rem" strength={2.4} divCount={6} curve="bezier" exponential opacity={1} />
+          <GradualBlur target="parent" position="bottom" height="8rem" strength={2.4} divCount={6} curve="bezier" exponential opacity={1} />
+        </div>
       </section>
 
       {/* ===================== PILARES ===================== */}

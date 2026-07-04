@@ -1,12 +1,22 @@
 # Fotos dos produtos
 
-Coloque aqui as fotos dos tênis. O nome do arquivo deve bater com o campo
-`img` do produto (cadastrado no painel da equipe ou em `src/lib/store.js`).
+Coloque aqui as **fotos reais** dos tênis. O nome do arquivo deve bater
+exatamente com o campo `img` de cada produto.
 
-Ex.: um produto com `img: "tenis-supernova.jpg"` procura por
-`public/products/tenis-supernova.jpg`.
+## Os 5 modelos do catálogo e seus arquivos
 
-Formatos recomendados: `.jpg`, `.png` ou `.webp`, proporção ~4:3, fundo claro.
+| Produto | Marca | Arquivo esperado |
+|---|---|---|
+| Campus 00s Preto | Adidas | `campus-preto.jpg` |
+| Supernova Branco | Adidas | `supernova-branco.jpg` |
+| Knu Skool Preto | Vans | `vans-preto.jpg` |
+| Jordan 1 Low Menta | Nike | `jordan-menta.jpg` |
+| Samba OG Creme | Adidas | `samba-creme.jpg` |
 
-Enquanto a foto não existir, o site mostra automaticamente uma ilustração
-vetorial elegante gerada a partir das cores do produto — nada quebra.
+Formatos: `.jpg`, `.png` ou `.webp`. Proporção recomendada ~4:3, com o tênis
+centralizado. Assim que o arquivo com o nome certo estiver nesta pasta, a foto
+real substitui automaticamente a ilustração de rascunho — sem precisar mexer
+no código.
+
+> Para adicionar/editar produtos e apontar o nome do arquivo da foto, use o
+> painel da equipe em `/equipe` (campo "Arquivo da foto").
