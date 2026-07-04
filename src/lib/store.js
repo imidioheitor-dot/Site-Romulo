@@ -6,9 +6,9 @@
 import { useSyncExternalStore } from 'react';
 
 const KEYS = {
-  products: 'rsf.products.v2',
+  products: 'rsf.products.v3',
   orders: 'rsf.orders.v1',
-  cart: 'rsf.cart.v2',
+  cart: 'rsf.cart.v3',
   staff: 'rsf.staff.v1',
   session: 'rsf.session.v1'
 };
@@ -104,6 +104,57 @@ const SEED_PRODUCTS = [
     img: 'samba-creme.jpg',
     destaque: true,
     tag: 'Novo'
+  },
+  {
+    id: 'rsf-jordan-mostarda',
+    nome: 'Jordan 1 Low Mostarda',
+    marca: 'Nike',
+    categoria: 'Casual',
+    genero: 'Masculino',
+    preco: 699.9,
+    precoAntigo: 799.9,
+    descricao: 'Branco e mostarda com swoosh preto e cadarços vermelhos que roubam a cena. Um colorway quente e cheio de personalidade para quem não passa despercebido.',
+    cores: ['#d8a63a', '#f4f1ea', '#161616'],
+    colorway: { base: '#e7edf2', mesh: '#f4f1ea', stripe: '#161616', sole: '#f6f4ee', accent: '#d8a63a', lace: '#c8462f' },
+    tamanhos: [39, 40, 41, 42, 43, 44],
+    estoque: 7,
+    img: 'jordan-mostarda.jpg',
+    destaque: true,
+    tag: 'Novo'
+  },
+  {
+    id: 'rsf-mizuno-azul',
+    nome: 'Wave Prophecy Azul',
+    marca: 'Mizuno',
+    categoria: 'Corrida',
+    genero: 'Unissex',
+    preco: 899.9,
+    precoAntigo: 1099.9,
+    descricao: 'Entressola Wave em ondas visíveis, cabedal azul-gelo com detalhes marinho. Amortecimento infinito e um visual futurista que impõe presença na rua e no treino.',
+    cores: ['#a9c9e0', '#1c2a52', '#c9d4dd'],
+    colorway: { base: '#bcd4e6', mesh: '#a9c9e0', stripe: '#1c2a52', sole: '#e4eaf0', accent: '#1c2a52', lace: '#dfe8f0' },
+    tamanhos: [39, 40, 41, 42, 43, 44],
+    estoque: 6,
+    img: 'mizuno-azul.jpg',
+    destaque: false,
+    tag: 'Premium'
+  },
+  {
+    id: 'rsf-mizuno-preto',
+    nome: 'Wave Prophecy Preto',
+    marca: 'Mizuno',
+    categoria: 'Corrida',
+    genero: 'Masculino',
+    preco: 899.9,
+    precoAntigo: null,
+    descricao: 'A icônica entressola Wave em preto total, com acabamento tech e presença absoluta. Conforto de elite para quem leva performance e estilo a sério.',
+    cores: ['#0e0e10', '#2a2a2e'],
+    colorway: { base: '#1a1a1e', mesh: '#0e0e10', stripe: '#3a3a40', sole: '#141416', accent: '#4a4a52', lace: '#0e0e10' },
+    tamanhos: [39, 40, 41, 42, 43, 44],
+    estoque: 9,
+    img: 'mizuno-preto.jpg',
+    destaque: false,
+    tag: 'Premium'
   }
 ];
 
