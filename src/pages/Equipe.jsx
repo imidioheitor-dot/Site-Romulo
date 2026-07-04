@@ -1,0 +1,420 @@
+import { useState, useEffect, useMemo } from 'react';
+import {
+  FiLock, FiLogOut, FiPackage, FiBox, FiSettings, FiCheck, FiX, FiTruck,
+  FiClock, FiPlus, FiMinus, FiEdit2, FiTrash2, FiEye, FiSave, FiSearch, FiExternalLink
+} from 'react-icons/fi';
+import LiquidGlass from '../components/fx/LiquidGlass';
+import ProductMedia from '../components/ProductMedia';
+import {
+  useSession, login, logout, changePassword,
+  useOrders, updateOrderStatus, ORDER_STATUS,
+  useProducts, saveProduct, deleteProduct, adjustStock, LOJA
+} from '../lib/store';
+import { brl, dataBR } from '../lib/format';
+import { useToast } from '../components/Toast';
+import './Equipe.css';
+
+export default function Equipe() {
+  const session = useSession();
+  useEffect(() => window.scrollTo(0, 0), []);
+  return session ? <Painel /> : <Login />;
+}
+
+/* ---------------- LOGIN ---------------- */
+function Login() {
+  const [pass, setPass] = useState('');
+  const [erro, setErro] = useState(false);
+  const toast = useToast();
+
+  const entrar = e => {
+    e.preventDefault();
+    if (login(pass)) {
+      toast('Bem-vindo à área da equipe.', 'ok');
+    } else {
+      setErro(true);
+      toast('Senha incorreta.', 'danger');
+      setTimeout(() => setErro(false), 600);
+    }
+  };
+
+  return (
+    <div className="equipe equipe--login">
+      <div className="container">
+        <LiquidGlass radius={28} className={`login-card rise ${erro ? 'shake' : ''}`} blur={10}>
+          <form className="login-card__inner" onSubmit={entrar}>
+            <span className="login-card__ic"><FiLock size={24} /></span>
+            <h1 className="h2" style={{ fontSize: 30 }}>Área da <em className="h-serif">equipe</em></h1>
+            <p className="muted" style={{ textAlign: 'center', marginBottom: 8 }}>
+              Acesso restrito para gestão de estoque e pedidos.
+            </p>
+            <div className="field" style={{ width: '100%' }}>
+              <label>Senha</label>
+              <input type="password" value={pass} onChange={e => setPass(e.target.value)} placeholder="••••••••" autoFocus />
+            </div>
+            <button type="submit" className="btn btn-primary cursor-target" style={{ width: '100%' }}>Entrar</button>
+            <p className="login-card__hint muted">Senha padrão inicial: <code>romulo2026</code> — altere após o primeiro acesso.</p>
+          </form>
+        </LiquidGlass>
+        <div className="page-end-space" />
+      </div>
+    </div>
+  );
+}
+
+/* ---------------- PAINEL ---------------- */
+const STATUS_META = {
+  [ORDER_STATUS.AGUARDANDO]: { label: 'Aguardando', cls: 'gold', icon: <FiClock size={11} /> },
+  [ORDER_STATUS.PAGO]: { label: 'Pago · Preparando', cls: 'ok', icon: <FiCheck size={11} /> },
+  [ORDER_STATUS.ENVIADO]: { label: 'Enviado', cls: 'ok', icon: <FiTruck size={11} /> },
+  [ORDER_STATUS.CANCELADO]: { label: 'Cancelado', cls: 'danger', icon: <FiX size={11} /> }
+};
+
+function Painel() {
+  const [tab, setTab] = useState('pedidos');
+  const toast = useToast();
+
+  const tabs = [
+    { id: 'pedidos', label: 'Pedidos', icon: <FiPackage /> },
+    { id: 'estoque', label: 'Estoque', icon: <FiBox /> },
+    { id: 'config', label: 'Configurações', icon: <FiSettings /> }
+  ];
+
+  return (
+    <div className="equipe">
+      <div className="container">
+        <header className="painel__head">
+          <div>
+            <p className="eyebrow" style={{ marginBottom: 12 }}>Painel da equipe</p>
+            <h1 className="display" style={{ fontSize: 'clamp(34px, 5vw, 62px)' }}>Gestão da <em>loja</em>.</h1>
+          </div>
+          <button className="btn btn-danger cursor-target" onClick={() => { logout(); toast('Sessão encerrada.', 'info'); }}>
+            <FiLogOut /> Sair
+          </button>
+        </header>
+
+        <nav className="painel__tabs">
+          {tabs.map(t => (
+            <button key={t.id} className={`painel__tab cursor-target ${tab === t.id ? 'is-on' : ''}`} onClick={() => setTab(t.id)}>
+              {t.icon} {t.label}
+            </button>
+          ))}
+        </nav>
+
+        {tab === 'pedidos' && <Pedidos />}
+        {tab === 'estoque' && <Estoque />}
+        {tab === 'config' && <Config />}
+
+        <div className="page-end-space" />
+      </div>
+    </div>
+  );
+}
+
+/* ---------------- PEDIDOS ---------------- */
+function Pedidos() {
+  const orders = useOrders();
+  const toast = useToast();
+  const [filtro, setFiltro] = useState('todos');
+  const [ver, setVer] = useState(null);
+
+  const stats = useMemo(() => {
+    const aguardando = orders.filter(o => o.status === ORDER_STATUS.AGUARDANDO).length;
+    const pagos = orders.filter(o => o.status === ORDER_STATUS.PAGO).length;
+    const receita = orders.filter(o => o.status !== ORDER_STATUS.CANCELADO).reduce((s, o) => s + o.total, 0);
+    return { aguardando, pagos, receita, total: orders.length };
+  }, [orders]);
+
+  const lista = filtro === 'todos' ? orders : orders.filter(o => o.status === filtro);
+
+  const confirmar = o => {
+    updateOrderStatus(o.id, ORDER_STATUS.PAGO);
+    toast(`Pedido #${o.id} confirmado. Estoque atualizado.`, 'ok');
+  };
+
+  return (
+    <div className="pedidos">
+      <div className="painel__stats">
+        <Stat label="Pedidos" value={stats.total} />
+        <Stat label="Aguardando" value={stats.aguardando} tone="gold" />
+        <Stat label="Em preparo" value={stats.pagos} tone="ok" />
+        <Stat label="Receita" value={brl(stats.receita)} />
+      </div>
+
+      <div className="pedidos__filters">
+        {['todos', ORDER_STATUS.AGUARDANDO, ORDER_STATUS.PAGO, ORDER_STATUS.ENVIADO, ORDER_STATUS.CANCELADO].map(f => (
+          <button key={f} className={`catalogo__chip cursor-target ${filtro === f ? 'is-on' : ''}`} onClick={() => setFiltro(f)}>
+            {f === 'todos' ? 'Todos' : STATUS_META[f].label}
+          </button>
+        ))}
+      </div>
+
+      {lista.length === 0 ? (
+        <div className="painel__empty">Nenhum pedido {filtro !== 'todos' ? 'com esse status' : 'ainda'}.</div>
+      ) : (
+        <div className="pedidos__list">
+          {lista.map(o => {
+            const meta = STATUS_META[o.status];
+            return (
+              <div key={o.id} className="pedido">
+                <div className="pedido__main">
+                  <div className="pedido__id">
+                    <strong>#{o.id}</strong>
+                    <span className={`tag ${meta.cls}`}>{meta.icon} {meta.label}</span>
+                  </div>
+                  <div className="pedido__cliente">
+                    <span>{o.cliente.nome}</span>
+                    <span className="muted">{o.cliente.telefone} · {o.cliente.entrega === 'entrega' ? 'Entrega' : 'Retirada'}</span>
+                  </div>
+                  <div className="pedido__meta">
+                    <span className="muted">{dataBR(o.criadoEm)}</span>
+                    <strong>{brl(o.total)}</strong>
+                  </div>
+                </div>
+
+                <div className="pedido__itens">
+                  {o.itens.map((it, i) => (
+                    <span key={i} className="pedido__item">{it.qtd}× {it.nome} <em>({it.tamanho})</em></span>
+                  ))}
+                </div>
+
+                <div className="pedido__actions">
+                  {o.comprovante && (
+                    <button className="btn btn-quiet btn-sm cursor-target" onClick={() => setVer(o)}>
+                      <FiEye /> Comprovante
+                    </button>
+                  )}
+                  <a
+                    className="btn btn-quiet btn-sm cursor-target"
+                    href={`https://wa.me/${(o.cliente.telefone || '').replace(/\D/g, '') || LOJA.whatsapp}`}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    <FiExternalLink /> Cliente
+                  </a>
+                  {o.status === ORDER_STATUS.AGUARDANDO && (
+                    <>
+                      <button className="btn btn-primary btn-sm cursor-target" onClick={() => confirmar(o)}><FiCheck /> Confirmar venda</button>
+                      <button className="btn btn-danger btn-sm cursor-target" onClick={() => { updateOrderStatus(o.id, ORDER_STATUS.CANCELADO); toast('Pedido cancelado.', 'info'); }}><FiX /></button>
+                    </>
+                  )}
+                  {o.status === ORDER_STATUS.PAGO && (
+                    <button className="btn btn-primary btn-sm cursor-target" onClick={() => { updateOrderStatus(o.id, ORDER_STATUS.ENVIADO); toast('Marcado como enviado.', 'ok'); }}><FiTruck /> Marcar enviado</button>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {ver && (
+        <div className="modal" onClick={() => setVer(null)}>
+          <div className="modal__box" onClick={e => e.stopPropagation()}>
+            <div className="modal__head">
+              <strong>Comprovante · #{ver.id}</strong>
+              <button className="cursor-target" onClick={() => setVer(null)}><FiX size={18} /></button>
+            </div>
+            {ver.comprovante?.type?.startsWith('image') ? (
+              <img src={ver.comprovante.data} alt="Comprovante" />
+            ) : (
+              <a className="btn btn-quiet cursor-target" href={ver.comprovante.data} download={ver.comprovante.name}>Baixar {ver.comprovante.name}</a>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function Stat({ label, value, tone }) {
+  return (
+    <div className={`stat stat--${tone || 'base'}`}>
+      <span className="stat__label">{label}</span>
+      <strong className="stat__value">{value}</strong>
+    </div>
+  );
+}
+
+/* ---------------- ESTOQUE ---------------- */
+const EMPTY = {
+  nome: '', marca: '', categoria: 'Casual', genero: 'Unissex', preco: '', precoAntigo: '',
+  descricao: '', estoque: 0, tamanhos: '38,39,40,41,42', tag: '',
+  cores: '#e9eef6,#3d7bff', img: '',
+  colorway: { base: '#e9eef6', mesh: '#f4f7fd', stripe: '#3d7bff', sole: '#f6f4ee', accent: '#2f5fd8', lace: '#ffffff' }
+};
+
+function Estoque() {
+  const products = useProducts();
+  const toast = useToast();
+  const [busca, setBusca] = useState('');
+  const [editando, setEditando] = useState(null);
+
+  const lista = products.filter(p => p.nome.toLowerCase().includes(busca.toLowerCase()) || p.marca.toLowerCase().includes(busca.toLowerCase()));
+
+  const totalPares = products.reduce((s, p) => s + p.estoque, 0);
+  const semEstoque = products.filter(p => p.estoque <= 0).length;
+
+  return (
+    <div className="estoque">
+      <div className="painel__stats">
+        <Stat label="Modelos" value={products.length} />
+        <Stat label="Pares em estoque" value={totalPares} />
+        <Stat label="Esgotados" value={semEstoque} tone={semEstoque ? 'danger' : 'base'} />
+      </div>
+
+      <div className="estoque__toolbar">
+        <div className="catalogo__search cursor-target" style={{ maxWidth: 360 }}>
+          <FiSearch />
+          <input placeholder="Buscar produto…" value={busca} onChange={e => setBusca(e.target.value)} />
+        </div>
+        <button className="btn btn-primary cursor-target" onClick={() => setEditando({ ...EMPTY })}><FiPlus /> Novo produto</button>
+      </div>
+
+      <div className="estoque__list">
+        {lista.map(p => (
+          <div key={p.id} className="erow">
+            <div className="erow__media"><ProductMedia produto={p} /></div>
+            <div className="erow__info">
+              <strong>{p.nome}</strong>
+              <span className="muted">{p.marca} · {p.categoria} · {brl(p.preco)}</span>
+            </div>
+            <div className="erow__stock">
+              <button className="cursor-target" onClick={() => adjustStock(p.id, -1)} aria-label="Diminuir"><FiMinus /></button>
+              <span className={p.estoque <= 0 ? 'is-zero' : ''}>{p.estoque}</span>
+              <button className="cursor-target" onClick={() => adjustStock(p.id, 1)} aria-label="Aumentar"><FiPlus /></button>
+            </div>
+            <div className="erow__actions">
+              <button className="erow__btn cursor-target" onClick={() => setEditando({ ...p, tamanhos: p.tamanhos.join(','), cores: (p.cores || []).join(','), precoAntigo: p.precoAntigo || '' })} aria-label="Editar"><FiEdit2 /></button>
+              <button className="erow__btn erow__btn--del cursor-target" onClick={() => { if (confirm(`Excluir ${p.nome}?`)) { deleteProduct(p.id); toast('Produto removido.', 'info'); } }} aria-label="Excluir"><FiTrash2 /></button>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {editando && <ProdutoForm produto={editando} onClose={() => setEditando(null)} onSaved={() => { setEditando(null); toast('Produto salvo.', 'ok'); }} />}
+    </div>
+  );
+}
+
+function ProdutoForm({ produto, onClose, onSaved }) {
+  const [f, setF] = useState(produto);
+  const set = (k, v) => setF(prev => ({ ...prev, [k]: v }));
+  const setCw = (k, v) => setF(prev => ({ ...prev, colorway: { ...prev.colorway, [k]: v } }));
+
+  const salvar = e => {
+    e.preventDefault();
+    const payload = {
+      ...f,
+      preco: parseFloat(f.preco) || 0,
+      precoAntigo: f.precoAntigo ? parseFloat(f.precoAntigo) : null,
+      estoque: parseInt(f.estoque, 10) || 0,
+      tamanhos: String(f.tamanhos).split(',').map(t => parseInt(t.trim(), 10)).filter(Boolean),
+      cores: String(f.cores).split(',').map(c => c.trim()).filter(Boolean),
+      tag: f.tag || null,
+      destaque: !!f.destaque
+    };
+    saveProduct(payload);
+    onSaved();
+  };
+
+  return (
+    <div className="modal" onClick={onClose}>
+      <div className="modal__box modal__box--wide" onClick={e => e.stopPropagation()}>
+        <div className="modal__head">
+          <strong>{produto.id ? 'Editar produto' : 'Novo produto'}</strong>
+          <button className="cursor-target" onClick={onClose}><FiX size={18} /></button>
+        </div>
+        <form className="pform" onSubmit={salvar}>
+          <div className="pform__grid">
+            <div className="field"><label>Nome</label><input value={f.nome} onChange={e => set('nome', e.target.value)} required /></div>
+            <div className="field"><label>Marca</label><input value={f.marca} onChange={e => set('marca', e.target.value)} /></div>
+            <div className="field"><label>Categoria</label><input value={f.categoria} onChange={e => set('categoria', e.target.value)} /></div>
+            <div className="field"><label>Gênero</label>
+              <select value={f.genero} onChange={e => set('genero', e.target.value)} className="cursor-target">
+                <option>Unissex</option><option>Masculino</option><option>Feminino</option>
+              </select>
+            </div>
+            <div className="field"><label>Preço (R$)</label><input type="number" step="0.01" value={f.preco} onChange={e => set('preco', e.target.value)} required /></div>
+            <div className="field"><label>Preço antigo (opcional)</label><input type="number" step="0.01" value={f.precoAntigo} onChange={e => set('precoAntigo', e.target.value)} /></div>
+            <div className="field"><label>Estoque</label><input type="number" value={f.estoque} onChange={e => set('estoque', e.target.value)} /></div>
+            <div className="field"><label>Etiqueta (ex: Novo)</label><input value={f.tag || ''} onChange={e => set('tag', e.target.value)} /></div>
+            <div className="field"><label>Tamanhos (vírgula)</label><input value={f.tamanhos} onChange={e => set('tamanhos', e.target.value)} /></div>
+            <div className="field"><label>Cores hex (vírgula)</label><input value={f.cores} onChange={e => set('cores', e.target.value)} /></div>
+            <div className="field"><label>Arquivo da foto (public/products/)</label><input value={f.img || ''} onChange={e => set('img', e.target.value)} placeholder="ex: meu-tenis.jpg" /></div>
+            <div className="field field--check">
+              <label className="pform__check cursor-target">
+                <input type="checkbox" checked={!!f.destaque} onChange={e => set('destaque', e.target.checked)} /> Exibir em destaque
+              </label>
+            </div>
+          </div>
+
+          <div className="field"><label>Descrição</label><textarea rows={3} value={f.descricao} onChange={e => set('descricao', e.target.value)} /></div>
+
+          <div className="pform__cw">
+            <span className="pform__cw-label">Cores da ilustração (usada quando não há foto)</span>
+            <div className="pform__cw-grid">
+              {['base', 'mesh', 'stripe', 'sole', 'accent', 'lace'].map(k => (
+                <label key={k} className="pform__cw-item">
+                  <input type="color" value={f.colorway?.[k] || '#ffffff'} onChange={e => setCw(k, e.target.value)} className="cursor-target" />
+                  <span>{k}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+
+          <div className="pform__actions">
+            <button type="button" className="btn btn-ghost cursor-target" onClick={onClose}>Cancelar</button>
+            <button type="submit" className="btn btn-primary cursor-target"><FiSave /> Salvar produto</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+/* ---------------- CONFIG ---------------- */
+function Config() {
+  const toast = useToast();
+  const [cur, setCur] = useState('');
+  const [nova, setNova] = useState('');
+  const [conf, setConf] = useState('');
+
+  const trocar = e => {
+    e.preventDefault();
+    if (nova.length < 6) return toast('A nova senha precisa ter ao menos 6 caracteres.', 'danger');
+    if (nova !== conf) return toast('As senhas não coincidem.', 'danger');
+    if (changePassword(cur, nova)) {
+      toast('Senha atualizada com sucesso.', 'ok');
+      setCur(''); setNova(''); setConf('');
+    } else {
+      toast('Senha atual incorreta.', 'danger');
+    }
+  };
+
+  return (
+    <div className="config">
+      <LiquidGlass radius={24} className="config__card" blur={9}>
+        <form className="config__form" onSubmit={trocar}>
+          <h2>Alterar senha da equipe</h2>
+          <p className="muted" style={{ marginBottom: 8 }}>A senha é compartilhada por quem gerencia a loja. Guarde com cuidado.</p>
+          <div className="field"><label>Senha atual</label><input type="password" value={cur} onChange={e => setCur(e.target.value)} /></div>
+          <div className="field"><label>Nova senha</label><input type="password" value={nova} onChange={e => setNova(e.target.value)} /></div>
+          <div className="field"><label>Confirmar nova senha</label><input type="password" value={conf} onChange={e => setConf(e.target.value)} /></div>
+          <button type="submit" className="btn btn-primary cursor-target"><FiSave /> Salvar nova senha</button>
+        </form>
+      </LiquidGlass>
+
+      <LiquidGlass radius={24} className="config__card" blur={9}>
+        <div className="config__form">
+          <h2>Sobre o painel</h2>
+          <ul className="config__list">
+            <li><FiCheck /> Os pedidos chegam aqui assim que o cliente envia o comprovante.</li>
+            <li><FiCheck /> Ao <strong>confirmar a venda</strong>, o estoque é baixado automaticamente.</li>
+            <li><FiCheck /> Ajuste o estoque manualmente na aba <strong>Estoque</strong> a qualquer momento.</li>
+            <li><FiCheck /> Cadastre novos modelos com foto (em <code>public/products/</code>) ou apenas com as cores da ilustração.</li>
+          </ul>
+        </div>
+      </LiquidGlass>
+    </div>
+  );
+}

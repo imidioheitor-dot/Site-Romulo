@@ -1,0 +1,108 @@
+.chroma-grid {
+  position: relative;
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(var(--cols, 3), 1fr);
+  gap: 20px;
+
+  --x: 50%;
+  --y: 50%;
+  --r: 320px;
+}
+
+.chroma-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  border-radius: 20px;
+  overflow: hidden;
+  border: 1px solid rgba(158, 197, 255, 0.12);
+  transition: border-color 0.3s ease, transform 0.5s cubic-bezier(0.52, 0.01, 0, 1);
+  background: var(--card-gradient);
+  --mouse-x: 50%;
+  --mouse-y: 50%;
+  --spotlight-color: rgba(158, 197, 255, 0.3);
+}
+
+.chroma-card:hover {
+  border-color: var(--card-border);
+  transform: translateY(-6px);
+}
+
+.chroma-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at var(--mouse-x) var(--mouse-y), var(--spotlight-color), transparent 70%);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  z-index: 3;
+}
+
+.chroma-card:hover::before {
+  opacity: 1;
+}
+
+.chroma-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 4;
+  backdrop-filter: grayscale(1) brightness(0.82);
+  -webkit-backdrop-filter: grayscale(1) brightness(0.82);
+  background: rgba(0, 0, 0, 0.001);
+  border-radius: 20px;
+
+  --mask: radial-gradient(
+    circle var(--r) at var(--x) var(--y),
+    transparent 0%,
+    transparent 18%,
+    rgba(0, 0, 0, 0.4) 55%,
+    rgba(0, 0, 0, 0.75) 82%,
+    white 100%
+  );
+  mask-image: var(--mask);
+  -webkit-mask-image: var(--mask);
+}
+
+.chroma-fade {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 5;
+  backdrop-filter: grayscale(1) brightness(0.82);
+  -webkit-backdrop-filter: grayscale(1) brightness(0.82);
+  background: rgba(0, 0, 0, 0.001);
+  border-radius: 20px;
+
+  --mask: radial-gradient(
+    circle var(--r) at var(--x) var(--y),
+    white 0%,
+    white 18%,
+    rgba(255, 255, 255, 0.65) 55%,
+    rgba(255, 255, 255, 0.25) 82%,
+    transparent 100%
+  );
+  mask-image: var(--mask);
+  -webkit-mask-image: var(--mask);
+
+  opacity: 1;
+  transition: opacity 0.25s ease;
+}
+
+@media (max-width: 900px) {
+  .chroma-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 560px) {
+  .chroma-grid {
+    grid-template-columns: 1fr;
+  }
+  .chroma-overlay,
+  .chroma-fade {
+    display: none;
+  }
+}

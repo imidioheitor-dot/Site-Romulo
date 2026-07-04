@@ -1,0 +1,104 @@
+.liquid-glass {
+  --mx: 50%;
+  --my: 40%;
+  --lg-radius: 24px;
+  --lg-blur: 10px;
+  --lg-tint: rgba(158, 197, 255, 0.06);
+
+  position: relative;
+  border-radius: var(--lg-radius);
+  isolation: isolate;
+  overflow: hidden;
+  box-shadow:
+    0 24px 70px -34px rgba(0, 0, 0, 0.85),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+
+.liquid-glass__svg {
+  position: absolute;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+.liquid-glass__refract,
+.liquid-glass__tint,
+.liquid-glass__sheen,
+.liquid-glass__edge,
+.liquid-glass__spot {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+.liquid-glass__refract {
+  z-index: 0;
+}
+
+/* fallback quando o browser não aplica url() em backdrop-filter */
+@supports not (backdrop-filter: url(#x)) {
+  .liquid-glass__refract {
+    -webkit-backdrop-filter: blur(var(--lg-blur));
+    backdrop-filter: blur(var(--lg-blur));
+  }
+}
+
+.liquid-glass__tint {
+  z-index: 1;
+  background: var(--lg-tint);
+}
+
+.liquid-glass__sheen {
+  z-index: 2;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.16) 0%,
+    rgba(255, 255, 255, 0.03) 26%,
+    rgba(255, 255, 255, 0) 46%,
+    rgba(120, 170, 255, 0.05) 74%,
+    rgba(255, 255, 255, 0.14) 100%
+  );
+  mix-blend-mode: screen;
+  opacity: 0.9;
+}
+
+.liquid-glass__edge {
+  z-index: 3;
+  padding: 1px;
+  background: linear-gradient(
+    140deg,
+    rgba(255, 255, 255, 0.55),
+    rgba(158, 197, 255, 0.16) 40%,
+    rgba(255, 255, 255, 0.06) 60%,
+    rgba(158, 197, 255, 0.4)
+  );
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+}
+
+.liquid-glass__spot {
+  z-index: 2;
+  background: radial-gradient(
+    280px circle at var(--mx) var(--my),
+    rgba(160, 200, 255, 0.16),
+    transparent 60%
+  );
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.liquid-glass:hover .liquid-glass__spot {
+  opacity: 1;
+}
+
+.liquid-glass__content {
+  position: relative;
+  z-index: 4;
+}

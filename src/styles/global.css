@@ -1,0 +1,389 @@
+/* ============================================================
+   RÔMULO SANTOS FLORES — design system
+   Void escuro + acento azul-gelo (paleta da referência MOVE
+   traduzida para o palco escuro dos sites de referência)
+   ============================================================ */
+
+:root {
+  /* Cores */
+  --void: #05070d;
+  --void-2: #090d16;
+  --surface: #0d1320;
+  --surface-2: #121a2b;
+  --line: rgba(158, 197, 255, 0.12);
+  --line-strong: rgba(158, 197, 255, 0.25);
+  --bone: #f4f7ff;
+  --mist: #b9c6de;
+  --ash: #7887a3;
+  --ice: #9ccdf5;
+  --electric: #3d7bff;
+  --electric-2: #62a0ff;
+  --aqua: #59e3d8;
+  --magenta: #c4499c;
+  --gold: #ffb829;
+  --danger: #ff5d5d;
+  --ok: #43d9a3;
+
+  /* Tipografia */
+  --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-serif: 'Cormorant Garamond', Georgia, serif;
+
+  /* Formas */
+  --r-sm: 10px;
+  --r-md: 16px;
+  --r-lg: 24px;
+  --r-pill: 999px;
+
+  --page-max: 1280px;
+
+  --nav-h: 74px;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--void);
+  color: var(--bone);
+  font-family: var(--font-sans);
+  font-weight: 300;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+::selection {
+  background: rgba(61, 123, 255, 0.35);
+  color: #fff;
+}
+
+/* Scrollbar discreta */
+::-webkit-scrollbar {
+  width: 10px;
+}
+::-webkit-scrollbar-track {
+  background: var(--void);
+}
+::-webkit-scrollbar-thumb {
+  background: #1c2740;
+  border-radius: 8px;
+  border: 2px solid var(--void);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+/* ---------- utilitários de layout ---------- */
+.container {
+  width: min(var(--page-max), calc(100% - 48px));
+  margin-inline: auto;
+}
+
+.section {
+  padding-block: clamp(72px, 10vw, 130px);
+  position: relative;
+}
+
+/* ---------- tipografia ---------- */
+.eyebrow {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--ice);
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.eyebrow::before {
+  content: '';
+  width: 34px;
+  height: 1px;
+  background: linear-gradient(90deg, var(--electric), transparent);
+}
+
+.display {
+  font-weight: 300;
+  font-size: clamp(44px, 7.5vw, 108px);
+  line-height: 1.02;
+  letter-spacing: -0.04em;
+}
+
+.display em,
+.h-serif {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 500;
+  color: var(--ice);
+}
+
+.h2 {
+  font-weight: 300;
+  font-size: clamp(32px, 4.4vw, 58px);
+  line-height: 1.06;
+  letter-spacing: -0.03em;
+}
+
+.lead {
+  font-size: clamp(16px, 1.4vw, 19px);
+  line-height: 1.65;
+  font-weight: 200;
+  color: var(--mist);
+  max-width: 52ch;
+}
+
+.muted {
+  color: var(--ash);
+}
+
+/* ---------- botões ---------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  border-radius: var(--r-pill);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  padding: 16px 30px;
+  border: 1px solid transparent;
+  transition:
+    transform 0.45s cubic-bezier(0.52, 0.01, 0, 1),
+    background 0.35s ease,
+    color 0.35s ease,
+    border-color 0.35s ease,
+    box-shadow 0.35s ease;
+  user-select: none;
+}
+
+.btn:active {
+  transform: scale(0.97);
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--electric) 0%, #2f5fd8 100%);
+  color: #fff;
+  box-shadow: 0 8px 30px rgba(61, 123, 255, 0.35);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 44px rgba(61, 123, 255, 0.5);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--bone);
+  border-color: var(--line-strong);
+}
+
+.btn-ghost:hover {
+  border-color: var(--ice);
+  color: var(--ice);
+}
+
+.btn-quiet {
+  background: rgba(158, 197, 255, 0.08);
+  color: var(--ice);
+}
+
+.btn-quiet:hover {
+  background: rgba(158, 197, 255, 0.16);
+}
+
+.btn-danger {
+  background: rgba(255, 93, 93, 0.12);
+  color: var(--danger);
+  border-color: rgba(255, 93, 93, 0.3);
+}
+
+.btn-sm {
+  padding: 10px 18px;
+  font-size: 11px;
+}
+
+.btn[disabled] {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* ---------- vidro líquido (liquid glass) ---------- */
+.glass {
+  position: relative;
+  background: linear-gradient(145deg, rgba(158, 197, 255, 0.07), rgba(158, 197, 255, 0.02));
+  -webkit-backdrop-filter: blur(22px) saturate(1.5);
+  backdrop-filter: blur(22px) saturate(1.5);
+  border: 1px solid rgba(158, 197, 255, 0.14);
+  border-radius: var(--r-lg);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.09),
+    inset 0 -20px 40px -30px rgba(120, 170, 255, 0.25),
+    0 24px 60px -30px rgba(0, 0, 0, 0.8);
+  overflow: hidden;
+}
+
+.glass::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background:
+    radial-gradient(120% 60% at 8% 0%, rgba(255, 255, 255, 0.1), transparent 45%),
+    radial-gradient(80% 40% at 100% 100%, rgba(98, 160, 255, 0.08), transparent 60%);
+}
+
+/* ---------- inputs ---------- */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.field label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ash);
+}
+
+.field input,
+.field textarea,
+.field select {
+  background: rgba(158, 197, 255, 0.05);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  color: var(--bone);
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 300;
+  padding: 14px 16px;
+  outline: none;
+  transition: border-color 0.3s ease, background 0.3s ease;
+}
+
+.field input:focus,
+.field textarea:focus,
+.field select:focus {
+  border-color: var(--electric-2);
+  background: rgba(158, 197, 255, 0.09);
+}
+
+.field select option {
+  background: var(--surface);
+  color: var(--bone);
+}
+
+/* ---------- badges ---------- */
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: var(--r-pill);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  border: 1px solid var(--line);
+  color: var(--ice);
+  background: rgba(158, 197, 255, 0.06);
+}
+
+.tag.gold {
+  color: var(--gold);
+  border-color: rgba(255, 184, 41, 0.3);
+  background: rgba(255, 184, 41, 0.07);
+}
+
+.tag.ok {
+  color: var(--ok);
+  border-color: rgba(67, 217, 163, 0.3);
+  background: rgba(67, 217, 163, 0.07);
+}
+
+.tag.danger {
+  color: var(--danger);
+  border-color: rgba(255, 93, 93, 0.3);
+  background: rgba(255, 93, 93, 0.07);
+}
+
+/* ---------- divisor tracejado ---------- */
+.hairline {
+  border: none;
+  border-top: 1px dashed var(--line-strong);
+  margin-block: 0;
+}
+
+/* ---------- animações de entrada ---------- */
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(26px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.rise {
+  animation: rise 0.9s cubic-bezier(0.52, 0.01, 0, 1) both;
+}
+
+.rise-1 { animation-delay: 0.08s; }
+.rise-2 { animation-delay: 0.18s; }
+.rise-3 { animation-delay: 0.3s; }
+.rise-4 { animation-delay: 0.44s; }
+
+/* reveal on scroll */
+.reveal {
+  opacity: 0;
+  transform: translateY(34px);
+  transition:
+    opacity 0.9s cubic-bezier(0.52, 0.01, 0, 1),
+    transform 0.9s cubic-bezier(0.52, 0.01, 0, 1);
+}
+
+.reveal.in {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rise,
+  .reveal {
+    animation: none;
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+
+/* respiro no fim das páginas para o dock não cobrir conteúdo */
+.page-end-space {
+  height: 130px;
+}
