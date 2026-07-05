@@ -4,16 +4,15 @@ import { SiNike, SiAdidas, SiPuma, SiNewbalance, SiReebok, SiJordan, SiFila, SiU
 import { FiArrowRight, FiArrowUpRight, FiFeather, FiZap, FiShield, FiRefreshCw, FiTruck, FiCreditCard, FiHeadphones } from 'react-icons/fi';
 
 import HeroBackground from '../components/HeroBackground';
-import BlurText from '../components/fx/BlurText';
+import RotatingText from '../components/fx/RotatingText';
 import GradualBlur from '../components/fx/GradualBlur';
 import LogoLoop from '../components/fx/LogoLoop';
 import LiquidGlass from '../components/fx/LiquidGlass';
 import ShapeBlur from '../components/fx/ShapeBlur';
 import StickerPeel from '../components/fx/StickerPeel';
-import Strands from '../components/fx/Strands';
-import MetaBalls from '../components/fx/MetaBalls';
+import Cubes from '../components/fx/Cubes';
 import ProductCard from '../components/ProductCard';
-import TenisArt from '../components/TenisArt';
+import SplitCardMedia from '../components/SplitCardMedia';
 import { useProducts } from '../lib/store';
 import { useReveal } from '../lib/useReveal';
 import './Home.css';
@@ -88,23 +87,30 @@ export default function Home() {
         <div className="hero__sticky">
           <HeroBackground />
 
-          <div className="hero__metaballs" aria-hidden="true">
-            <MetaBalls color="#4d86ff" cursorBallColor="#9ccdf5" ballCount={11} animationSize={26} speed={0.28} clumpFactor={0.9} cursorBallSize={2} enableTransparency />
-          </div>
-
           {/* Camada 1 — entrada */}
           <div className="container hero__inner hero__layer hero__layer--1">
             <div className="hero__eyebrow rise">
-              <span className="tag">Coleção 2026 · Rômulo Santos Flores</span>
+              <span className="tag">Coleção 2026 · Rômulo Santos</span>
             </div>
 
-            <BlurText
-              text="Sinta a leveza."
-              className="hero__title"
-              animateBy="words"
-              delay={180}
-              stepDuration={0.5}
-            />
+            <h1 className="hero__title rise">
+              <span className="hero__title-line">
+                <span className="hero__sinta">Sinta a</span>
+                <RotatingText
+                  texts={['leveza.', 'conforto.', 'elegância.', 'maciez.', 'atitude.', 'presença.', 'durabilidade.', 'sofisticação.']}
+                  mainClassName="hero__rotating"
+                  splitLevelClassName="hero__rotating-split"
+                  staggerFrom="last"
+                  staggerDuration={0.015}
+                  rotationInterval={2600}
+                  initial={{ y: '110%', opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  exit={{ y: '-120%', opacity: 0 }}
+                  transition={{ type: 'spring', damping: 34, stiffness: 480 }}
+                />
+              </span>
+              <span className="hero__brand">Rômulo Santos</span>
+            </h1>
 
             <p className="hero__sub rise rise-2">
               Sapatos para o dia a dia que mantêm a <em>elegância</em> — selecionados a dedo,
@@ -189,7 +195,7 @@ export default function Home() {
             <ShapeBlur variation={0} shapeSize={0.62} roundness={0.5} borderSize={0.045} circleSize={0.35} circleEdge={0.9} color="#62a0ff" pixelRatioProp={typeof window !== 'undefined' ? window.devicePixelRatio : 1} />
           </div>
           <div className="split-card__sticker" aria-hidden="true">
-            <StickerPeel width={230} rotate={-8} peelBackHoverPct={26} peelDirection={-24} shadowIntensity={0.5} renderImage={() => <TenisArt colorway={techProduct?.colorway} seed={7} />} />
+            <StickerPeel width={230} rotate={-8} peelBackHoverPct={26} peelDirection={-24} shadowIntensity={0.5} renderImage={() => <SplitCardMedia img="card-amortecimento.jpg" colorway={techProduct?.colorway} seed={7} />} />
           </div>
           <div className="split-card__body">
             <span className="tag">Tecnologia</span>
@@ -204,7 +210,7 @@ export default function Home() {
             <ShapeBlur variation={2} shapeSize={0.7} roundness={0.5} borderSize={0.05} circleSize={0.4} circleEdge={1} color="#59e3d8" pixelRatioProp={typeof window !== 'undefined' ? window.devicePixelRatio : 1} />
           </div>
           <div className="split-card__sticker" aria-hidden="true">
-            <StickerPeel width={230} rotate={9} peelBackHoverPct={26} peelDirection={20} shadowIntensity={0.5} renderImage={() => <TenisArt colorway={designProduct?.colorway} seed={12} />} />
+            <StickerPeel width={230} rotate={9} peelBackHoverPct={26} peelDirection={20} shadowIntensity={0.5} renderImage={() => <SplitCardMedia img="card-estilo.jpg" colorway={designProduct?.colorway} seed={12} />} />
           </div>
           <div className="split-card__body">
             <span className="tag">Design</span>
@@ -215,10 +221,22 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ===================== FAIXA STRANDS / CTA ===================== */}
+      {/* ===================== FAIXA CUBES / CTA ===================== */}
       <section className="section home-cta">
-        <div className="home-cta__strands" aria-hidden="true">
-          <Strands colors={['#3d7bff', '#59e3d8', '#9ccdf5', '#c4499c']} count={4} speed={0.5} amplitude={1} intensity={0.7} glow={2.8} scale={1.7} />
+        <div className="home-cta__cubes" aria-hidden="true">
+          <Cubes
+            gridSize={9}
+            maxAngle={55}
+            radius={4}
+            cellGap={6}
+            borderStyle="1px solid rgba(158,197,255,0.18)"
+            faceColor="#0b1120"
+            shadow={false}
+            autoAnimate
+            rippleOnClick
+            rippleColor="#3d7bff"
+            rippleSpeed={1.6}
+          />
         </div>
         <div className="container">
           <LiquidGlass className="home-cta__glass reveal" radius={30} blur={12}>

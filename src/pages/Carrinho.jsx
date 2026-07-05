@@ -6,6 +6,7 @@ import {
   FiShoppingBag, FiCreditCard, FiClock, FiExternalLink
 } from 'react-icons/fi';
 import LiquidGlass from '../components/fx/LiquidGlass';
+import Antigravity from '../components/fx/Antigravity';
 import ProductMedia from '../components/ProductMedia';
 import { useProducts, useCart, cartDetails, setCartQty, createOrder, LOJA } from '../lib/store';
 import { buildPixPayload } from '../lib/pix';
@@ -176,6 +177,22 @@ export default function Carrinho() {
 
   return (
     <div className="carrinho">
+      <div className="carrinho__ambient" aria-hidden="true">
+        <Antigravity
+          count={220}
+          magnetRadius={7}
+          ringRadius={12}
+          waveSpeed={1}
+          waveAmplitude={0.7}
+          particleSize={0.55}
+          lerpSpeed={0.05}
+          color="#3d7bff"
+          autoAnimate
+          particleVariance={1}
+          depthFactor={1.1}
+          pulseSpeed={1.6}
+        />
+      </div>
       <div className="container">
         <header className="carrinho__head">
           <h1 className="display" style={{ fontSize: 'clamp(38px, 6vw, 76px)' }}>Sua <em>sacola</em>.</h1>

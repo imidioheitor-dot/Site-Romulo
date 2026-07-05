@@ -4,18 +4,6 @@
   overflow: hidden;
 }
 
-.contato__strands {
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 60%;
-  height: 70vh;
-  z-index: -1;
-  opacity: 0.4;
-  mask-image: radial-gradient(70% 80% at 70% 20%, #000, transparent 70%);
-  -webkit-mask-image: radial-gradient(70% 80% at 70% 20%, #000, transparent 70%);
-}
-
 .contato__head {
   padding-bottom: 50px;
 }

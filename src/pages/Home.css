@@ -95,18 +95,51 @@
 }
 
 .hero__title {
+  display: flex;
+  flex-direction: column;
   font-weight: 300;
-  font-size: clamp(60px, 12vw, 168px);
-  line-height: 0.92;
-  letter-spacing: -0.05em;
+  font-size: clamp(44px, 8.4vw, 122px);
+  line-height: 0.95;
+  letter-spacing: -0.045em;
   color: var(--bone);
   margin-bottom: 8px;
 }
 
-.hero__title span:last-child {
+.hero__title-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.28em;
+}
+
+.hero__sinta {
+  color: var(--bone);
+}
+
+/* palavra rotativa — o acento vivo do headline */
+.hero__rotating {
   color: var(--ice);
   font-family: var(--font-serif);
   font-style: italic;
+  display: inline-flex;
+}
+
+.hero__rotating-split {
+  overflow: hidden;
+  padding-top: 0.14em;
+  padding-bottom: 0.16em;
+  margin-top: -0.14em;
+  margin-bottom: -0.16em;
+}
+
+/* nome da loja — assinatura final */
+.hero__brand {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 0.62em;
+  color: var(--mist);
+  letter-spacing: -0.02em;
+  margin-top: 0.16em;
 }
 
 .hero__sub {
@@ -359,19 +392,28 @@
   gap: 15px;
 }
 
-/* ===================== CTA STRANDS ===================== */
+/* ===================== CTA CUBES ===================== */
 .home-cta {
   position: relative;
   overflow: hidden;
 }
 
-.home-cta__strands {
+.home-cta__cubes {
   position: absolute;
   inset: 0;
   z-index: 0;
-  opacity: 0.5;
-  mask-image: radial-gradient(70% 100% at 50% 50%, #000 30%, transparent 80%);
-  -webkit-mask-image: radial-gradient(70% 100% at 50% 50%, #000 30%, transparent 80%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.7;
+  mask-image: radial-gradient(75% 100% at 50% 50%, #000 25%, transparent 78%);
+  -webkit-mask-image: radial-gradient(75% 100% at 50% 50%, #000 25%, transparent 78%);
+}
+
+/* o Cubes é quadrado; deixamos largo o suficiente para preencher a faixa */
+.home-cta__cubes .cubes-animation {
+  width: min(120%, 900px);
+  opacity: 0.9;
 }
 
 .home-cta__glass {

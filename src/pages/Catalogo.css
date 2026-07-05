@@ -3,6 +3,14 @@
   padding-bottom: 40px;
 }
 
+.catalogo__title {
+  position: relative;
+}
+
+.catalogo__vp {
+  display: inline;
+}
+
 .catalogo__head .lead {
   max-width: 60ch;
 }

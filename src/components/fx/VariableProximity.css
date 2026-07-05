@@ -1,0 +1,17 @@
+/* Roboto Flex é carregado via <link> em index.html (não use @import aqui:
+   um @import para um host bloqueado trava o carregamento do chunk). */
+.variable-proximity {
+  font-family: 'Roboto Flex', 'Inter', sans-serif;
+}
+
+.variable-proximity .sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

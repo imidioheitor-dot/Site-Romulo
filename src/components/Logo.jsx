@@ -53,7 +53,7 @@ export default function Logo({ size = 34, withText = true }) {
               marginTop: 3
             }}
           >
-            Flores · Calçados
+            Calçados
           </span>
         </span>
       )}

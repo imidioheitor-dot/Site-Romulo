@@ -1,7 +1,8 @@
-import { useMemo, useState, useEffect } from 'react';
+import { useMemo, useState, useEffect, useRef } from 'react';
 import { FiSearch, FiSliders } from 'react-icons/fi';
 import ProductCard from '../components/ProductCard';
 import GradualBlur from '../components/fx/GradualBlur';
+import VariableProximity from '../components/fx/VariableProximity';
 import { useProducts } from '../lib/store';
 import { useReveal } from '../lib/useReveal';
 import './Catalogo.css';
@@ -20,6 +21,7 @@ export default function Catalogo() {
   const [genero, setGenero] = useState('Todos');
   const [marca, setMarca] = useState('Todas');
   const [ordem, setOrdem] = useState('destaque');
+  const headRef = useRef(null);
 
   useEffect(() => window.scrollTo(0, 0), []);
 
@@ -53,7 +55,18 @@ export default function Catalogo() {
     <div className="catalogo">
       <section className="container catalogo__head">
         <p className="eyebrow rise" style={{ marginBottom: 20 }}>O catálogo completo</p>
-        <h1 className="display rise rise-1">Encontre o seu <em>par</em>.</h1>
+        <h1 className="display rise rise-1 catalogo__title" ref={headRef}>
+          <VariableProximity
+            label="Encontre o seu"
+            containerRef={headRef}
+            className="catalogo__vp cursor-target"
+            fromFontVariationSettings="'wght' 300, 'opsz' 12"
+            toFontVariationSettings="'wght' 900, 'opsz' 40"
+            radius={130}
+            falloff="gaussian"
+          />{' '}
+          <em>par</em>.
+        </h1>
         <p className="lead rise rise-2" style={{ marginTop: 18 }}>
           Do casual ao social, do conforto à corrida — {products.length} modelos selecionados
           com o equilíbrio certo entre estilo, qualidade e preço.

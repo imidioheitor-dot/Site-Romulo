@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { FiPhone, FiMail, FiMapPin, FiClock, FiSend, FiInstagram, FiExternalLink } from 'react-icons/fi';
 import LiquidGlass from '../components/fx/LiquidGlass';
-import Strands from '../components/fx/Strands';
 import { LOJA } from '../lib/store';
 import { useToast } from '../components/Toast';
 import { useReveal } from '../lib/useReveal';
@@ -27,10 +26,6 @@ export default function Contato() {
 
   return (
     <div className="contato">
-      <div className="contato__strands" aria-hidden="true">
-        <Strands colors={['#3d7bff', '#59e3d8', '#9ccdf5']} count={3} speed={0.4} intensity={0.6} glow={2.6} scale={1.9} />
-      </div>
-
       <section className="container contato__head">
         <p className="eyebrow rise" style={{ marginBottom: 20 }}>Fale com a gente</p>
         <h1 className="display rise rise-1">Vamos <em>conversar</em>?</h1>

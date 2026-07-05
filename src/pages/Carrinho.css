@@ -1,5 +1,28 @@
 .carrinho {
   padding-top: calc(var(--nav-h) + 50px);
+  position: relative;
+}
+
+/* campo de partículas sutil atrás do carrinho — não bloqueia cliques */
+.carrinho__ambient {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.32;
+  mask-image: radial-gradient(90% 80% at 50% 40%, #000 30%, transparent 78%);
+  -webkit-mask-image: radial-gradient(90% 80% at 50% 40%, #000 30%, transparent 78%);
+}
+
+.carrinho .container {
+  position: relative;
+  z-index: 1;
+}
+
+@media (max-width: 640px) {
+  .carrinho__ambient {
+    opacity: 0.2;
+  }
 }
 
 .carrinho__head {
