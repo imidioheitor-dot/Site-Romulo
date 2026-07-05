@@ -1,3 +1,94 @@
+/* fundo "liquid glass" sutil da landing (CSS puro) — evita áreas 100% pretas.
+   Blobs de luz que vagam lentamente + um brilho de vidro atravessando. */
+.home__bg {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  overflow: hidden;
+  opacity: 0.55;
+  mask-image: linear-gradient(180deg, transparent 0%, #000 14%, #000 100%);
+  -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 14%, #000 100%);
+}
+
+.home__bg-blob {
+  position: absolute;
+  width: 46vw;
+  height: 46vw;
+  border-radius: 50%;
+  filter: blur(90px);
+  mix-blend-mode: screen;
+  opacity: 0.5;
+  will-change: transform;
+}
+
+.home__bg-blob--1 {
+  background: radial-gradient(circle, rgba(61, 123, 255, 0.55), transparent 68%);
+  top: 12%;
+  left: 8%;
+  animation: bg-drift-1 26s ease-in-out infinite;
+}
+
+.home__bg-blob--2 {
+  background: radial-gradient(circle, rgba(89, 227, 216, 0.4), transparent 68%);
+  top: 42%;
+  right: 6%;
+  animation: bg-drift-2 32s ease-in-out infinite;
+}
+
+.home__bg-blob--3 {
+  width: 38vw;
+  height: 38vw;
+  background: radial-gradient(circle, rgba(120, 90, 220, 0.4), transparent 68%);
+  bottom: 6%;
+  left: 40%;
+  animation: bg-drift-3 30s ease-in-out infinite;
+}
+
+/* brilho de vidro diagonal, quase imperceptível, deslizando devagar */
+.home__bg-sheen {
+  position: absolute;
+  inset: -40% -20%;
+  background: repeating-linear-gradient(
+    115deg,
+    transparent 0 90px,
+    rgba(158, 197, 255, 0.05) 90px 92px,
+    transparent 92px 220px
+  );
+  mix-blend-mode: screen;
+  opacity: 0.5;
+  animation: bg-sheen 40s linear infinite;
+}
+
+@keyframes bg-drift-1 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(26vw, 18vh) scale(1.12); }
+  66% { transform: translate(10vw, 34vh) scale(0.95); }
+}
+
+@keyframes bg-drift-2 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  40% { transform: translate(-30vw, 14vh) scale(1.1); }
+  70% { transform: translate(-14vw, -18vh) scale(0.94); }
+}
+
+@keyframes bg-drift-3 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(-22vw, -26vh) scale(1.15); }
+}
+
+@keyframes bg-sheen {
+  from { transform: translateX(-12%); }
+  to { transform: translateX(12%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home__bg-blob,
+  .home__bg-sheen {
+    animation: none;
+  }
+}
+
 /* ===================== HERO SCROLÁVEL ===================== */
 .hero {
   --p: 0;
@@ -402,18 +493,21 @@
   position: absolute;
   inset: 0;
   z-index: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0.7;
-  mask-image: radial-gradient(75% 100% at 50% 50%, #000 25%, transparent 78%);
-  -webkit-mask-image: radial-gradient(75% 100% at 50% 50%, #000 25%, transparent 78%);
+  overflow: hidden;
+  opacity: 0.6;
+  mask-image: radial-gradient(85% 130% at 50% 50%, #000 32%, transparent 84%);
+  -webkit-mask-image: radial-gradient(85% 130% at 50% 50%, #000 32%, transparent 84%);
 }
 
-/* o Cubes é quadrado; deixamos largo o suficiente para preencher a faixa */
+/* o Cubes é quadrado — centralizamos e deixamos preencher toda a largura da
+   faixa, recortando o excedente vertical (mostra uma tira de cubos). */
 .home-cta__cubes .cubes-animation {
-  width: min(120%, 900px);
-  opacity: 0.9;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: max(100%, 1000px);
+  aspect-ratio: 1 / 1;
 }
 
 .home-cta__glass {

@@ -32,7 +32,7 @@ const PILLARS = [
   { icon: <FiFeather />, t: 'Leveza', d: 'Materiais ultraleves' },
   { icon: <FiZap />, t: 'Performance', d: 'Feito para o ritmo' },
   { icon: <FiShield />, t: 'Durabilidade', d: 'Construção que dura' },
-  { icon: <FiRefreshCw />, t: 'Conforto', d: 'O dia todo, sem peso' }
+  { icon: <FiRefreshCw />, t: 'Maciez', d: 'O dia todo, sem peso' }
 ];
 
 const PERKS = [
@@ -82,6 +82,15 @@ export default function Home() {
 
   return (
     <div className="home">
+      {/* fundo "liquid glass" bem sutil (CSS puro, sem WebGL) para as áreas
+          escuras não ficarem chapadas de preto */}
+      <div className="home__bg" aria-hidden="true">
+        <span className="home__bg-blob home__bg-blob--1" />
+        <span className="home__bg-blob home__bg-blob--2" />
+        <span className="home__bg-blob home__bg-blob--3" />
+        <span className="home__bg-sheen" />
+      </div>
+
       {/* ===================== HERO SCROLÁVEL ===================== */}
       <section className="hero" ref={heroRef}>
         <div className="hero__sticky">
@@ -97,7 +106,7 @@ export default function Home() {
               <span className="hero__title-line">
                 <span className="hero__sinta">Sinta a</span>
                 <RotatingText
-                  texts={['leveza.', 'conforto.', 'elegância.', 'maciez.', 'atitude.', 'presença.', 'durabilidade.', 'sofisticação.']}
+                  texts={['leveza.', 'elegância.', 'maciez.', 'atitude.', 'presença.', 'durabilidade.', 'sofisticação.']}
                   mainClassName="hero__rotating"
                   splitLevelClassName="hero__rotating-split"
                   staggerFrom="last"
@@ -114,7 +123,7 @@ export default function Home() {
 
             <p className="hero__sub rise rise-2">
               Sapatos para o dia a dia que mantêm a <em>elegância</em> — selecionados a dedo,
-              com o conforto que te acompanha e o preço que cabe no bolso.
+              com o caimento que te acompanha e o preço que cabe no bolso.
             </p>
 
             <div className="hero__cta rise rise-3">
