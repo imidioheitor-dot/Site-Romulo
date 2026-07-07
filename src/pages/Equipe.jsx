@@ -4,11 +4,12 @@ import {
   FiClock, FiPlus, FiMinus, FiEdit2, FiTrash2, FiEye, FiSave, FiSearch, FiExternalLink
 } from 'react-icons/fi';
 import LiquidGlass from '../components/fx/LiquidGlass';
+import AnimatedTitle from '../components/AnimatedTitle';
 import ProductMedia from '../components/ProductMedia';
 import {
   useSession, login, logout, changePassword,
   useOrders, updateOrderStatus, ORDER_STATUS,
-  useProducts, saveProduct, deleteProduct, adjustStock, LOJA
+  useProducts, saveProduct, deleteProduct, adjustStock, LOJA, CATEGORIAS
 } from '../lib/store';
 import { brl, dataBR } from '../lib/format';
 import { useToast } from '../components/Toast';
@@ -85,7 +86,7 @@ function Painel() {
         <header className="painel__head">
           <div>
             <p className="eyebrow" style={{ marginBottom: 12 }}>Painel da equipe</p>
-            <h1 className="display" style={{ fontSize: 'clamp(34px, 5vw, 62px)' }}>Gestão da <em>loja</em>.</h1>
+            <AnimatedTitle className="display" style={{ fontSize: 'clamp(34px, 5vw, 62px)' }} pre="Gestão da" accent="loja" post="." />
           </div>
           <button className="btn btn-danger cursor-target" onClick={() => { logout(); toast('Sessão encerrada.', 'info'); }}>
             <FiLogOut /> Sair
@@ -237,10 +238,10 @@ function Stat({ label, value, tone }) {
 
 /* ---------------- ESTOQUE ---------------- */
 const EMPTY = {
-  nome: '', marca: '', categoria: 'Casual', genero: 'Unissex', preco: '', precoAntigo: '',
+  nome: '', marca: '', tipo: 'Tênis', categoria: '', genero: 'Unissex', preco: '', precoAntigo: '',
   descricao: '', estoque: 0, tamanhos: '38,39,40,41,42', tag: '',
-  cores: '#e9eef6,#3d7bff', img: '',
-  colorway: { base: '#e9eef6', mesh: '#f4f7fd', stripe: '#3d7bff', sole: '#f6f4ee', accent: '#2f5fd8', lace: '#ffffff' }
+  cores: '#e9eef6,#c0663a', img: '',
+  colorway: { base: '#e9eef6', mesh: '#f4f7fd', stripe: '#c0663a', sole: '#f6f4ee', accent: '#8a4526', lace: '#ffffff' }
 };
 
 function Estoque() {
@@ -328,7 +329,12 @@ function ProdutoForm({ produto, onClose, onSaved }) {
           <div className="pform__grid">
             <div className="field"><label>Nome</label><input value={f.nome} onChange={e => set('nome', e.target.value)} required /></div>
             <div className="field"><label>Marca</label><input value={f.marca} onChange={e => set('marca', e.target.value)} /></div>
-            <div className="field"><label>Categoria</label><input value={f.categoria} onChange={e => set('categoria', e.target.value)} /></div>
+            <div className="field"><label>Categoria (aba do site)</label>
+              <select value={f.tipo || 'Tênis'} onChange={e => set('tipo', e.target.value)} className="cursor-target">
+                {CATEGORIAS.map(c => <option key={c} value={c}>{c}</option>)}
+              </select>
+            </div>
+            <div className="field"><label>Subcategoria (ex: Casual)</label><input value={f.categoria} onChange={e => set('categoria', e.target.value)} /></div>
             <div className="field"><label>Gênero</label>
               <select value={f.genero} onChange={e => set('genero', e.target.value)} className="cursor-target">
                 <option>Unissex</option><option>Masculino</option><option>Feminino</option>

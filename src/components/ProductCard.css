@@ -23,8 +23,8 @@
   position: relative;
   aspect-ratio: 4 / 3;
   background:
-    radial-gradient(120% 90% at 50% 20%, rgba(158, 197, 255, 0.12), transparent 60%),
-    linear-gradient(180deg, #0e1626, #0a0f1a);
+    radial-gradient(120% 90% at 50% 20%, rgba(224, 183, 138, 0.12), transparent 60%),
+    linear-gradient(180deg, #2a1e15, #1a120c);
   display: grid;
   place-items: center;
   overflow: hidden;
@@ -98,7 +98,7 @@
   display: grid;
   place-items: center;
   color: #fff;
-  background: rgba(61, 123, 255, 0.9);
+  background: rgba(192, 102, 58, 0.9);
   opacity: 0;
   transform: translateY(8px) scale(0.9);
   transition: all 0.45s cubic-bezier(0.52, 0.01, 0, 1);

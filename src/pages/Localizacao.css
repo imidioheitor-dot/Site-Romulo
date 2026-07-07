@@ -45,7 +45,7 @@
   padding: 20px;
   border-radius: var(--r-md);
   border: 1px solid var(--line);
-  background: rgba(158, 197, 255, 0.03);
+  background: rgba(224, 183, 138, 0.03);
 }
 
 .local__ic {
@@ -55,7 +55,7 @@
   display: grid;
   place-items: center;
   color: var(--ice);
-  background: rgba(158, 197, 255, 0.08);
+  background: rgba(224, 183, 138, 0.08);
   border: 1px solid var(--line);
   font-size: 18px;
   flex-shrink: 0;
@@ -76,6 +76,42 @@
 
 @media (max-width: 900px) {
   .local__layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* galeria da loja física */
+.local__gallery-wrap {
+  padding-top: 70px;
+}
+
+.local__gallery {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.local__photo {
+  aspect-ratio: 3 / 4;
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  border: 1px solid var(--line);
+  background: var(--surface);
+}
+
+.local__photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.7s cubic-bezier(0.52, 0.01, 0, 1);
+}
+
+.local__photo:hover img {
+  transform: scale(1.05);
+}
+
+@media (max-width: 720px) {
+  .local__gallery {
     grid-template-columns: 1fr;
   }
 }

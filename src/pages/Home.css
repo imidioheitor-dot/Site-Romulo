@@ -23,14 +23,14 @@
 }
 
 .home__bg-blob--1 {
-  background: radial-gradient(circle, rgba(61, 123, 255, 0.55), transparent 68%);
+  background: radial-gradient(circle, rgba(192, 102, 58, 0.55), transparent 68%);
   top: 12%;
   left: 8%;
   animation: bg-drift-1 26s ease-in-out infinite;
 }
 
 .home__bg-blob--2 {
-  background: radial-gradient(circle, rgba(89, 227, 216, 0.4), transparent 68%);
+  background: radial-gradient(circle, rgba(207, 155, 107, 0.4), transparent 68%);
   top: 42%;
   right: 6%;
   animation: bg-drift-2 32s ease-in-out infinite;
@@ -39,7 +39,7 @@
 .home__bg-blob--3 {
   width: 38vw;
   height: 38vw;
-  background: radial-gradient(circle, rgba(120, 90, 220, 0.4), transparent 68%);
+  background: radial-gradient(circle, rgba(176, 85, 62, 0.4), transparent 68%);
   bottom: 6%;
   left: 40%;
   animation: bg-drift-3 30s ease-in-out infinite;
@@ -52,7 +52,7 @@
   background: repeating-linear-gradient(
     115deg,
     transparent 0 90px,
-    rgba(158, 197, 255, 0.05) 90px 92px,
+    rgba(224, 183, 138, 0.05) 90px 92px,
     transparent 92px 220px
   );
   mix-blend-mode: screen;
@@ -349,7 +349,7 @@
   display: grid;
   place-items: center;
   color: var(--ice);
-  background: rgba(158, 197, 255, 0.08);
+  background: rgba(224, 183, 138, 0.08);
   border: 1px solid var(--line);
   font-size: 19px;
   flex-shrink: 0;
@@ -397,7 +397,7 @@
 }
 
 .home-featured__all:hover {
-  background: rgba(158, 197, 255, 0.1);
+  background: rgba(224, 183, 138, 0.1);
   border-color: var(--line-strong);
 }
 
@@ -534,7 +534,7 @@
   padding: 22px;
   border-radius: var(--r-md);
   border: 1px solid var(--line);
-  background: rgba(158, 197, 255, 0.03);
+  background: rgba(224, 183, 138, 0.03);
 }
 
 .perk__ic {
@@ -545,7 +545,7 @@
   display: grid;
   place-items: center;
   color: var(--ice);
-  background: rgba(158, 197, 255, 0.08);
+  background: rgba(224, 183, 138, 0.08);
   font-size: 18px;
 }
 

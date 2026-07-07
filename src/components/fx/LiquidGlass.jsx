@@ -17,7 +17,7 @@ export default function LiquidGlass({
   displace = 14,
   freq = 0.008,
   interactive = true,
-  tint = 'rgba(158, 197, 255, 0.06)',
+  tint = 'rgba(224, 183, 138, 0.06)',
   style,
   as: Tag = 'div',
   ...rest

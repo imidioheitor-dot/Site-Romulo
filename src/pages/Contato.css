@@ -32,7 +32,7 @@
   padding: 20px;
   border-radius: var(--r-md);
   border: 1px solid var(--line);
-  background: rgba(158, 197, 255, 0.03);
+  background: rgba(224, 183, 138, 0.03);
   transition: all 0.35s ease;
 }
 
@@ -48,7 +48,7 @@
   display: grid;
   place-items: center;
   color: var(--ice);
-  background: rgba(158, 197, 255, 0.08);
+  background: rgba(224, 183, 138, 0.08);
   border: 1px solid var(--line);
   font-size: 19px;
   flex-shrink: 0;

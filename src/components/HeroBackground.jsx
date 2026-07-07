@@ -28,7 +28,7 @@ export default function HeroBackground() {
   return (
     <div className="hero-bg">
       <div className="hero-bg__chrome">
-        <LiquidChrome baseColor={[0.05, 0.09, 0.2]} speed={0.35} amplitude={0.45} frequencyX={2.6} frequencyY={2.2} interactive />
+        <LiquidChrome baseColor={[0.16, 0.09, 0.05]} speed={0.35} amplitude={0.45} frequencyX={2.6} frequencyY={2.2} interactive />
       </div>
 
       <video

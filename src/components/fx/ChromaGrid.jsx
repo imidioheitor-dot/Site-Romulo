@@ -80,8 +80,8 @@ export const ChromaGrid = ({
           onMouseMove={handleCardMove}
           onClick={() => c.onClick?.(c)}
           style={{
-            '--card-border': c.borderColor || 'rgba(158,197,255,0.25)',
-            '--card-gradient': c.gradient || 'linear-gradient(145deg, #16223b, #05070d)',
+            '--card-border': c.borderColor || 'rgba(224, 183, 138,0.25)',
+            '--card-gradient': c.gradient || 'linear-gradient(145deg, #16223b, #17110d)',
             cursor: c.onClick ? 'pointer' : 'default'
           }}
         >

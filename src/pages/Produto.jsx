@@ -21,9 +21,11 @@ export default function Produto() {
 
   useEffect(() => {
     window.scrollTo(0, 0);
-    setTamanho(null);
+    // óculos/itens de tamanho único já vêm selecionados
+    const t = products.find(p => p.id === id)?.tamanhos;
+    setTamanho(t && t.length === 1 ? t[0] : null);
     setQtd(1);
-  }, [id]);
+  }, [id, products]);
 
   const relacionados = useMemo(
     () => products.filter(p => p.id !== id && (p.categoria === produto?.categoria || p.marca === produto?.marca)).slice(0, 4),
@@ -131,8 +133,10 @@ export default function Produto() {
 
           <ul className="produto__facts">
             <li><FiCheck /> Gênero: {produto.genero}</li>
-            <li><FiCheck /> Numeração {produto.tamanhos[0]} ao {produto.tamanhos[produto.tamanhos.length - 1]}</li>
-            <li><FiCheck /> Selecionado pela curadoria Rômulo Santos Flores</li>
+            {produto.tipo === 'Tênis' && produto.tamanhos.length > 1 && (
+              <li><FiCheck /> Numeração {produto.tamanhos[0]} ao {produto.tamanhos[produto.tamanhos.length - 1]}</li>
+            )}
+            <li><FiCheck /> Selecionado pela curadoria Casa Mikka</li>
           </ul>
         </div>
       </section>

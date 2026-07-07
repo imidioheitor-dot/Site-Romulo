@@ -4,9 +4,9 @@ export default function Logo({ size = 34, withText = true }) {
       <svg width={size} height={size} viewBox="0 0 48 48" fill="none" aria-hidden="true">
         <defs>
           <linearGradient id="rsf-logo-g" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0" stopColor="#62a0ff" />
-            <stop offset="0.55" stopColor="#3d7bff" />
-            <stop offset="1" stopColor="#59e3d8" />
+            <stop offset="0" stopColor="#d8834e" />
+            <stop offset="0.55" stopColor="#c0663a" />
+            <stop offset="1" stopColor="#cf9b6b" />
           </linearGradient>
         </defs>
         <rect x="1" y="1" width="46" height="46" rx="13" stroke="url(#rsf-logo-g)" strokeWidth="1.4" opacity="0.6" />
@@ -41,7 +41,7 @@ export default function Logo({ size = 34, withText = true }) {
               letterSpacing: '0.01em'
             }}
           >
-            Rômulo Santos
+            Casa Mikka
           </span>
           <span
             style={{
@@ -53,7 +53,7 @@ export default function Logo({ size = 34, withText = true }) {
               marginTop: 3
             }}
           >
-            Calçados
+            Boutique
           </span>
         </span>
       )}

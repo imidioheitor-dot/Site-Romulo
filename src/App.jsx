@@ -61,7 +61,7 @@ export default function App() {
             enableMagnetism={false}
             clickEffect={false}
             spotlightRadius={340}
-            glowColor="61, 123, 255"
+            glowColor="192, 102, 58"
           />
         </div>
       )}
@@ -75,6 +75,7 @@ export default function App() {
           <Routes location={loc}>
             <Route path="/" element={<Home />} />
             <Route path="/catalogo" element={<Catalogo />} />
+            <Route path="/catalogo/:tipo" element={<Catalogo />} />
             <Route path="/produto/:id" element={<Produto />} />
             <Route path="/carrinho" element={<Carrinho />} />
             <Route path="/contato" element={<Contato />} />

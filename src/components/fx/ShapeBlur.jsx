@@ -130,7 +130,7 @@ const ShapeBlur = ({
   borderSize = 0.05,
   circleSize = 0.3,
   circleEdge = 0.5,
-  color = '#9ccdf5'
+  color = '#e6bd8c'
 }) => {
   const mountRef = useRef();
 

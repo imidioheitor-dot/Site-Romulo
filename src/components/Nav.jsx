@@ -1,13 +1,15 @@
 import { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { FiShoppingBag, FiMenu, FiX } from 'react-icons/fi';
+import { FiShoppingBag, FiMenu, FiX, FiChevronDown } from 'react-icons/fi';
 import Logo from './Logo';
-import { useCart } from '../lib/store';
+import { useCart, CATEGORIAS } from '../lib/store';
 import './Nav.css';
+
+const slug = s => s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
 
 const LINKS = [
   { to: '/', label: 'Início' },
-  { to: '/catalogo', label: 'Catálogo' },
+  { to: '/catalogo', label: 'Catálogo', categorias: true },
   { to: '/contato', label: 'Contato' },
   { to: '/localizacao', label: 'Localização' },
   { to: '/equipe', label: 'Equipe' }
@@ -38,23 +40,36 @@ export default function Nav() {
         </Link>
 
         <nav className="nav__links">
-          {LINKS.map(l => (
-            <Link
-              key={l.to}
-              to={l.to}
-              className={`nav__link cursor-target ${loc.pathname === l.to ? 'is-active' : ''}`}
-            >
-              {l.label}
-            </Link>
-          ))}
+          {LINKS.map(l =>
+            l.categorias ? (
+              <div className="nav__dropdown" key={l.to}>
+                <Link
+                  to={l.to}
+                  className={`nav__link cursor-target ${loc.pathname.startsWith('/catalogo') ? 'is-active' : ''}`}
+                >
+                  {l.label} <FiChevronDown size={13} />
+                </Link>
+                <div className="nav__menu">
+                  <Link to="/catalogo" className="nav__menu-link">Ver tudo</Link>
+                  {CATEGORIAS.map(c => (
+                    <Link key={c} to={`/catalogo/${slug(c)}`} className="nav__menu-link">{c}</Link>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <Link
+                key={l.to}
+                to={l.to}
+                className={`nav__link cursor-target ${loc.pathname === l.to ? 'is-active' : ''}`}
+              >
+                {l.label}
+              </Link>
+            )
+          )}
         </nav>
 
         <div className="nav__actions">
-          <button
-            className="nav__cart cursor-target"
-            onClick={() => navigate('/carrinho')}
-            aria-label="Carrinho"
-          >
+          <button className="nav__cart cursor-target" onClick={() => navigate('/carrinho')} aria-label="Carrinho">
             <FiShoppingBag size={19} />
             {count > 0 && <span className="nav__cart-badge">{count}</span>}
           </button>
@@ -65,11 +80,15 @@ export default function Nav() {
       </div>
 
       <div className={`nav__mobile ${open ? 'is-open' : ''}`}>
-        {LINKS.map(l => (
-          <Link key={l.to} to={l.to} className={`nav__mobile-link ${loc.pathname === l.to ? 'is-active' : ''}`}>
-            {l.label}
-          </Link>
+        <Link to="/" className={`nav__mobile-link ${loc.pathname === '/' ? 'is-active' : ''}`}>Início</Link>
+        <span className="nav__mobile-heading">Categorias</span>
+        <Link to="/catalogo" className="nav__mobile-link nav__mobile-sub">Ver tudo</Link>
+        {CATEGORIAS.map(c => (
+          <Link key={c} to={`/catalogo/${slug(c)}`} className="nav__mobile-link nav__mobile-sub">{c}</Link>
         ))}
+        <Link to="/contato" className={`nav__mobile-link ${loc.pathname === '/contato' ? 'is-active' : ''}`}>Contato</Link>
+        <Link to="/localizacao" className={`nav__mobile-link ${loc.pathname === '/localizacao' ? 'is-active' : ''}`}>Localização</Link>
+        <Link to="/equipe" className={`nav__mobile-link ${loc.pathname === '/equipe' ? 'is-active' : ''}`}>Equipe</Link>
       </div>
     </header>
   );

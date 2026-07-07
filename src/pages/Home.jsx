@@ -99,7 +99,7 @@ export default function Home() {
           {/* Camada 1 — entrada */}
           <div className="container hero__inner hero__layer hero__layer--1">
             <div className="hero__eyebrow rise">
-              <span className="tag">Coleção 2026 · Rômulo Santos</span>
+              <span className="tag">Coleção 2026 · Casa Mikka</span>
             </div>
 
             <h1 className="hero__title rise">
@@ -118,7 +118,7 @@ export default function Home() {
                   transition={{ type: 'spring', damping: 34, stiffness: 480 }}
                 />
               </span>
-              <span className="hero__brand">Rômulo Santos</span>
+              <span className="hero__brand">Casa Mikka</span>
             </h1>
 
             <p className="hero__sub rise rise-2">
@@ -175,7 +175,7 @@ export default function Home() {
         <div className="container">
           <p className="eyebrow reveal" style={{ marginBottom: 26 }}>As marcas que você ama</p>
         </div>
-        <LogoLoop logos={BRANDS} speed={62} logoHeight={30} gap={72} fadeOut fadeOutColor="#05070d" scaleOnHover ariaLabel="Marcas" />
+        <LogoLoop logos={BRANDS} speed={62} logoHeight={30} gap={72} fadeOut fadeOutColor="#17110d" scaleOnHover ariaLabel="Marcas" />
       </section>
 
       {/* ===================== DESTAQUES ===================== */}
@@ -201,7 +201,7 @@ export default function Home() {
       <section className="section container home-split">
         <div className="split-card split-card--tech reveal cursor-target" onClick={() => navigate('/catalogo')}>
           <div className="split-card__shape" aria-hidden="true">
-            <ShapeBlur variation={0} shapeSize={0.62} roundness={0.5} borderSize={0.045} circleSize={0.35} circleEdge={0.9} color="#62a0ff" pixelRatioProp={typeof window !== 'undefined' ? window.devicePixelRatio : 1} />
+            <ShapeBlur variation={0} shapeSize={0.62} roundness={0.5} borderSize={0.045} circleSize={0.35} circleEdge={0.9} color="#d8834e" pixelRatioProp={typeof window !== 'undefined' ? window.devicePixelRatio : 1} />
           </div>
           <div className="split-card__sticker" aria-hidden="true">
             <StickerPeel width={230} rotate={-8} peelBackHoverPct={26} peelDirection={-24} shadowIntensity={0.5} renderImage={() => <SplitCardMedia img="card-amortecimento.jpg" colorway={techProduct?.colorway} seed={7} />} />
@@ -216,7 +216,7 @@ export default function Home() {
 
         <div className="split-card split-card--design reveal cursor-target" onClick={() => navigate(`/produto/${designProduct?.id}`)}>
           <div className="split-card__shape" aria-hidden="true">
-            <ShapeBlur variation={2} shapeSize={0.7} roundness={0.5} borderSize={0.05} circleSize={0.4} circleEdge={1} color="#59e3d8" pixelRatioProp={typeof window !== 'undefined' ? window.devicePixelRatio : 1} />
+            <ShapeBlur variation={2} shapeSize={0.7} roundness={0.5} borderSize={0.05} circleSize={0.4} circleEdge={1} color="#cf9b6b" pixelRatioProp={typeof window !== 'undefined' ? window.devicePixelRatio : 1} />
           </div>
           <div className="split-card__sticker" aria-hidden="true">
             <StickerPeel width={230} rotate={9} peelBackHoverPct={26} peelDirection={20} shadowIntensity={0.5} renderImage={() => <SplitCardMedia img="card-estilo.jpg" colorway={designProduct?.colorway} seed={12} />} />
@@ -238,12 +238,12 @@ export default function Home() {
             maxAngle={55}
             radius={4}
             cellGap={6}
-            borderStyle="1px solid rgba(158,197,255,0.18)"
-            faceColor="#0b1120"
+            borderStyle="1px solid rgba(224, 183, 138,0.18)"
+            faceColor="#241a12"
             shadow={false}
             autoAnimate
             rippleOnClick
-            rippleColor="#3d7bff"
+            rippleColor="#c0663a"
             rippleSpeed={1.6}
           />
         </div>

@@ -20,7 +20,7 @@
   background: linear-gradient(145deg, rgba(18, 26, 43, 0.82), rgba(9, 13, 22, 0.82));
   -webkit-backdrop-filter: blur(24px) saturate(1.4);
   backdrop-filter: blur(24px) saturate(1.4);
-  border: 1px solid rgba(158, 197, 255, 0.16);
+  border: 1px solid rgba(224, 183, 138, 0.16);
   padding: 0 12px 10px;
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.1),
@@ -34,8 +34,8 @@
   align-items: center;
   justify-content: center;
   border-radius: 13px;
-  background: rgba(158, 197, 255, 0.06);
-  border: 1px solid rgba(158, 197, 255, 0.12);
+  background: rgba(224, 183, 138, 0.06);
+  border: 1px solid rgba(224, 183, 138, 0.12);
   color: var(--mist, #b9c6de);
   cursor: pointer;
   outline: none;
@@ -44,14 +44,14 @@
 
 .dock-item:hover {
   color: var(--bone, #f4f7ff);
-  background: rgba(158, 197, 255, 0.12);
+  background: rgba(224, 183, 138, 0.12);
 }
 
 .dock-item--active {
   color: #fff;
-  background: linear-gradient(135deg, rgba(61, 123, 255, 0.9), rgba(47, 95, 216, 0.9));
+  background: linear-gradient(135deg, rgba(192, 102, 58, 0.9), rgba(47, 95, 216, 0.9));
   border-color: transparent;
-  box-shadow: 0 8px 24px -8px rgba(61, 123, 255, 0.7);
+  box-shadow: 0 8px 24px -8px rgba(192, 102, 58, 0.7);
 }
 
 .dock-icon {
@@ -67,7 +67,7 @@
   width: fit-content;
   white-space: pre;
   border-radius: 8px;
-  border: 1px solid rgba(158, 197, 255, 0.16);
+  border: 1px solid rgba(224, 183, 138, 0.16);
   background: rgba(13, 19, 32, 0.95);
   padding: 4px 10px;
   font-size: 11px;

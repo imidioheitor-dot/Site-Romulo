@@ -13,8 +13,8 @@
   position: absolute;
   inset: -2px;
   background-image:
-    linear-gradient(rgba(158, 197, 255, 0.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(158, 197, 255, 0.05) 1px, transparent 1px);
+    linear-gradient(rgba(224, 183, 138, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(224, 183, 138, 0.05) 1px, transparent 1px);
   background-size: 64px 64px;
   mask-image: radial-gradient(120% 90% at 50% 0%, #000 30%, transparent 75%);
   -webkit-mask-image: radial-gradient(120% 90% at 50% 0%, #000 30%, transparent 75%);
@@ -33,7 +33,7 @@
   height: 620px;
   top: -180px;
   left: -120px;
-  background: radial-gradient(circle, rgba(61, 123, 255, 0.4), transparent 65%);
+  background: radial-gradient(circle, rgba(192, 102, 58, 0.4), transparent 65%);
 }
 
 .app-bg__glow--2 {
@@ -41,7 +41,7 @@
   height: 560px;
   bottom: -160px;
   right: -120px;
-  background: radial-gradient(circle, rgba(89, 227, 216, 0.22), transparent 65%);
+  background: radial-gradient(circle, rgba(207, 155, 107, 0.22), transparent 65%);
 }
 
 /* transição de rota */
@@ -65,7 +65,7 @@
   width: 42px;
   height: 42px;
   border-radius: 50%;
-  border: 3px solid rgba(158, 197, 255, 0.15);
+  border: 3px solid rgba(224, 183, 138, 0.15);
   border-top-color: var(--electric-2);
   animation: spin 0.9s linear infinite;
 }

@@ -4,16 +4,16 @@ import './MagicBento.css';
 
 const DEFAULT_PARTICLE_COUNT = 12;
 const DEFAULT_SPOTLIGHT_RADIUS = 300;
-const DEFAULT_GLOW_COLOR = '61, 123, 255';
+const DEFAULT_GLOW_COLOR = '192, 102, 58';
 const MOBILE_BREAKPOINT = 768;
 
 const defaultCards = [
-  { color: '#0b1120', title: 'Curadoria', description: 'Modelos escolhidos a dedo', label: 'Seleção' },
-  { color: '#0b1120', title: 'Pix sem taxa', description: 'Pague em segundos', label: 'Pagamento' },
-  { color: '#0b1120', title: 'Troca fácil', description: 'Até 30 dias', label: 'Garantia' },
-  { color: '#0b1120', title: 'Entrega Goiânia', description: 'Retirada grátis na loja', label: 'Logística' },
-  { color: '#0b1120', title: 'Elegância', description: 'Estilo para o dia a dia', label: 'Design' },
-  { color: '#0b1120', title: 'Atendimento', description: 'Suporte dedicado', label: 'Cuidado' }
+  { color: '#241a12', title: 'Curadoria', description: 'Modelos escolhidos a dedo', label: 'Seleção' },
+  { color: '#241a12', title: 'Pix sem taxa', description: 'Pague em segundos', label: 'Pagamento' },
+  { color: '#241a12', title: 'Troca fácil', description: 'Até 30 dias', label: 'Garantia' },
+  { color: '#241a12', title: 'Entrega Goiânia', description: 'Retirada grátis na loja', label: 'Logística' },
+  { color: '#241a12', title: 'Elegância', description: 'Estilo para o dia a dia', label: 'Design' },
+  { color: '#241a12', title: 'Atendimento', description: 'Suporte dedicado', label: 'Cuidado' }
 ];
 
 const createParticleElement = (x, y, color = DEFAULT_GLOW_COLOR) => {

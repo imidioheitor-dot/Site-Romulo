@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { FiPhone, FiMail, FiMapPin, FiClock, FiSend, FiInstagram, FiExternalLink } from 'react-icons/fi';
 import LiquidGlass from '../components/fx/LiquidGlass';
+import AnimatedTitle from '../components/AnimatedTitle';
 import { LOJA } from '../lib/store';
 import { useToast } from '../components/Toast';
 import { useReveal } from '../lib/useReveal';
@@ -28,7 +29,7 @@ export default function Contato() {
     <div className="contato">
       <section className="container contato__head">
         <p className="eyebrow rise" style={{ marginBottom: 20 }}>Fale com a gente</p>
-        <h1 className="display rise rise-1">Vamos <em>conversar</em>?</h1>
+        <AnimatedTitle className="display rise rise-1" pre="Vamos" accent="conversar" post="?" />
         <p className="lead rise rise-2" style={{ marginTop: 18 }}>
           Dúvidas sobre numeração, disponibilidade ou seu pedido? Estamos por aqui —
           responda em minutos pelo WhatsApp ou envie uma mensagem.

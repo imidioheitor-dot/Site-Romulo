@@ -6,9 +6,9 @@
 import { useSyncExternalStore } from 'react';
 
 const KEYS = {
-  products: 'rsf.products.v3',
+  products: 'rsf.products.v4',
   orders: 'rsf.orders.v1',
-  cart: 'rsf.cart.v3',
+  cart: 'rsf.cart.v4',
   staff: 'rsf.staff.v1',
   session: 'rsf.session.v1'
 };
@@ -24,6 +24,7 @@ const SEED_PRODUCTS = [
     id: 'rsf-campus-preto',
     nome: 'Campus 00s Preto',
     marca: 'Adidas',
+    tipo: 'Tênis',
     categoria: 'Casual',
     genero: 'Unissex',
     preco: 499.9,
@@ -41,6 +42,7 @@ const SEED_PRODUCTS = [
     id: 'rsf-supernova',
     nome: 'Supernova Branco',
     marca: 'Adidas',
+    tipo: 'Tênis',
     categoria: 'Corrida',
     genero: 'Unissex',
     preco: 549.9,
@@ -58,6 +60,7 @@ const SEED_PRODUCTS = [
     id: 'rsf-vans-preto',
     nome: 'Knu Skool Preto',
     marca: 'Vans',
+    tipo: 'Tênis',
     categoria: 'Casual',
     genero: 'Unissex',
     preco: 429.9,
@@ -75,6 +78,7 @@ const SEED_PRODUCTS = [
     id: 'rsf-jordan-menta',
     nome: 'Jordan 1 Low Menta',
     marca: 'Nike',
+    tipo: 'Tênis',
     categoria: 'Casual',
     genero: 'Masculino',
     preco: 699.9,
@@ -92,6 +96,7 @@ const SEED_PRODUCTS = [
     id: 'rsf-samba-creme',
     nome: 'Samba OG Creme',
     marca: 'Adidas',
+    tipo: 'Tênis',
     categoria: 'Casual',
     genero: 'Feminino',
     preco: 469.9,
@@ -109,6 +114,7 @@ const SEED_PRODUCTS = [
     id: 'rsf-jordan-mostarda',
     nome: 'Jordan 1 Low Mostarda',
     marca: 'Nike',
+    tipo: 'Tênis',
     categoria: 'Casual',
     genero: 'Masculino',
     preco: 699.9,
@@ -126,6 +132,7 @@ const SEED_PRODUCTS = [
     id: 'rsf-mizuno-azul',
     nome: 'Wave Prophecy Azul',
     marca: 'Mizuno',
+    tipo: 'Tênis',
     categoria: 'Corrida',
     genero: 'Unissex',
     preco: 899.9,
@@ -143,6 +150,7 @@ const SEED_PRODUCTS = [
     id: 'rsf-mizuno-preto',
     nome: 'Wave Prophecy Preto',
     marca: 'Mizuno',
+    tipo: 'Tênis',
     categoria: 'Corrida',
     genero: 'Masculino',
     preco: 899.9,
@@ -155,8 +163,33 @@ const SEED_PRODUCTS = [
     img: 'mizuno-preto.jpg',
     destaque: false,
     tag: 'Premium'
-  }
+  },
+
+  /* ---------- ÓCULOS (Casa Mikka) ---------- */
+  oculosProd('rsf-oculos-01', 'Aviador Clássico', 179.9, 229.9, 'Aviador atemporal com armação metálica e lentes espelhadas. Acompanha estojo de couro e flanela Mikka.', 'oculos-01.jpg', 10, true, 'Best-seller', ['#3a2a1e', '#c9a24a']),
+  oculosProd('rsf-oculos-02', 'Retrô Tartaruga', 169.9, null, 'Armação em acetato tartaruga com lentes polarizadas. Um clássico que valoriza qualquer rosto.', 'oculos-02.jpg', 12, true, 'Novo', ['#6b4230', '#e0a35f']),
+  oculosProd('rsf-oculos-03', 'Esportivo Wrap', 199.9, 249.9, 'Modelo esportivo envolvente com proteção UV400 e lentes espelhadas azuis. Leve e firme no rosto.', 'oculos-03.jpg', 8, true, 'Lançamento', ['#1c2a52', '#9ccdf5']),
+  oculosProd('rsf-oculos-04', 'Redondo Vintage', 159.9, null, 'Armação redonda metálica de inspiração vintage. Elegante e despojado ao mesmo tempo.', 'oculos-04.jpg', 14, false, null, ['#c0663a', '#e6bd8c']),
+  oculosProd('rsf-oculos-05', 'Quadrado Moderno', 189.9, 219.9, 'Linhas retas e armação encorpada para um visual contemporâneo. Lentes com proteção total.', 'oculos-05.jpg', 9, true, null, ['#2e2016', '#d8834e']),
+  oculosProd('rsf-oculos-06', 'Aviador Espelhado', 209.9, null, 'Aviador com lentes espelhadas premium e acabamento impecável. O queridinho da casa.', 'oculos-06.jpg', 7, true, 'Best-seller', ['#4a4f52', '#9adfc3']),
+  oculosProd('rsf-oculos-07', 'Esportivo Rainbow', 219.9, 269.9, 'Lente única espelhada em degradê arco-íris. Para quem quer se destacar com estilo.', 'oculos-07.jpg', 6, true, 'Edição limitada', ['#c4499c', '#59e3d8']),
+  oculosProd('rsf-oculos-08', 'Retrô Âmbar', 159.9, null, 'Acetato âmbar translúcido com lentes marrons. Sofisticação em tom quente.', 'oculos-08.jpg', 11, false, null, ['#8a5a3b', '#e3b768']),
+  oculosProd('rsf-oculos-09', 'Piloto Degradê', 189.9, 229.9, 'Estilo piloto com lentes degradê e armação leve. Conforto para o dia todo.', 'oculos-09.jpg', 10, false, null, ['#3a2a1e', '#d8a63a']),
+  oculosProd('rsf-oculos-10', 'Wayfarer Noir', 169.9, null, 'O wayfarer preto absoluto — atemporal, versátil e sempre elegante.', 'oculos-10.jpg', 13, true, null, ['#141110', '#6c5f51']),
+  oculosProd('rsf-oculos-11', 'Esportivo Azul', 199.9, null, 'Modelo esportivo com lentes espelhadas azuis e pegada firme. Ideal para o sol forte.', 'oculos-11.jpg', 8, false, null, ['#1c2a52', '#62a0ff']),
+  oculosProd('rsf-oculos-12', 'Redondo Metal', 179.9, 219.9, 'Armação metálica fina e lentes redondas espelhadas. Leveza e personalidade.', 'oculos-12.jpg', 9, false, null, ['#a38b74', '#e6bd8c']),
+  oculosProd('rsf-oculos-13', 'Aviador Dourado', 229.9, 279.9, 'Aviador com armação dourada e lentes premium. O toque de luxo da coleção.', 'oculos-13.jpg', 5, true, 'Premium', ['#c9a24a', '#f6ece0'])
 ];
+
+/* fábrica de produtos de óculos — reduz repetição no seed */
+function oculosProd(id, nome, preco, precoAntigo, descricao, img, estoque, destaque, tag, cores) {
+  return {
+    id, nome, marca: 'Mikka', tipo: 'Óculos', categoria: 'Óculos de sol', genero: 'Unissex',
+    preco, precoAntigo, descricao, cores,
+    colorway: { base: '#2e2016', mesh: '#3a2a1e', stripe: '#c0663a', sole: '#e6bd8c', accent: '#c9a24a', lace: '#e6bd8c' },
+    tamanhos: ['Único'], estoque, img, destaque, tag
+  };
+}
 
 /* senha padrão da equipe: romulo2026 (troque no painel) */
 const SEED_STAFF = { passHash: hashPass('romulo2026') };
@@ -215,6 +248,9 @@ export function useStoreKey(name, fallback) {
   const key = KEYS[name];
   return useSyncExternalStore(subscribe, () => getSnapshot(key, fallback));
 }
+
+/* ---------- categorias (tipos de produto) ---------- */
+export const CATEGORIAS = ['Tênis', 'Roupas', 'Óculos', 'Bolsas', 'Cuecas', 'Acessórios'];
 
 /* ---------- produtos / estoque ---------- */
 export const useProducts = () => useStoreKey('products', []);
@@ -351,12 +387,12 @@ export function changePassword(current, next) {
 
 /* dados fixos da loja */
 export const LOJA = {
-  nome: 'Rômulo Santos Flores',
+  nome: 'Casa Mikka',
   slogan: 'Elegância para o dia a dia.',
   pixTelefone: '+55 62 9236-8358',
   pixChave: '+556292368358',
   whatsapp: '556292368358',
-  email: 'contato@romulosantosflores.com.br',
+  email: 'contato@casamikka.com.br',
   endereco: 'Av. República do Líbano, 1875 — St. Oeste, Goiânia - GO, 74115-030',
   horario: 'Seg a Sáb — 9h às 19h',
   cidade: 'GOIANIA'

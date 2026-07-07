@@ -9,9 +9,9 @@ export default function TenisArt({ colorway = {}, seed = 1, className = '', styl
   const c = {
     base: colorway.base || '#e9eef6',
     mesh: colorway.mesh || '#f4f7fd',
-    stripe: colorway.stripe || '#3d7bff',
+    stripe: colorway.stripe || '#c0663a',
     sole: colorway.sole || '#f6f4ee',
-    accent: colorway.accent || '#2f5fd8',
+    accent: colorway.accent || '#8a4526',
     lace: colorway.lace || '#ffffff'
   };
   const gid = useMemo(() => `tenis-${seed}-${Math.random().toString(36).slice(2, 7)}`, [seed]);

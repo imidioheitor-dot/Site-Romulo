@@ -30,7 +30,7 @@
   justify-content: center;
   border: 1px solid var(--line);
   color: var(--mist);
-  background: rgba(158, 197, 255, 0.05);
+  background: rgba(224, 183, 138, 0.05);
   transition: all 0.35s ease;
 }
 

@@ -7,6 +7,7 @@ import {
 } from 'react-icons/fi';
 import LiquidGlass from '../components/fx/LiquidGlass';
 import Antigravity from '../components/fx/Antigravity';
+import AnimatedTitle from '../components/AnimatedTitle';
 import ProductMedia from '../components/ProductMedia';
 import { useProducts, useCart, cartDetails, setCartQty, createOrder, LOJA } from '../lib/store';
 import { buildPixPayload } from '../lib/pix';
@@ -50,7 +51,7 @@ export default function Carrinho() {
 
   useEffect(() => {
     if (step === 2 && total > 0) {
-      QRCode.toDataURL(pixPayload, { margin: 1, width: 320, color: { dark: '#05070d', light: '#f4f7ff' } })
+      QRCode.toDataURL(pixPayload, { margin: 1, width: 320, color: { dark: '#17110d', light: '#f4f7ff' } })
         .then(setQrDataUrl)
         .catch(() => setQrDataUrl(''));
     }
@@ -186,7 +187,7 @@ export default function Carrinho() {
           waveAmplitude={0.7}
           particleSize={0.55}
           lerpSpeed={0.05}
-          color="#3d7bff"
+          color="#c0663a"
           autoAnimate
           particleVariance={1}
           depthFactor={1.1}
@@ -195,7 +196,7 @@ export default function Carrinho() {
       </div>
       <div className="container">
         <header className="carrinho__head">
-          <h1 className="display" style={{ fontSize: 'clamp(38px, 6vw, 76px)' }}>Sua <em>sacola</em>.</h1>
+          <AnimatedTitle className="display" style={{ fontSize: 'clamp(38px, 6vw, 76px)' }} pre="Sua" accent="sacola" post="." />
           <div className="carrinho__steps">
             {STEPS.map((s, i) => (
               <div key={s} className={`carrinho__step ${i === step ? 'is-on' : ''} ${i < step ? 'is-done' : ''}`}>
