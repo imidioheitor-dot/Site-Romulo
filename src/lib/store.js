@@ -6,7 +6,7 @@
 import { useSyncExternalStore } from 'react';
 
 const KEYS = {
-  products: 'rsf.products.v4',
+  products: 'rsf.products.v5',
   orders: 'rsf.orders.v1',
   cart: 'rsf.cart.v4',
   staff: 'rsf.staff.v1',
@@ -178,8 +178,96 @@ const SEED_PRODUCTS = [
   oculosProd('rsf-oculos-10', 'Wayfarer Noir', 169.9, null, 'O wayfarer preto absoluto — atemporal, versátil e sempre elegante.', 'oculos-10.jpg', 13, true, null, ['#141110', '#6c5f51']),
   oculosProd('rsf-oculos-11', 'Esportivo Azul', 199.9, null, 'Modelo esportivo com lentes espelhadas azuis e pegada firme. Ideal para o sol forte.', 'oculos-11.jpg', 8, false, null, ['#1c2a52', '#62a0ff']),
   oculosProd('rsf-oculos-12', 'Redondo Metal', 179.9, 219.9, 'Armação metálica fina e lentes redondas espelhadas. Leveza e personalidade.', 'oculos-12.jpg', 9, false, null, ['#a38b74', '#e6bd8c']),
-  oculosProd('rsf-oculos-13', 'Aviador Dourado', 229.9, 279.9, 'Aviador com armação dourada e lentes premium. O toque de luxo da coleção.', 'oculos-13.jpg', 5, true, 'Premium', ['#c9a24a', '#f6ece0'])
+  oculosProd('rsf-oculos-13', 'Aviador Dourado', 229.9, 279.9, 'Aviador com armação dourada e lentes premium. O toque de luxo da coleção.', 'oculos-13.jpg', 5, true, 'Premium', ['#c9a24a', '#f6ece0']),
+
+  /* ---------- TÊNIS (fotos reais da coleção) ---------- */
+  {
+    id: 'rsf-nb-9060-cream',
+    nome: 'New Balance 9060 Cream',
+    marca: 'New Balance',
+    tipo: 'Tênis',
+    categoria: 'Casual',
+    genero: 'Unissex',
+    preco: 150,
+    precoAntigo: null,
+    descricao: 'A silhueta chunky do 9060 em tom creme com o "N" clássico. Camurça e mesh premium, entressola volumosa e muito conforto para o dia a dia.',
+    cores: ['#e8e0d0', '#b9bec4'],
+    colorway: { base: '#e8e0d0', mesh: '#f0eadd', stripe: '#9aa0a8', sole: '#efe9dc', accent: '#b9bec4', lace: '#e8e0d0' },
+    tamanhos: [37, 38, 39, 40, 41, 42, 43],
+    estoque: 10,
+    img: 'tenis-nb-cream.jpg',
+    destaque: true,
+    tag: 'Novo'
+  },
+  {
+    id: 'rsf-adidas-samba-choco',
+    nome: 'Samba Chocolate',
+    marca: 'Adidas',
+    tipo: 'Tênis',
+    categoria: 'Casual',
+    genero: 'Unissex',
+    preco: 150,
+    precoAntigo: null,
+    descricao: 'Samba em couro off-white com as três listras marrom-chocolate e sola de goma caramelo. Um clássico absoluto que combina com qualquer look.',
+    cores: ['#f2ead9', '#5a3a26', '#e0a35f'],
+    colorway: { base: '#f2ead9', mesh: '#f7f1e4', stripe: '#5a3a26', sole: '#e0a35f', accent: '#5a3a26', lace: '#f2ead9' },
+    tamanhos: [37, 38, 39, 40, 41, 42, 43],
+    estoque: 12,
+    img: 'tenis-adidas-choco.jpg',
+    destaque: true,
+    tag: 'Best-seller'
+  },
+  {
+    id: 'rsf-nb-9060-blush',
+    nome: 'New Balance 9060 Blush',
+    marca: 'New Balance',
+    tipo: 'Tênis',
+    categoria: 'Casual',
+    genero: 'Feminino',
+    preco: 100,
+    precoAntigo: 150,
+    descricao: 'O 9060 em tom rosé amanteigado, delicado e cheio de personalidade. Conforto de sobra numa entressola volumosa com visual atual.',
+    cores: ['#e9d7ca', '#caa892'],
+    colorway: { base: '#e9d7ca', mesh: '#f2e6dc', stripe: '#caa892', sole: '#f0e6dc', accent: '#caa892', lace: '#e9d7ca' },
+    tamanhos: [34, 35, 36, 37, 38, 39, 40],
+    estoque: 9,
+    img: 'tenis-nb-bege.jpg',
+    destaque: true,
+    tag: 'Oferta'
+  },
+
+  /* ---------- BOLSAS (fotos reais) ---------- */
+  mikkaProd('rsf-bolsa-caramelo', 'Bolsas', 'Bolsa de mão', 'Feminino', 'Bolsa Iconic Caramelo', 150, null,
+    'Bolsa estruturada em couro caramelo com fecho H dourado e alça de corrente. Elegância atemporal para compor looks sofisticados.',
+    'bolsa-marrom.jpg', 8, true, 'Novo', ['#a45a34', '#c9a24a']),
+  mikkaProd('rsf-bolsa-terracota', 'Bolsas', 'Bolsa de mão', 'Feminino', 'Bolsa Iconic Terracota', 150, null,
+    'Bolsa em couro terracota com fecho H dourado e alça de corrente removível. Um toque de cor quente para o seu dia.',
+    'bolsa-rose.jpg', 7, true, null, ['#b96a4a', '#c9a24a']),
+  mikkaProd('rsf-bolsa-preta', 'Bolsas', 'Bolsa de mão', 'Feminino', 'Bolsa Iconic Preta', 150, null,
+    'Bolsa preta atemporal em couro com fecho H dourado e corrente. O acessório coringa que combina com tudo.',
+    'bolsa-navy.jpg', 9, true, 'Best-seller', ['#121316', '#c9a24a']),
+
+  /* ---------- PERFUMES (fotos reais) ---------- */
+  mikkaProd('rsf-perfume-fabulous', 'Acessórios', 'Perfumaria', 'Feminino', 'Perfume Fabulous Red', 89.9, null,
+    'Fragrância marcante em frasco vermelho translúcido com tampa dourada. Presença doce e envolvente que dura o dia todo. 50 ml.',
+    'perfume-fabulous.jpg', 20, true, 'Novo', ['#8e1420', '#c9a24a']),
+  mikkaProd('rsf-perfume-f1-black', 'Acessórios', 'Perfumaria', 'Masculino', 'Perfume F1 Black', 89.9, null,
+    'Perfume masculino amadeirado inspirado no universo das pistas. Notas intensas e sofisticadas para marcar presença. 50 ml.',
+    'perfume-f1black.jpg', 18, true, null, ['#161616', '#e3b768']),
+  mikkaProd('rsf-perfume-black-oud', 'Acessórios', 'Perfumaria', 'Unissex', 'Perfume Black Oud', 89.9, null,
+    'Fragrância oriental em frasco fosco com estojo verde e detalhes dourados. Amadeirado envolvente para todos os momentos. 50 ml.',
+    'perfume-black.jpg', 16, true, null, ['#1c241c', '#c9a24a'])
 ];
+
+/* fábrica de produtos de tamanho único (bolsas, perfumes, acessórios) */
+function mikkaProd(id, tipo, categoria, genero, nome, preco, precoAntigo, descricao, img, estoque, destaque, tag, cores) {
+  return {
+    id, nome, marca: 'Mikka', tipo, categoria, genero,
+    preco, precoAntigo, descricao, cores,
+    colorway: { base: '#2e2016', mesh: '#3a2a1e', stripe: '#c0663a', sole: '#e6bd8c', accent: '#c9a24a', lace: '#e6bd8c' },
+    tamanhos: ['Único'], estoque, img, destaque, tag
+  };
+}
 
 /* fábrica de produtos de óculos — reduz repetição no seed */
 function oculosProd(id, nome, preco, precoAntigo, descricao, img, estoque, destaque, tag, cores) {
