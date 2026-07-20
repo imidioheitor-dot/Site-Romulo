@@ -8,6 +8,64 @@
   padding-bottom: 30px;
 }
 
+/* banner de vídeo (aba Tênis) */
+.catalogo__banner-wrap {
+  padding-bottom: 34px;
+}
+
+.catalogo__banner {
+  position: relative;
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  border: 1px solid var(--line);
+  aspect-ratio: 21 / 9;
+  background: var(--surface);
+}
+
+.catalogo__banner-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.catalogo__banner-scrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(23, 17, 13, 0.85) 0%, rgba(23, 17, 13, 0.45) 45%, rgba(23, 17, 13, 0.1) 100%);
+}
+
+.catalogo__banner-text {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  padding: clamp(20px, 4vw, 42px);
+  max-width: 60ch;
+}
+
+.catalogo__banner-text h2 {
+  font-family: var(--font-serif);
+  font-size: clamp(1.8rem, 4vw, 3rem);
+  font-weight: 600;
+  color: var(--bone);
+  line-height: 1.05;
+  margin: 8px 0 10px;
+}
+
+.catalogo__banner-text p {
+  color: var(--mist);
+  font-size: 14.5px;
+  max-width: 44ch;
+}
+
+@media (max-width: 720px) {
+  .catalogo__banner {
+    aspect-ratio: 4 / 3;
+  }
+}
+
 .catalogo__tabs {
   display: flex;
   flex-wrap: wrap;

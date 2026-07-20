@@ -107,6 +107,28 @@ export default function Catalogo() {
         </div>
       </section>
 
+      {tipo === 'Tênis' && (
+        <section className="container catalogo__banner-wrap">
+          <div className="catalogo__banner reveal">
+            <video
+              className="catalogo__banner-video"
+              src={`${import.meta.env.BASE_URL}media/tenis.mp4`}
+              autoPlay
+              loop
+              muted
+              playsInline
+              preload="auto"
+            />
+            <div className="catalogo__banner-scrim" />
+            <div className="catalogo__banner-text">
+              <span className="eyebrow">Coleção de tênis</span>
+              <h2>Do casual ao statement.</h2>
+              <p>Modelos selecionados a dedo — conforto e presença em cada passo.</p>
+            </div>
+          </div>
+        </section>
+      )}
+
       <section className="container catalogo__toolbar">
         <div className="catalogo__search cursor-target">
           <FiSearch />
