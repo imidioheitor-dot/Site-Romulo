@@ -1,0 +1,9 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+# SPA fallback (o site usa HashRouter, mas isto garante rotas diretas)
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

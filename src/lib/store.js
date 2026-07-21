@@ -6,7 +6,7 @@
 import { useSyncExternalStore } from 'react';
 
 const KEYS = {
-  products: 'rsf.products.v6',
+  products: 'rsf.products.v7',
   orders: 'rsf.orders.v1',
   cart: 'rsf.cart.v4',
   staff: 'rsf.staff.v1',
@@ -21,242 +21,2243 @@ const EVENT = 'rsf-store-change';
    O colorway fica só como rede de segurança visual. */
 const SEED_PRODUCTS = [
   {
-    id: 'rsf-campus-preto',
-    nome: 'Campus 00s Preto',
-    marca: 'Adidas',
-    tipo: 'Tênis',
-    categoria: 'Casual',
-    genero: 'Unissex',
-    preco: 499.9,
-    precoAntigo: 599.9,
-    descricao: 'Camurça preta com as três listras brancas, sola de goma caramelo e trefoil bordado. Um ícone do streetwear que combina com tudo, do jeans ao social despojado.',
-    cores: ['#111113', '#ffffff', '#c9a24a'],
-    colorway: { base: '#161618', mesh: '#101012', stripe: '#f4f4f2', sole: '#d8c69a', accent: '#c9a24a', lace: '#ffffff' },
-    tamanhos: [37, 38, 39, 40, 41, 42, 43, 44],
-    estoque: 16,
-    img: 'campus-preto.jpg',
-    destaque: true,
-    tag: 'Best-seller'
+    "id": "rsf-tenis-nb-cream",
+    "nome": "New Balance 9060 Cream",
+    "marca": "New Balance",
+    "tipo": "Tênis",
+    "categoria": "Tênis",
+    "genero": "Unissex",
+    "preco": 150,
+    "precoAntigo": null,
+    "descricao": "New Balance 9060 Cream — foto real da loja. Original, na caixa, pronto para envio. Conforto e estilo para o dia a dia.",
+    "cores": [
+      "#e8e0d0",
+      "#9aa0a8"
+    ],
+    "colorway": {
+      "base": "#e8e0d0",
+      "mesh": "#e8e0d0",
+      "stripe": "#9aa0a8",
+      "sole": "#efe9dc",
+      "accent": "#9aa0a8",
+      "lace": "#e8e0d0"
+    },
+    "tamanhos": [
+      37,
+      38,
+      39,
+      40,
+      41,
+      42,
+      43
+    ],
+    "estoque": 10,
+    "img": "tenis-nb-cream.jpg",
+    "destaque": true,
+    "tag": "Best-seller"
   },
   {
-    id: 'rsf-supernova',
-    nome: 'Supernova Branco',
-    marca: 'Adidas',
-    tipo: 'Tênis',
-    categoria: 'Corrida',
-    genero: 'Unissex',
-    preco: 549.9,
-    precoAntigo: 649.9,
-    descricao: 'Malha branca ultraleve com o cabedal em degradê ciano e detalhe magenta no calcanhar. Amortecimento reativo que devolve energia a cada passo.',
-    cores: ['#f5f8ff', '#37b6d9', '#c4499c'],
-    colorway: { base: '#eef3fa', mesh: '#bfeef4', stripe: '#2fa8c9', sole: '#f6f2e6', accent: '#c4499c', lace: '#ffffff' },
-    tamanhos: [36, 37, 38, 39, 40, 41, 42, 43],
-    estoque: 12,
-    img: 'supernova-branco.jpg',
-    destaque: true,
-    tag: 'Lançamento'
+    "id": "rsf-tenis-nb-blue",
+    "nome": "New Balance 9060 Azul",
+    "marca": "New Balance",
+    "tipo": "Tênis",
+    "categoria": "Tênis",
+    "genero": "Unissex",
+    "preco": 150,
+    "precoAntigo": null,
+    "descricao": "New Balance 9060 Azul — foto real da loja. Original, na caixa, pronto para envio. Conforto e estilo para o dia a dia.",
+    "cores": [
+      "#a9c9e0",
+      "#dfe8f0"
+    ],
+    "colorway": {
+      "base": "#a9c9e0",
+      "mesh": "#a9c9e0",
+      "stripe": "#dfe8f0",
+      "sole": "#efe9dc",
+      "accent": "#dfe8f0",
+      "lace": "#a9c9e0"
+    },
+    "tamanhos": [
+      37,
+      38,
+      39,
+      40,
+      41,
+      42,
+      43
+    ],
+    "estoque": 8,
+    "img": "tenis-nb-blue.jpg",
+    "destaque": true,
+    "tag": "Novo"
   },
   {
-    id: 'rsf-vans-preto',
-    nome: 'Knu Skool Preto',
-    marca: 'Vans',
-    tipo: 'Tênis',
-    categoria: 'Casual',
-    genero: 'Unissex',
-    preco: 429.9,
-    precoAntigo: null,
-    descricao: 'Silhueta chunky all-black com a faixa lateral branca marcante e cadarços grossos. O par que resolve qualquer look de rua com atitude.',
-    cores: ['#0d0d0f', '#ffffff'],
-    colorway: { base: '#161619', mesh: '#0d0d0f', stripe: '#f5f5f5', sole: '#101014', accent: '#f5f5f5', lace: '#0d0d0f' },
-    tamanhos: [35, 36, 37, 38, 39, 40, 41, 42, 43, 44],
-    estoque: 20,
-    img: 'vans-preto.jpg',
-    destaque: true,
-    tag: 'Best-seller'
+    "id": "rsf-tenis-nb-black",
+    "nome": "New Balance 9060 Preto",
+    "marca": "New Balance",
+    "tipo": "Tênis",
+    "categoria": "Tênis",
+    "genero": "Unissex",
+    "preco": 150,
+    "precoAntigo": null,
+    "descricao": "New Balance 9060 Preto — foto real da loja. Original, na caixa, pronto para envio. Conforto e estilo para o dia a dia.",
+    "cores": [
+      "#1a1a1e",
+      "#3a3a40"
+    ],
+    "colorway": {
+      "base": "#1a1a1e",
+      "mesh": "#1a1a1e",
+      "stripe": "#3a3a40",
+      "sole": "#efe9dc",
+      "accent": "#3a3a40",
+      "lace": "#1a1a1e"
+    },
+    "tamanhos": [
+      37,
+      38,
+      39,
+      40,
+      41,
+      42,
+      43
+    ],
+    "estoque": 9,
+    "img": "tenis-nb-black.jpg",
+    "destaque": true,
+    "tag": null
   },
   {
-    id: 'rsf-jordan-menta',
-    nome: 'Jordan 1 Low Menta',
-    marca: 'Nike',
-    tipo: 'Tênis',
-    categoria: 'Casual',
-    genero: 'Masculino',
-    preco: 699.9,
-    precoAntigo: 799.9,
-    descricao: 'Cinza-névoa com swoosh grafite e cadarços verde-menta que dão o toque final. Discreto no corpo, ousado nos detalhes — para quem sabe se destacar sem gritar.',
-    cores: ['#c9c9c4', '#4a4f52', '#9adfc3'],
-    colorway: { base: '#d9d9d2', mesh: '#efefe9', stripe: '#4a4f52', sole: '#f2f2ee', accent: '#9adfc3', lace: '#9adfc3' },
-    tamanhos: [38, 39, 40, 41, 42, 43, 44],
-    estoque: 8,
-    img: 'jordan-menta.jpg',
-    destaque: true,
-    tag: 'Edição limitada'
+    "id": "rsf-tenis-nb-white",
+    "nome": "New Balance 530 Branco",
+    "marca": "New Balance",
+    "tipo": "Tênis",
+    "categoria": "Tênis",
+    "genero": "Unissex",
+    "preco": 150,
+    "precoAntigo": null,
+    "descricao": "New Balance 530 Branco — foto real da loja. Original, na caixa, pronto para envio. Conforto e estilo para o dia a dia.",
+    "cores": [
+      "#f0f0ee",
+      "#cfcfca"
+    ],
+    "colorway": {
+      "base": "#f0f0ee",
+      "mesh": "#f0f0ee",
+      "stripe": "#cfcfca",
+      "sole": "#efe9dc",
+      "accent": "#cfcfca",
+      "lace": "#f0f0ee"
+    },
+    "tamanhos": [
+      37,
+      38,
+      39,
+      40,
+      41,
+      42,
+      43
+    ],
+    "estoque": 7,
+    "img": "tenis-nb-white.jpg",
+    "destaque": true,
+    "tag": "Novo"
   },
   {
-    id: 'rsf-samba-creme',
-    nome: 'Samba OG Creme',
-    marca: 'Adidas',
-    tipo: 'Tênis',
-    categoria: 'Casual',
-    genero: 'Feminino',
-    preco: 469.9,
-    precoAntigo: null,
-    descricao: 'Couro off-white com as três listras em marrom-café e sola de goma caramelo. Um clássico atemporal, elegante em qualquer ocasião do dia a dia.',
-    cores: ['#f2ead9', '#6b4230', '#e0a35f'],
-    colorway: { base: '#f2ead9', mesh: '#f7f1e4', stripe: '#6b4230', sole: '#e0a35f', accent: '#6b4230', lace: '#f2ead9' },
-    tamanhos: [34, 35, 36, 37, 38, 39, 40],
-    estoque: 15,
-    img: 'samba-creme.jpg',
-    destaque: true,
-    tag: 'Novo'
+    "id": "rsf-tenis-campus-preto",
+    "nome": "Campus 00s Preto",
+    "marca": "Adidas",
+    "tipo": "Tênis",
+    "categoria": "Tênis",
+    "genero": "Unissex",
+    "preco": 140,
+    "precoAntigo": null,
+    "descricao": "Campus 00s Preto — foto real da loja. Original, na caixa, pronto para envio. Conforto e estilo para o dia a dia.",
+    "cores": [
+      "#161618",
+      "#f4f4f2"
+    ],
+    "colorway": {
+      "base": "#161618",
+      "mesh": "#161618",
+      "stripe": "#f4f4f2",
+      "sole": "#efe9dc",
+      "accent": "#f4f4f2",
+      "lace": "#161618"
+    },
+    "tamanhos": [
+      37,
+      38,
+      39,
+      40,
+      41,
+      42,
+      43
+    ],
+    "estoque": 12,
+    "img": "tenis-campus-preto.jpg",
+    "destaque": true,
+    "tag": "Best-seller"
   },
   {
-    id: 'rsf-jordan-mostarda',
-    nome: 'Jordan 1 Low Mostarda',
-    marca: 'Nike',
-    tipo: 'Tênis',
-    categoria: 'Casual',
-    genero: 'Masculino',
-    preco: 699.9,
-    precoAntigo: 799.9,
-    descricao: 'Branco e mostarda com swoosh preto e cadarços vermelhos que roubam a cena. Um colorway quente e cheio de personalidade para quem não passa despercebido.',
-    cores: ['#d8a63a', '#f4f1ea', '#161616'],
-    colorway: { base: '#e7edf2', mesh: '#f4f1ea', stripe: '#161616', sole: '#f6f4ee', accent: '#d8a63a', lace: '#c8462f' },
-    tamanhos: [39, 40, 41, 42, 43, 44],
-    estoque: 7,
-    img: 'jordan-mostarda.jpg',
-    destaque: true,
-    tag: 'Novo'
+    "id": "rsf-tenis-campus-verde",
+    "nome": "Campus 00s Verde",
+    "marca": "Adidas",
+    "tipo": "Tênis",
+    "categoria": "Tênis",
+    "genero": "Unissex",
+    "preco": 140,
+    "precoAntigo": null,
+    "descricao": "Campus 00s Verde — foto real da loja. Original, na caixa, pronto para envio. Conforto e estilo para o dia a dia.",
+    "cores": [
+      "#2f6b3a",
+      "#f4f4f2"
+    ],
+    "colorway": {
+      "base": "#2f6b3a",
+      "mesh": "#2f6b3a",
+      "stripe": "#f4f4f2",
+      "sole": "#efe9dc",
+      "accent": "#f4f4f2",
+      "lace": "#2f6b3a"
+    },
+    "tamanhos": [
+      37,
+      38,
+      39,
+      40,
+      41,
+      42,
+      43
+    ],
+    "estoque": 8,
+    "img": "tenis-campus-verde.jpg",
+    "destaque": true,
+    "tag": "Novo"
   },
   {
-    id: 'rsf-mizuno-azul',
-    nome: 'Wave Prophecy Azul',
-    marca: 'Mizuno',
-    tipo: 'Tênis',
-    categoria: 'Corrida',
-    genero: 'Unissex',
-    preco: 899.9,
-    precoAntigo: 1099.9,
-    descricao: 'Entressola Wave em ondas visíveis, cabedal azul-gelo com detalhes marinho. Amortecimento infinito e um visual futurista que impõe presença na rua e no treino.',
-    cores: ['#a9c9e0', '#1c2a52', '#c9d4dd'],
-    colorway: { base: '#bcd4e6', mesh: '#a9c9e0', stripe: '#1c2a52', sole: '#e4eaf0', accent: '#1c2a52', lace: '#dfe8f0' },
-    tamanhos: [39, 40, 41, 42, 43, 44],
-    estoque: 6,
-    img: 'mizuno-azul.jpg',
-    destaque: false,
-    tag: 'Premium'
+    "id": "rsf-tenis-campus-rosa",
+    "nome": "Campus 00s Rosa",
+    "marca": "Adidas",
+    "tipo": "Tênis",
+    "categoria": "Tênis",
+    "genero": "Feminino",
+    "preco": 140,
+    "precoAntigo": null,
+    "descricao": "Campus 00s Rosa — foto real da loja. Original, na caixa, pronto para envio. Conforto e estilo para o dia a dia.",
+    "cores": [
+      "#c23b6f",
+      "#f4f4f2"
+    ],
+    "colorway": {
+      "base": "#c23b6f",
+      "mesh": "#c23b6f",
+      "stripe": "#f4f4f2",
+      "sole": "#efe9dc",
+      "accent": "#f4f4f2",
+      "lace": "#c23b6f"
+    },
+    "tamanhos": [
+      37,
+      38,
+      39,
+      40,
+      41,
+      42,
+      43
+    ],
+    "estoque": 7,
+    "img": "tenis-campus-rosa.jpg",
+    "destaque": false,
+    "tag": null
   },
   {
-    id: 'rsf-mizuno-preto',
-    nome: 'Wave Prophecy Preto',
-    marca: 'Mizuno',
-    tipo: 'Tênis',
-    categoria: 'Corrida',
-    genero: 'Masculino',
-    preco: 899.9,
-    precoAntigo: null,
-    descricao: 'A icônica entressola Wave em preto total, com acabamento tech e presença absoluta. Conforto de elite para quem leva performance e estilo a sério.',
-    cores: ['#0e0e10', '#2a2a2e'],
-    colorway: { base: '#1a1a1e', mesh: '#0e0e10', stripe: '#3a3a40', sole: '#141416', accent: '#4a4a52', lace: '#0e0e10' },
-    tamanhos: [39, 40, 41, 42, 43, 44],
-    estoque: 9,
-    img: 'mizuno-preto.jpg',
-    destaque: false,
-    tag: 'Premium'
-  },
-
-  /* ---------- ÓCULOS (Casa Mikka) ---------- */
-  oculosProd('rsf-oculos-01', 'Aviador Clássico', 100, null, 'Aviador atemporal com armação metálica e lentes espelhadas. Acompanha estojo de couro e flanela Mikka.', 'oculos-01.jpg', 10, true, 'Best-seller', ['#3a2a1e', '#c9a24a']),
-  oculosProd('rsf-oculos-02', 'Retrô Tartaruga', 100, null, 'Armação em acetato tartaruga com lentes polarizadas. Um clássico que valoriza qualquer rosto.', 'oculos-02.jpg', 12, true, 'Novo', ['#6b4230', '#e0a35f']),
-  oculosProd('rsf-oculos-03', 'Esportivo Wrap', 100, null, 'Modelo esportivo envolvente com proteção UV400 e lentes espelhadas azuis. Leve e firme no rosto.', 'oculos-03.jpg', 8, true, 'Lançamento', ['#1c2a52', '#9ccdf5']),
-  oculosProd('rsf-oculos-04', 'Redondo Vintage', 100, null, 'Armação redonda metálica de inspiração vintage. Elegante e despojado ao mesmo tempo.', 'oculos-04.jpg', 14, false, null, ['#c0663a', '#e6bd8c']),
-  oculosProd('rsf-oculos-05', 'Quadrado Moderno', 100, null, 'Linhas retas e armação encorpada para um visual contemporâneo. Lentes com proteção total.', 'oculos-05.jpg', 9, true, null, ['#2e2016', '#d8834e']),
-  oculosProd('rsf-oculos-06', 'Aviador Espelhado', 100, null, 'Aviador com lentes espelhadas premium e acabamento impecável. O queridinho da casa.', 'oculos-06.jpg', 7, true, 'Best-seller', ['#4a4f52', '#9adfc3']),
-  oculosProd('rsf-oculos-07', 'Esportivo Rainbow', 100, null, 'Lente única espelhada em degradê arco-íris. Para quem quer se destacar com estilo.', 'oculos-07.jpg', 6, true, 'Edição limitada', ['#c4499c', '#59e3d8']),
-  oculosProd('rsf-oculos-08', 'Retrô Âmbar', 100, null, 'Acetato âmbar translúcido com lentes marrons. Sofisticação em tom quente.', 'oculos-08.jpg', 11, false, null, ['#8a5a3b', '#e3b768']),
-  oculosProd('rsf-oculos-09', 'Piloto Degradê', 100, null, 'Estilo piloto com lentes degradê e armação leve. Conforto para o dia todo.', 'oculos-09.jpg', 10, false, null, ['#3a2a1e', '#d8a63a']),
-  oculosProd('rsf-oculos-10', 'Wayfarer Noir', 100, null, 'O wayfarer preto absoluto — atemporal, versátil e sempre elegante.', 'oculos-10.jpg', 13, true, null, ['#141110', '#6c5f51']),
-  oculosProd('rsf-oculos-11', 'Esportivo Azul', 100, null, 'Modelo esportivo com lentes espelhadas azuis e pegada firme. Ideal para o sol forte.', 'oculos-11.jpg', 8, false, null, ['#1c2a52', '#62a0ff']),
-  oculosProd('rsf-oculos-12', 'Redondo Metal', 100, null, 'Armação metálica fina e lentes redondas espelhadas. Leveza e personalidade.', 'oculos-12.jpg', 9, false, null, ['#a38b74', '#e6bd8c']),
-  oculosProd('rsf-oculos-13', 'Aviador Dourado', 100, null, 'Aviador com armação dourada e lentes premium. O toque de luxo da coleção.', 'oculos-13.jpg', 5, true, 'Premium', ['#c9a24a', '#f6ece0']),
-
-  /* ---------- TÊNIS (fotos reais da coleção) ---------- */
-  {
-    id: 'rsf-nb-9060-cream',
-    nome: 'New Balance 9060 Cream',
-    marca: 'New Balance',
-    tipo: 'Tênis',
-    categoria: 'Casual',
-    genero: 'Unissex',
-    preco: 150,
-    precoAntigo: null,
-    descricao: 'A silhueta chunky do 9060 em tom creme com o "N" clássico. Camurça e mesh premium, entressola volumosa e muito conforto para o dia a dia.',
-    cores: ['#e8e0d0', '#b9bec4'],
-    colorway: { base: '#e8e0d0', mesh: '#f0eadd', stripe: '#9aa0a8', sole: '#efe9dc', accent: '#b9bec4', lace: '#e8e0d0' },
-    tamanhos: [37, 38, 39, 40, 41, 42, 43],
-    estoque: 10,
-    img: 'tenis-nb-cream.jpg',
-    destaque: true,
-    tag: 'Novo'
+    "id": "rsf-tenis-samba-creme",
+    "nome": "Samba OG Creme",
+    "marca": "Adidas",
+    "tipo": "Tênis",
+    "categoria": "Tênis",
+    "genero": "Unissex",
+    "preco": 140,
+    "precoAntigo": null,
+    "descricao": "Samba OG Creme — foto real da loja. Original, na caixa, pronto para envio. Conforto e estilo para o dia a dia.",
+    "cores": [
+      "#f2ead9",
+      "#6b4230"
+    ],
+    "colorway": {
+      "base": "#f2ead9",
+      "mesh": "#f2ead9",
+      "stripe": "#6b4230",
+      "sole": "#efe9dc",
+      "accent": "#6b4230",
+      "lace": "#f2ead9"
+    },
+    "tamanhos": [
+      37,
+      38,
+      39,
+      40,
+      41,
+      42,
+      43
+    ],
+    "estoque": 11,
+    "img": "tenis-samba-creme.jpg",
+    "destaque": true,
+    "tag": "Novo"
   },
   {
-    id: 'rsf-adidas-samba-choco',
-    nome: 'Samba Chocolate',
-    marca: 'Adidas',
-    tipo: 'Tênis',
-    categoria: 'Casual',
-    genero: 'Unissex',
-    preco: 150,
-    precoAntigo: null,
-    descricao: 'Samba em couro off-white com as três listras marrom-chocolate e sola de goma caramelo. Um clássico absoluto que combina com qualquer look.',
-    cores: ['#f2ead9', '#5a3a26', '#e0a35f'],
-    colorway: { base: '#f2ead9', mesh: '#f7f1e4', stripe: '#5a3a26', sole: '#e0a35f', accent: '#5a3a26', lace: '#f2ead9' },
-    tamanhos: [37, 38, 39, 40, 41, 42, 43],
-    estoque: 12,
-    img: 'tenis-adidas-choco.jpg',
-    destaque: true,
-    tag: 'Best-seller'
+    "id": "rsf-tenis-samba-preto",
+    "nome": "Samba OG Preto",
+    "marca": "Adidas",
+    "tipo": "Tênis",
+    "categoria": "Tênis",
+    "genero": "Unissex",
+    "preco": 140,
+    "precoAntigo": null,
+    "descricao": "Samba OG Preto — foto real da loja. Original, na caixa, pronto para envio. Conforto e estilo para o dia a dia.",
+    "cores": [
+      "#161618",
+      "#e0a35f"
+    ],
+    "colorway": {
+      "base": "#161618",
+      "mesh": "#161618",
+      "stripe": "#e0a35f",
+      "sole": "#efe9dc",
+      "accent": "#e0a35f",
+      "lace": "#161618"
+    },
+    "tamanhos": [
+      37,
+      38,
+      39,
+      40,
+      41,
+      42,
+      43
+    ],
+    "estoque": 10,
+    "img": "tenis-samba-preto.jpg",
+    "destaque": false,
+    "tag": null
   },
   {
-    id: 'rsf-nb-9060-blush',
-    nome: 'New Balance 9060 Blush',
-    marca: 'New Balance',
-    tipo: 'Tênis',
-    categoria: 'Casual',
-    genero: 'Feminino',
-    preco: 100,
-    precoAntigo: 150,
-    descricao: 'O 9060 em tom rosé amanteigado, delicado e cheio de personalidade. Conforto de sobra numa entressola volumosa com visual atual.',
-    cores: ['#e9d7ca', '#caa892'],
-    colorway: { base: '#e9d7ca', mesh: '#f2e6dc', stripe: '#caa892', sole: '#f0e6dc', accent: '#caa892', lace: '#e9d7ca' },
-    tamanhos: [34, 35, 36, 37, 38, 39, 40],
-    estoque: 9,
-    img: 'tenis-nb-bege.jpg',
-    destaque: true,
-    tag: 'Oferta'
+    "id": "rsf-tenis-af1-preto",
+    "nome": "Air Force 1 Preto",
+    "marca": "Nike",
+    "tipo": "Tênis",
+    "categoria": "Tênis",
+    "genero": "Unissex",
+    "preco": 140,
+    "precoAntigo": null,
+    "descricao": "Air Force 1 Preto — foto real da loja. Original, na caixa, pronto para envio. Conforto e estilo para o dia a dia.",
+    "cores": [
+      "#0e0e10",
+      "#2a2a2e"
+    ],
+    "colorway": {
+      "base": "#0e0e10",
+      "mesh": "#0e0e10",
+      "stripe": "#2a2a2e",
+      "sole": "#efe9dc",
+      "accent": "#2a2a2e",
+      "lace": "#0e0e10"
+    },
+    "tamanhos": [
+      37,
+      38,
+      39,
+      40,
+      41,
+      42,
+      43
+    ],
+    "estoque": 9,
+    "img": "tenis-af1-preto.jpg",
+    "destaque": true,
+    "tag": null
   },
-
-  /* ---------- BOLSAS (fotos reais) ---------- */
-  mikkaProd('rsf-bolsa-caramelo', 'Bolsas', 'Bolsa de mão', 'Feminino', 'Bolsa Iconic Caramelo', 150, null,
-    'Bolsa estruturada em couro caramelo com fecho H dourado e alça de corrente. Elegância atemporal para compor looks sofisticados.',
-    'bolsa-marrom.jpg', 8, true, 'Novo', ['#a45a34', '#c9a24a']),
-  mikkaProd('rsf-bolsa-terracota', 'Bolsas', 'Bolsa de mão', 'Feminino', 'Bolsa Iconic Terracota', 150, null,
-    'Bolsa em couro terracota com fecho H dourado e alça de corrente removível. Um toque de cor quente para o seu dia.',
-    'bolsa-rose.jpg', 7, true, null, ['#b96a4a', '#c9a24a']),
-  mikkaProd('rsf-bolsa-preta', 'Bolsas', 'Bolsa de mão', 'Feminino', 'Bolsa Iconic Preta', 150, null,
-    'Bolsa preta atemporal em couro com fecho H dourado e corrente. O acessório coringa que combina com tudo.',
-    'bolsa-navy.jpg', 9, true, 'Best-seller', ['#121316', '#c9a24a']),
-
-  /* ---------- PERFUMES (fotos reais) ---------- */
-  mikkaProd('rsf-perfume-fabulous', 'Acessórios', 'Perfumaria', 'Feminino', 'Perfume Fabulous Red', 89.9, null,
-    'Fragrância marcante em frasco vermelho translúcido com tampa dourada. Presença doce e envolvente que dura o dia todo. 50 ml.',
-    'perfume-fabulous.jpg', 20, true, 'Novo', ['#8e1420', '#c9a24a']),
-  mikkaProd('rsf-perfume-f1-black', 'Acessórios', 'Perfumaria', 'Masculino', 'Perfume F1 Black', 89.9, null,
-    'Perfume masculino amadeirado inspirado no universo das pistas. Notas intensas e sofisticadas para marcar presença. 50 ml.',
-    'perfume-f1black.jpg', 18, true, null, ['#161616', '#e3b768']),
-  mikkaProd('rsf-perfume-black-oud', 'Acessórios', 'Perfumaria', 'Unissex', 'Perfume Black Oud', 89.9, null,
-    'Fragrância oriental em frasco fosco com estojo verde e detalhes dourados. Amadeirado envolvente para todos os momentos. 50 ml.',
-    'perfume-black.jpg', 16, true, null, ['#1c241c', '#c9a24a'])
+  {
+    "id": "rsf-tenis-af1-branco",
+    "nome": "Air Force 1 Branco",
+    "marca": "Nike",
+    "tipo": "Tênis",
+    "categoria": "Tênis",
+    "genero": "Unissex",
+    "preco": 140,
+    "precoAntigo": null,
+    "descricao": "Air Force 1 Branco — foto real da loja. Original, na caixa, pronto para envio. Conforto e estilo para o dia a dia.",
+    "cores": [
+      "#f2f2ee",
+      "#d8d8d2"
+    ],
+    "colorway": {
+      "base": "#f2f2ee",
+      "mesh": "#f2f2ee",
+      "stripe": "#d8d8d2",
+      "sole": "#efe9dc",
+      "accent": "#d8d8d2",
+      "lace": "#f2f2ee"
+    },
+    "tamanhos": [
+      37,
+      38,
+      39,
+      40,
+      41,
+      42,
+      43
+    ],
+    "estoque": 10,
+    "img": "tenis-af1-branco.jpg",
+    "destaque": true,
+    "tag": "Best-seller"
+  },
+  {
+    "id": "rsf-tenis-dunk-cinza",
+    "nome": "Dunk Low Cinza",
+    "marca": "Nike",
+    "tipo": "Tênis",
+    "categoria": "Tênis",
+    "genero": "Unissex",
+    "preco": 150,
+    "precoAntigo": null,
+    "descricao": "Dunk Low Cinza — foto real da loja. Original, na caixa, pronto para envio. Conforto e estilo para o dia a dia.",
+    "cores": [
+      "#9aa0a8",
+      "#9adfc3"
+    ],
+    "colorway": {
+      "base": "#9aa0a8",
+      "mesh": "#9aa0a8",
+      "stripe": "#9adfc3",
+      "sole": "#efe9dc",
+      "accent": "#9adfc3",
+      "lace": "#9aa0a8"
+    },
+    "tamanhos": [
+      37,
+      38,
+      39,
+      40,
+      41,
+      42,
+      43
+    ],
+    "estoque": 6,
+    "img": "tenis-dunk-cinza.jpg",
+    "destaque": true,
+    "tag": "Novo"
+  },
+  {
+    "id": "rsf-tenis-nike-mostarda",
+    "nome": "Dunk Low Mostarda",
+    "marca": "Nike",
+    "tipo": "Tênis",
+    "categoria": "Tênis",
+    "genero": "Masculino",
+    "preco": 150,
+    "precoAntigo": null,
+    "descricao": "Dunk Low Mostarda — foto real da loja. Original, na caixa, pronto para envio. Conforto e estilo para o dia a dia.",
+    "cores": [
+      "#d8a63a",
+      "#f4f1ea"
+    ],
+    "colorway": {
+      "base": "#d8a63a",
+      "mesh": "#d8a63a",
+      "stripe": "#f4f1ea",
+      "sole": "#efe9dc",
+      "accent": "#f4f1ea",
+      "lace": "#d8a63a"
+    },
+    "tamanhos": [
+      37,
+      38,
+      39,
+      40,
+      41,
+      42,
+      43
+    ],
+    "estoque": 6,
+    "img": "tenis-nike-mostarda.jpg",
+    "destaque": false,
+    "tag": null
+  },
+  {
+    "id": "rsf-tenis-vans-laranja",
+    "nome": "Knu Skool Laranja",
+    "marca": "Vans",
+    "tipo": "Tênis",
+    "categoria": "Tênis",
+    "genero": "Unissex",
+    "preco": 120,
+    "precoAntigo": null,
+    "descricao": "Knu Skool Laranja — foto real da loja. Original, na caixa, pronto para envio. Conforto e estilo para o dia a dia.",
+    "cores": [
+      "#d2622a",
+      "#f5f5f5"
+    ],
+    "colorway": {
+      "base": "#d2622a",
+      "mesh": "#d2622a",
+      "stripe": "#f5f5f5",
+      "sole": "#efe9dc",
+      "accent": "#f5f5f5",
+      "lace": "#d2622a"
+    },
+    "tamanhos": [
+      37,
+      38,
+      39,
+      40,
+      41,
+      42,
+      43
+    ],
+    "estoque": 9,
+    "img": "tenis-vans-laranja.jpg",
+    "destaque": false,
+    "tag": null
+  },
+  {
+    "id": "rsf-tenis-vans-preto",
+    "nome": "Knu Skool Preto",
+    "marca": "Vans",
+    "tipo": "Tênis",
+    "categoria": "Tênis",
+    "genero": "Unissex",
+    "preco": 120,
+    "precoAntigo": null,
+    "descricao": "Knu Skool Preto — foto real da loja. Original, na caixa, pronto para envio. Conforto e estilo para o dia a dia.",
+    "cores": [
+      "#161619",
+      "#f5f5f5"
+    ],
+    "colorway": {
+      "base": "#161619",
+      "mesh": "#161619",
+      "stripe": "#f5f5f5",
+      "sole": "#efe9dc",
+      "accent": "#f5f5f5",
+      "lace": "#161619"
+    },
+    "tamanhos": [
+      37,
+      38,
+      39,
+      40,
+      41,
+      42,
+      43
+    ],
+    "estoque": 12,
+    "img": "tenis-vans-preto.jpg",
+    "destaque": true,
+    "tag": null
+  },
+  {
+    "id": "rsf-tenis-mizuno-azul",
+    "nome": "Wave Prophecy Azul",
+    "marca": "Mizuno",
+    "tipo": "Tênis",
+    "categoria": "Tênis",
+    "genero": "Unissex",
+    "preco": 150,
+    "precoAntigo": null,
+    "descricao": "Wave Prophecy Azul — foto real da loja. Original, na caixa, pronto para envio. Conforto e estilo para o dia a dia.",
+    "cores": [
+      "#a9c9e0",
+      "#1c2a52"
+    ],
+    "colorway": {
+      "base": "#a9c9e0",
+      "mesh": "#a9c9e0",
+      "stripe": "#1c2a52",
+      "sole": "#efe9dc",
+      "accent": "#1c2a52",
+      "lace": "#a9c9e0"
+    },
+    "tamanhos": [
+      37,
+      38,
+      39,
+      40,
+      41,
+      42,
+      43
+    ],
+    "estoque": 6,
+    "img": "tenis-mizuno-azul.jpg",
+    "destaque": false,
+    "tag": "Premium"
+  },
+  {
+    "id": "rsf-tenis-mizuno-preto",
+    "nome": "Wave Prophecy Preto",
+    "marca": "Mizuno",
+    "tipo": "Tênis",
+    "categoria": "Tênis",
+    "genero": "Masculino",
+    "preco": 150,
+    "precoAntigo": null,
+    "descricao": "Wave Prophecy Preto — foto real da loja. Original, na caixa, pronto para envio. Conforto e estilo para o dia a dia.",
+    "cores": [
+      "#0e0e10",
+      "#3a3a40"
+    ],
+    "colorway": {
+      "base": "#0e0e10",
+      "mesh": "#0e0e10",
+      "stripe": "#3a3a40",
+      "sole": "#efe9dc",
+      "accent": "#3a3a40",
+      "lace": "#0e0e10"
+    },
+    "tamanhos": [
+      37,
+      38,
+      39,
+      40,
+      41,
+      42,
+      43
+    ],
+    "estoque": 7,
+    "img": "tenis-mizuno-preto.jpg",
+    "destaque": false,
+    "tag": "Premium"
+  },
+  {
+    "id": "rsf-tenis-adidas-response",
+    "nome": "Response Cinza/Laranja",
+    "marca": "Adidas",
+    "tipo": "Tênis",
+    "categoria": "Tênis",
+    "genero": "Unissex",
+    "preco": 140,
+    "precoAntigo": null,
+    "descricao": "Response Cinza/Laranja — foto real da loja. Original, na caixa, pronto para envio. Conforto e estilo para o dia a dia.",
+    "cores": [
+      "#c9c4bd",
+      "#d2622a"
+    ],
+    "colorway": {
+      "base": "#c9c4bd",
+      "mesh": "#c9c4bd",
+      "stripe": "#d2622a",
+      "sole": "#efe9dc",
+      "accent": "#d2622a",
+      "lace": "#c9c4bd"
+    },
+    "tamanhos": [
+      37,
+      38,
+      39,
+      40,
+      41,
+      42,
+      43
+    ],
+    "estoque": 8,
+    "img": "tenis-adidas-response.jpg",
+    "destaque": false,
+    "tag": null
+  },
+  {
+    "id": "rsf-tenis-ultraboost-laranja",
+    "nome": "Ultraboost Laranja",
+    "marca": "Adidas",
+    "tipo": "Tênis",
+    "categoria": "Tênis",
+    "genero": "Unissex",
+    "preco": 140,
+    "precoAntigo": null,
+    "descricao": "Ultraboost Laranja — foto real da loja. Original, na caixa, pronto para envio. Conforto e estilo para o dia a dia.",
+    "cores": [
+      "#e0512a",
+      "#1a1a1e"
+    ],
+    "colorway": {
+      "base": "#e0512a",
+      "mesh": "#e0512a",
+      "stripe": "#1a1a1e",
+      "sole": "#efe9dc",
+      "accent": "#1a1a1e",
+      "lace": "#e0512a"
+    },
+    "tamanhos": [
+      37,
+      38,
+      39,
+      40,
+      41,
+      42,
+      43
+    ],
+    "estoque": 7,
+    "img": "tenis-ultraboost-laranja.jpg",
+    "destaque": false,
+    "tag": null
+  },
+  {
+    "id": "rsf-tenis-ultraboost-rosa",
+    "nome": "Ultraboost Branco/Rosa",
+    "marca": "Adidas",
+    "tipo": "Tênis",
+    "categoria": "Tênis",
+    "genero": "Feminino",
+    "preco": 140,
+    "precoAntigo": null,
+    "descricao": "Ultraboost Branco/Rosa — foto real da loja. Original, na caixa, pronto para envio. Conforto e estilo para o dia a dia.",
+    "cores": [
+      "#f0f0ee",
+      "#e06a9c"
+    ],
+    "colorway": {
+      "base": "#f0f0ee",
+      "mesh": "#f0f0ee",
+      "stripe": "#e06a9c",
+      "sole": "#efe9dc",
+      "accent": "#e06a9c",
+      "lace": "#f0f0ee"
+    },
+    "tamanhos": [
+      37,
+      38,
+      39,
+      40,
+      41,
+      42,
+      43
+    ],
+    "estoque": 7,
+    "img": "tenis-ultraboost-rosa.jpg",
+    "destaque": false,
+    "tag": "Novo"
+  },
+  {
+    "id": "rsf-tenis-supernova-bege",
+    "nome": "Supernova Bege",
+    "marca": "Adidas",
+    "tipo": "Tênis",
+    "categoria": "Tênis",
+    "genero": "Unissex",
+    "preco": 130,
+    "precoAntigo": null,
+    "descricao": "Supernova Bege — foto real da loja. Original, na caixa, pronto para envio. Conforto e estilo para o dia a dia.",
+    "cores": [
+      "#cdbfae",
+      "#1a1a1e"
+    ],
+    "colorway": {
+      "base": "#cdbfae",
+      "mesh": "#cdbfae",
+      "stripe": "#1a1a1e",
+      "sole": "#efe9dc",
+      "accent": "#1a1a1e",
+      "lace": "#cdbfae"
+    },
+    "tamanhos": [
+      37,
+      38,
+      39,
+      40,
+      41,
+      42,
+      43
+    ],
+    "estoque": 9,
+    "img": "tenis-supernova-bege.jpg",
+    "destaque": false,
+    "tag": null
+  },
+  {
+    "id": "rsf-camiseta-hugo-azul",
+    "nome": "Camiseta HUGO Azul",
+    "marca": "Hugo",
+    "tipo": "Roupas",
+    "categoria": "Camiseta",
+    "genero": "Masculino",
+    "preco": 55,
+    "precoAntigo": null,
+    "descricao": "Camiseta HUGO Azul em algodão premium com caimento perfeito. Peça versátil que combina com tudo.",
+    "cores": [
+      "#2a4a8a",
+      "#ffffff"
+    ],
+    "colorway": {
+      "base": "#2a4a8a",
+      "mesh": "#2a4a8a",
+      "stripe": "#ffffff",
+      "sole": "#efe9dc",
+      "accent": "#ffffff",
+      "lace": "#2a4a8a"
+    },
+    "tamanhos": [
+      "P",
+      "M",
+      "G",
+      "GG"
+    ],
+    "estoque": 14,
+    "img": "camiseta-hugo-azul.jpg",
+    "destaque": true,
+    "tag": "Best-seller"
+  },
+  {
+    "id": "rsf-camiseta-ea7-azul",
+    "nome": "Camiseta EA7 Azul",
+    "marca": "EA7",
+    "tipo": "Roupas",
+    "categoria": "Camiseta",
+    "genero": "Masculino",
+    "preco": 55,
+    "precoAntigo": null,
+    "descricao": "Camiseta EA7 Azul em algodão premium com caimento perfeito. Peça versátil que combina com tudo.",
+    "cores": [
+      "#3a4a6a",
+      "#ffffff"
+    ],
+    "colorway": {
+      "base": "#3a4a6a",
+      "mesh": "#3a4a6a",
+      "stripe": "#ffffff",
+      "sole": "#efe9dc",
+      "accent": "#ffffff",
+      "lace": "#3a4a6a"
+    },
+    "tamanhos": [
+      "P",
+      "M",
+      "G",
+      "GG"
+    ],
+    "estoque": 12,
+    "img": "camiseta-ea7-azul.jpg",
+    "destaque": true,
+    "tag": null
+  },
+  {
+    "id": "rsf-camiseta-armani-branca",
+    "nome": "Camiseta Armani Branca",
+    "marca": "Armani",
+    "tipo": "Roupas",
+    "categoria": "Camiseta",
+    "genero": "Masculino",
+    "preco": 55,
+    "precoAntigo": null,
+    "descricao": "Camiseta Armani Branca em algodão premium com caimento perfeito. Peça versátil que combina com tudo.",
+    "cores": [
+      "#f0f0ee",
+      "#161616"
+    ],
+    "colorway": {
+      "base": "#f0f0ee",
+      "mesh": "#f0f0ee",
+      "stripe": "#161616",
+      "sole": "#efe9dc",
+      "accent": "#161616",
+      "lace": "#f0f0ee"
+    },
+    "tamanhos": [
+      "P",
+      "M",
+      "G",
+      "GG"
+    ],
+    "estoque": 13,
+    "img": "camiseta-armani-branca.jpg",
+    "destaque": true,
+    "tag": "Novo"
+  },
+  {
+    "id": "rsf-camiseta-preta",
+    "nome": "Camiseta Basic Preta",
+    "marca": "Mikka",
+    "tipo": "Roupas",
+    "categoria": "Camiseta",
+    "genero": "Masculino",
+    "preco": 55,
+    "precoAntigo": null,
+    "descricao": "Camiseta Basic Preta em algodão premium com caimento perfeito. Peça versátil que combina com tudo.",
+    "cores": [
+      "#161616",
+      "#3a3a3a"
+    ],
+    "colorway": {
+      "base": "#161616",
+      "mesh": "#161616",
+      "stripe": "#3a3a3a",
+      "sole": "#efe9dc",
+      "accent": "#3a3a3a",
+      "lace": "#161616"
+    },
+    "tamanhos": [
+      "P",
+      "M",
+      "G",
+      "GG"
+    ],
+    "estoque": 16,
+    "img": "camiseta-preta.jpg",
+    "destaque": true,
+    "tag": null
+  },
+  {
+    "id": "rsf-camiseta-vermelha",
+    "nome": "Camiseta Basic Vermelha",
+    "marca": "Mikka",
+    "tipo": "Roupas",
+    "categoria": "Camiseta",
+    "genero": "Masculino",
+    "preco": 55,
+    "precoAntigo": null,
+    "descricao": "Camiseta Basic Vermelha em algodão premium com caimento perfeito. Peça versátil que combina com tudo.",
+    "cores": [
+      "#b12a2a",
+      "#ffffff"
+    ],
+    "colorway": {
+      "base": "#b12a2a",
+      "mesh": "#b12a2a",
+      "stripe": "#ffffff",
+      "sole": "#efe9dc",
+      "accent": "#ffffff",
+      "lace": "#b12a2a"
+    },
+    "tamanhos": [
+      "P",
+      "M",
+      "G",
+      "GG"
+    ],
+    "estoque": 12,
+    "img": "camiseta-vermelha.jpg",
+    "destaque": false,
+    "tag": null
+  },
+  {
+    "id": "rsf-camiseta-laranja",
+    "nome": "Camiseta Basic Laranja",
+    "marca": "Mikka",
+    "tipo": "Roupas",
+    "categoria": "Camiseta",
+    "genero": "Masculino",
+    "preco": 55,
+    "precoAntigo": null,
+    "descricao": "Camiseta Basic Laranja em algodão premium com caimento perfeito. Peça versátil que combina com tudo.",
+    "cores": [
+      "#d2622a",
+      "#ffffff"
+    ],
+    "colorway": {
+      "base": "#d2622a",
+      "mesh": "#d2622a",
+      "stripe": "#ffffff",
+      "sole": "#efe9dc",
+      "accent": "#ffffff",
+      "lace": "#d2622a"
+    },
+    "tamanhos": [
+      "P",
+      "M",
+      "G",
+      "GG"
+    ],
+    "estoque": 11,
+    "img": "camiseta-laranja.jpg",
+    "destaque": false,
+    "tag": null
+  },
+  {
+    "id": "rsf-camiseta-verde",
+    "nome": "Camiseta Basic Verde",
+    "marca": "Mikka",
+    "tipo": "Roupas",
+    "categoria": "Camiseta",
+    "genero": "Masculino",
+    "preco": 55,
+    "precoAntigo": null,
+    "descricao": "Camiseta Basic Verde em algodão premium com caimento perfeito. Peça versátil que combina com tudo.",
+    "cores": [
+      "#2f6b6b",
+      "#ffffff"
+    ],
+    "colorway": {
+      "base": "#2f6b6b",
+      "mesh": "#2f6b6b",
+      "stripe": "#ffffff",
+      "sole": "#efe9dc",
+      "accent": "#ffffff",
+      "lace": "#2f6b6b"
+    },
+    "tamanhos": [
+      "P",
+      "M",
+      "G",
+      "GG"
+    ],
+    "estoque": 12,
+    "img": "camiseta-verde.jpg",
+    "destaque": false,
+    "tag": null
+  },
+  {
+    "id": "rsf-camiseta-marrom",
+    "nome": "Camiseta Basic Marrom",
+    "marca": "Mikka",
+    "tipo": "Roupas",
+    "categoria": "Camiseta",
+    "genero": "Masculino",
+    "preco": 55,
+    "precoAntigo": null,
+    "descricao": "Camiseta Basic Marrom em algodão premium com caimento perfeito. Peça versátil que combina com tudo.",
+    "cores": [
+      "#5a3a26",
+      "#ffffff"
+    ],
+    "colorway": {
+      "base": "#5a3a26",
+      "mesh": "#5a3a26",
+      "stripe": "#ffffff",
+      "sole": "#efe9dc",
+      "accent": "#ffffff",
+      "lace": "#5a3a26"
+    },
+    "tamanhos": [
+      "P",
+      "M",
+      "G",
+      "GG"
+    ],
+    "estoque": 13,
+    "img": "camiseta-marrom.jpg",
+    "destaque": true,
+    "tag": "Novo"
+  },
+  {
+    "id": "rsf-camiseta-navy",
+    "nome": "Camiseta Basic Azul Marinho",
+    "marca": "Mikka",
+    "tipo": "Roupas",
+    "categoria": "Camiseta",
+    "genero": "Masculino",
+    "preco": 55,
+    "precoAntigo": null,
+    "descricao": "Camiseta Basic Azul Marinho em algodão premium com caimento perfeito. Peça versátil que combina com tudo.",
+    "cores": [
+      "#1c2a52",
+      "#ffffff"
+    ],
+    "colorway": {
+      "base": "#1c2a52",
+      "mesh": "#1c2a52",
+      "stripe": "#ffffff",
+      "sole": "#efe9dc",
+      "accent": "#ffffff",
+      "lace": "#1c2a52"
+    },
+    "tamanhos": [
+      "P",
+      "M",
+      "G",
+      "GG"
+    ],
+    "estoque": 14,
+    "img": "camiseta-navy.jpg",
+    "destaque": false,
+    "tag": null
+  },
+  {
+    "id": "rsf-camiseta-lime",
+    "nome": "Camiseta Basic Verde Limão",
+    "marca": "Mikka",
+    "tipo": "Roupas",
+    "categoria": "Camiseta",
+    "genero": "Masculino",
+    "preco": 55,
+    "precoAntigo": null,
+    "descricao": "Camiseta Basic Verde Limão em algodão premium com caimento perfeito. Peça versátil que combina com tudo.",
+    "cores": [
+      "#b0d43a",
+      "#161616"
+    ],
+    "colorway": {
+      "base": "#b0d43a",
+      "mesh": "#b0d43a",
+      "stripe": "#161616",
+      "sole": "#efe9dc",
+      "accent": "#161616",
+      "lace": "#b0d43a"
+    },
+    "tamanhos": [
+      "P",
+      "M",
+      "G",
+      "GG"
+    ],
+    "estoque": 10,
+    "img": "camiseta-lime.jpg",
+    "destaque": false,
+    "tag": null
+  },
+  {
+    "id": "rsf-camiseta-gola-alta-bordo",
+    "nome": "Camiseta Gola Alta Bordô",
+    "marca": "Mikka",
+    "tipo": "Roupas",
+    "categoria": "Camiseta",
+    "genero": "Masculino",
+    "preco": 55,
+    "precoAntigo": null,
+    "descricao": "Camiseta Gola Alta Bordô em algodão premium com caimento perfeito. Peça versátil que combina com tudo.",
+    "cores": [
+      "#6a1f2a",
+      "#ffffff"
+    ],
+    "colorway": {
+      "base": "#6a1f2a",
+      "mesh": "#6a1f2a",
+      "stripe": "#ffffff",
+      "sole": "#efe9dc",
+      "accent": "#ffffff",
+      "lace": "#6a1f2a"
+    },
+    "tamanhos": [
+      "P",
+      "M",
+      "G",
+      "GG"
+    ],
+    "estoque": 11,
+    "img": "camiseta-gola-alta-bordo.jpg",
+    "destaque": true,
+    "tag": "Novo"
+  },
+  {
+    "id": "rsf-camisa-manutd",
+    "nome": "Camisa Manchester United",
+    "marca": "Adidas",
+    "tipo": "Roupas",
+    "categoria": "Camisa de time",
+    "genero": "Masculino",
+    "preco": 55,
+    "precoAntigo": null,
+    "descricao": "Camisa Manchester United — versão torcedor de alta qualidade, tecido leve e respirável. Vista o seu time com estilo.",
+    "cores": [
+      "#c8102e",
+      "#161616"
+    ],
+    "colorway": {
+      "base": "#c8102e",
+      "mesh": "#c8102e",
+      "stripe": "#161616",
+      "sole": "#efe9dc",
+      "accent": "#161616",
+      "lace": "#c8102e"
+    },
+    "tamanhos": [
+      "P",
+      "M",
+      "G",
+      "GG"
+    ],
+    "estoque": 10,
+    "img": "camisa-manutd.jpg",
+    "destaque": true,
+    "tag": "Best-seller"
+  },
+  {
+    "id": "rsf-camisa-saopaulo",
+    "nome": "Camisa São Paulo",
+    "marca": "New Balance",
+    "tipo": "Roupas",
+    "categoria": "Camisa de time",
+    "genero": "Masculino",
+    "preco": 55,
+    "precoAntigo": null,
+    "descricao": "Camisa São Paulo — versão torcedor de alta qualidade, tecido leve e respirável. Vista o seu time com estilo.",
+    "cores": [
+      "#c8102e",
+      "#161616"
+    ],
+    "colorway": {
+      "base": "#c8102e",
+      "mesh": "#c8102e",
+      "stripe": "#161616",
+      "sole": "#efe9dc",
+      "accent": "#161616",
+      "lace": "#c8102e"
+    },
+    "tamanhos": [
+      "P",
+      "M",
+      "G",
+      "GG"
+    ],
+    "estoque": 9,
+    "img": "camisa-saopaulo.jpg",
+    "destaque": true,
+    "tag": null
+  },
+  {
+    "id": "rsf-camisa-flamengo",
+    "nome": "Camisa Flamengo",
+    "marca": "Adidas",
+    "tipo": "Roupas",
+    "categoria": "Camisa de time",
+    "genero": "Masculino",
+    "preco": 55,
+    "precoAntigo": null,
+    "descricao": "Camisa Flamengo — versão torcedor de alta qualidade, tecido leve e respirável. Vista o seu time com estilo.",
+    "cores": [
+      "#f0f0ee",
+      "#c8102e"
+    ],
+    "colorway": {
+      "base": "#f0f0ee",
+      "mesh": "#f0f0ee",
+      "stripe": "#c8102e",
+      "sole": "#efe9dc",
+      "accent": "#c8102e",
+      "lace": "#f0f0ee"
+    },
+    "tamanhos": [
+      "P",
+      "M",
+      "G",
+      "GG"
+    ],
+    "estoque": 10,
+    "img": "camisa-flamengo.jpg",
+    "destaque": true,
+    "tag": "Novo"
+  },
+  {
+    "id": "rsf-camisa-palmeiras",
+    "nome": "Camisa Palmeiras",
+    "marca": "Puma",
+    "tipo": "Roupas",
+    "categoria": "Camisa de time",
+    "genero": "Masculino",
+    "preco": 55,
+    "precoAntigo": null,
+    "descricao": "Camisa Palmeiras — versão torcedor de alta qualidade, tecido leve e respirável. Vista o seu time com estilo.",
+    "cores": [
+      "#1a6b3a",
+      "#ffffff"
+    ],
+    "colorway": {
+      "base": "#1a6b3a",
+      "mesh": "#1a6b3a",
+      "stripe": "#ffffff",
+      "sole": "#efe9dc",
+      "accent": "#ffffff",
+      "lace": "#1a6b3a"
+    },
+    "tamanhos": [
+      "P",
+      "M",
+      "G",
+      "GG"
+    ],
+    "estoque": 9,
+    "img": "camisa-palmeiras.jpg",
+    "destaque": false,
+    "tag": null
+  },
+  {
+    "id": "rsf-camisa-gremio",
+    "nome": "Camisa Grêmio",
+    "marca": "Umbro",
+    "tipo": "Roupas",
+    "categoria": "Camisa de time",
+    "genero": "Masculino",
+    "preco": 55,
+    "precoAntigo": null,
+    "descricao": "Camisa Grêmio — versão torcedor de alta qualidade, tecido leve e respirável. Vista o seu time com estilo.",
+    "cores": [
+      "#1a6bd8",
+      "#161616"
+    ],
+    "colorway": {
+      "base": "#1a6bd8",
+      "mesh": "#1a6bd8",
+      "stripe": "#161616",
+      "sole": "#efe9dc",
+      "accent": "#161616",
+      "lace": "#1a6bd8"
+    },
+    "tamanhos": [
+      "P",
+      "M",
+      "G",
+      "GG"
+    ],
+    "estoque": 8,
+    "img": "camisa-gremio.jpg",
+    "destaque": false,
+    "tag": null
+  },
+  {
+    "id": "rsf-camisa-chelsea",
+    "nome": "Camisa Chelsea",
+    "marca": "Nike",
+    "tipo": "Roupas",
+    "categoria": "Camisa de time",
+    "genero": "Masculino",
+    "preco": 55,
+    "precoAntigo": null,
+    "descricao": "Camisa Chelsea — versão torcedor de alta qualidade, tecido leve e respirável. Vista o seu time com estilo.",
+    "cores": [
+      "#1a4bd8",
+      "#ffffff"
+    ],
+    "colorway": {
+      "base": "#1a4bd8",
+      "mesh": "#1a4bd8",
+      "stripe": "#ffffff",
+      "sole": "#efe9dc",
+      "accent": "#ffffff",
+      "lace": "#1a4bd8"
+    },
+    "tamanhos": [
+      "P",
+      "M",
+      "G",
+      "GG"
+    ],
+    "estoque": 9,
+    "img": "camisa-chelsea.jpg",
+    "destaque": false,
+    "tag": null
+  },
+  {
+    "id": "rsf-camisa-botao-branca",
+    "nome": "Camisa Botão Branca",
+    "marca": "Mikka",
+    "tipo": "Roupas",
+    "categoria": "Camisa",
+    "genero": "Masculino",
+    "preco": 80,
+    "precoAntigo": null,
+    "descricao": "Camisa Botão Branca de manga curta, tecido leve e corte moderno. Ideal para o calor com elegância.",
+    "cores": [
+      "#f0f0ee",
+      "#d8d8d2"
+    ],
+    "colorway": {
+      "base": "#f0f0ee",
+      "mesh": "#f0f0ee",
+      "stripe": "#d8d8d2",
+      "sole": "#efe9dc",
+      "accent": "#d8d8d2",
+      "lace": "#f0f0ee"
+    },
+    "tamanhos": [
+      "P",
+      "M",
+      "G",
+      "GG"
+    ],
+    "estoque": 8,
+    "img": "camisa-botao-branca.jpg",
+    "destaque": true,
+    "tag": "Novo"
+  },
+  {
+    "id": "rsf-camisa-botao-navy",
+    "nome": "Camisa Botão Azul Marinho",
+    "marca": "Mikka",
+    "tipo": "Roupas",
+    "categoria": "Camisa",
+    "genero": "Masculino",
+    "preco": 80,
+    "precoAntigo": null,
+    "descricao": "Camisa Botão Azul Marinho de manga curta, tecido leve e corte moderno. Ideal para o calor com elegância.",
+    "cores": [
+      "#1c2a52",
+      "#ffffff"
+    ],
+    "colorway": {
+      "base": "#1c2a52",
+      "mesh": "#1c2a52",
+      "stripe": "#ffffff",
+      "sole": "#efe9dc",
+      "accent": "#ffffff",
+      "lace": "#1c2a52"
+    },
+    "tamanhos": [
+      "P",
+      "M",
+      "G",
+      "GG"
+    ],
+    "estoque": 8,
+    "img": "camisa-botao-navy.jpg",
+    "destaque": false,
+    "tag": null
+  },
+  {
+    "id": "rsf-camisa-botao-cinza",
+    "nome": "Camisa Botão Cinza",
+    "marca": "Mikka",
+    "tipo": "Roupas",
+    "categoria": "Camisa",
+    "genero": "Masculino",
+    "preco": 80,
+    "precoAntigo": null,
+    "descricao": "Camisa Botão Cinza de manga curta, tecido leve e corte moderno. Ideal para o calor com elegância.",
+    "cores": [
+      "#5a5a5a",
+      "#ffffff"
+    ],
+    "colorway": {
+      "base": "#5a5a5a",
+      "mesh": "#5a5a5a",
+      "stripe": "#ffffff",
+      "sole": "#efe9dc",
+      "accent": "#ffffff",
+      "lace": "#5a5a5a"
+    },
+    "tamanhos": [
+      "P",
+      "M",
+      "G",
+      "GG"
+    ],
+    "estoque": 7,
+    "img": "camisa-botao-cinza.jpg",
+    "destaque": false,
+    "tag": null
+  },
+  {
+    "id": "rsf-shorts-sarja",
+    "nome": "Shorts Sarja",
+    "marca": "Mikka",
+    "tipo": "Roupas",
+    "categoria": "Shorts",
+    "genero": "Masculino",
+    "preco": 60,
+    "precoAntigo": null,
+    "descricao": "Shorts Sarja em sarja confortável, com cordão ajustável. Perfeito para o dia a dia e o verão.",
+    "cores": [
+      "#d2622a",
+      "#161616"
+    ],
+    "colorway": {
+      "base": "#d2622a",
+      "mesh": "#d2622a",
+      "stripe": "#161616",
+      "sole": "#efe9dc",
+      "accent": "#161616",
+      "lace": "#d2622a"
+    },
+    "tamanhos": [
+      "P",
+      "M",
+      "G",
+      "GG"
+    ],
+    "estoque": 14,
+    "img": "shorts-sarja.jpg",
+    "destaque": true,
+    "tag": "Novo"
+  },
+  {
+    "id": "rsf-shorts-colors",
+    "nome": "Shorts Sarja Colors",
+    "marca": "Mikka",
+    "tipo": "Roupas",
+    "categoria": "Shorts",
+    "genero": "Masculino",
+    "preco": 60,
+    "precoAntigo": null,
+    "descricao": "Shorts Sarja Colors em sarja confortável, com cordão ajustável. Perfeito para o dia a dia e o verão.",
+    "cores": [
+      "#2f6b3a",
+      "#b12a2a"
+    ],
+    "colorway": {
+      "base": "#2f6b3a",
+      "mesh": "#2f6b3a",
+      "stripe": "#b12a2a",
+      "sole": "#efe9dc",
+      "accent": "#b12a2a",
+      "lace": "#2f6b3a"
+    },
+    "tamanhos": [
+      "P",
+      "M",
+      "G",
+      "GG"
+    ],
+    "estoque": 14,
+    "img": "shorts-colors.jpg",
+    "destaque": false,
+    "tag": null
+  },
+  {
+    "id": "rsf-calca-verde-marrom",
+    "nome": "Calça Alfaiataria Verde/Marrom",
+    "marca": "Mikka",
+    "tipo": "Roupas",
+    "categoria": "Calça",
+    "genero": "Masculino",
+    "preco": 90,
+    "precoAntigo": null,
+    "descricao": "Calça Alfaiataria Verde/Marrom de alfaiataria leve, caimento impecável e muito conforto.",
+    "cores": [
+      "#2f6b4a",
+      "#8a5a3b"
+    ],
+    "colorway": {
+      "base": "#2f6b4a",
+      "mesh": "#2f6b4a",
+      "stripe": "#8a5a3b",
+      "sole": "#efe9dc",
+      "accent": "#8a5a3b",
+      "lace": "#2f6b4a"
+    },
+    "tamanhos": [
+      "P",
+      "M",
+      "G",
+      "GG"
+    ],
+    "estoque": 9,
+    "img": "calca-verde-marrom.jpg",
+    "destaque": false,
+    "tag": null
+  },
+  {
+    "id": "rsf-calca-preta-creme",
+    "nome": "Calça Alfaiataria Preto/Creme",
+    "marca": "Mikka",
+    "tipo": "Roupas",
+    "categoria": "Calça",
+    "genero": "Masculino",
+    "preco": 90,
+    "precoAntigo": null,
+    "descricao": "Calça Alfaiataria Preto/Creme de alfaiataria leve, caimento impecável e muito conforto.",
+    "cores": [
+      "#161616",
+      "#e8e0d0"
+    ],
+    "colorway": {
+      "base": "#161616",
+      "mesh": "#161616",
+      "stripe": "#e8e0d0",
+      "sole": "#efe9dc",
+      "accent": "#e8e0d0",
+      "lace": "#161616"
+    },
+    "tamanhos": [
+      "P",
+      "M",
+      "G",
+      "GG"
+    ],
+    "estoque": 9,
+    "img": "calca-preta-creme.jpg",
+    "destaque": true,
+    "tag": "Novo"
+  },
+  {
+    "id": "rsf-bolsa-caramelo",
+    "nome": "Bolsa Iconic Caramelo",
+    "marca": "Mikka",
+    "tipo": "Bolsas",
+    "categoria": "Bolsa",
+    "genero": "Feminino",
+    "preco": 150,
+    "precoAntigo": null,
+    "descricao": "Bolsa Iconic Caramelo estruturada com fecho H dourado e alça de corrente. Elegância atemporal.",
+    "cores": [
+      "#a45a34",
+      "#c9a24a"
+    ],
+    "colorway": {
+      "base": "#a45a34",
+      "mesh": "#a45a34",
+      "stripe": "#c9a24a",
+      "sole": "#efe9dc",
+      "accent": "#c9a24a",
+      "lace": "#a45a34"
+    },
+    "tamanhos": [
+      "Único"
+    ],
+    "estoque": 8,
+    "img": "bolsa-caramelo.jpg",
+    "destaque": true,
+    "tag": "Best-seller"
+  },
+  {
+    "id": "rsf-bolsa-preta",
+    "nome": "Bolsa Iconic Preta",
+    "marca": "Mikka",
+    "tipo": "Bolsas",
+    "categoria": "Bolsa",
+    "genero": "Feminino",
+    "preco": 150,
+    "precoAntigo": null,
+    "descricao": "Bolsa Iconic Preta estruturada com fecho H dourado e alça de corrente. Elegância atemporal.",
+    "cores": [
+      "#121316",
+      "#c9a24a"
+    ],
+    "colorway": {
+      "base": "#121316",
+      "mesh": "#121316",
+      "stripe": "#c9a24a",
+      "sole": "#efe9dc",
+      "accent": "#c9a24a",
+      "lace": "#121316"
+    },
+    "tamanhos": [
+      "Único"
+    ],
+    "estoque": 9,
+    "img": "bolsa-preta.jpg",
+    "destaque": true,
+    "tag": null
+  },
+  {
+    "id": "rsf-bolsa-rosa",
+    "nome": "Bolsa Iconic Rosé",
+    "marca": "Mikka",
+    "tipo": "Bolsas",
+    "categoria": "Bolsa",
+    "genero": "Feminino",
+    "preco": 150,
+    "precoAntigo": null,
+    "descricao": "Bolsa Iconic Rosé estruturada com fecho H dourado e alça de corrente. Elegância atemporal.",
+    "cores": [
+      "#c07a8a",
+      "#c9a24a"
+    ],
+    "colorway": {
+      "base": "#c07a8a",
+      "mesh": "#c07a8a",
+      "stripe": "#c9a24a",
+      "sole": "#efe9dc",
+      "accent": "#c9a24a",
+      "lace": "#c07a8a"
+    },
+    "tamanhos": [
+      "Único"
+    ],
+    "estoque": 7,
+    "img": "bolsa-rosa.jpg",
+    "destaque": true,
+    "tag": "Novo"
+  },
+  {
+    "id": "rsf-bolsa-navy",
+    "nome": "Bolsa Iconic Navy",
+    "marca": "Mikka",
+    "tipo": "Bolsas",
+    "categoria": "Bolsa",
+    "genero": "Feminino",
+    "preco": 150,
+    "precoAntigo": null,
+    "descricao": "Bolsa Iconic Navy estruturada com fecho H dourado e alça de corrente. Elegância atemporal.",
+    "cores": [
+      "#1c2438",
+      "#c9a24a"
+    ],
+    "colorway": {
+      "base": "#1c2438",
+      "mesh": "#1c2438",
+      "stripe": "#c9a24a",
+      "sole": "#efe9dc",
+      "accent": "#c9a24a",
+      "lace": "#1c2438"
+    },
+    "tamanhos": [
+      "Único"
+    ],
+    "estoque": 8,
+    "img": "bolsa-navy.jpg",
+    "destaque": false,
+    "tag": null
+  },
+  {
+    "id": "rsf-bolsa-vinho",
+    "nome": "Bolsa Iconic Vinho",
+    "marca": "Mikka",
+    "tipo": "Bolsas",
+    "categoria": "Bolsa",
+    "genero": "Feminino",
+    "preco": 150,
+    "precoAntigo": null,
+    "descricao": "Bolsa Iconic Vinho estruturada com fecho H dourado e alça de corrente. Elegância atemporal.",
+    "cores": [
+      "#5a1f2a",
+      "#c9a24a"
+    ],
+    "colorway": {
+      "base": "#5a1f2a",
+      "mesh": "#5a1f2a",
+      "stripe": "#c9a24a",
+      "sole": "#efe9dc",
+      "accent": "#c9a24a",
+      "lace": "#5a1f2a"
+    },
+    "tamanhos": [
+      "Único"
+    ],
+    "estoque": 7,
+    "img": "bolsa-vinho.jpg",
+    "destaque": false,
+    "tag": null
+  },
+  {
+    "id": "rsf-carteira-caramelo",
+    "nome": "Carteira Caramelo",
+    "marca": "Mikka",
+    "tipo": "Acessórios",
+    "categoria": "Carteira",
+    "genero": "Unissex",
+    "preco": 90,
+    "precoAntigo": null,
+    "descricao": "Carteira Caramelo em couro com acabamento premium. Organização e sofisticação no seu bolso.",
+    "cores": [
+      "#a45a34",
+      "#c9a24a"
+    ],
+    "colorway": {
+      "base": "#a45a34",
+      "mesh": "#a45a34",
+      "stripe": "#c9a24a",
+      "sole": "#efe9dc",
+      "accent": "#c9a24a",
+      "lace": "#a45a34"
+    },
+    "tamanhos": [
+      "Único"
+    ],
+    "estoque": 10,
+    "img": "carteira-caramelo.jpg",
+    "destaque": true,
+    "tag": "Novo"
+  },
+  {
+    "id": "rsf-carteira-set",
+    "nome": "Kit Carteira + Necessaire",
+    "marca": "Mikka",
+    "tipo": "Acessórios",
+    "categoria": "Carteira",
+    "genero": "Unissex",
+    "preco": 90,
+    "precoAntigo": null,
+    "descricao": "Kit Carteira + Necessaire em couro com acabamento premium. Organização e sofisticação no seu bolso.",
+    "cores": [
+      "#3a3a3a",
+      "#c9a24a"
+    ],
+    "colorway": {
+      "base": "#3a3a3a",
+      "mesh": "#3a3a3a",
+      "stripe": "#c9a24a",
+      "sole": "#efe9dc",
+      "accent": "#c9a24a",
+      "lace": "#3a3a3a"
+    },
+    "tamanhos": [
+      "Único"
+    ],
+    "estoque": 9,
+    "img": "carteira-set.jpg",
+    "destaque": false,
+    "tag": null
+  },
+  {
+    "id": "rsf-perfume-fabulous",
+    "nome": "Perfume Fabulous Red",
+    "marca": "Mikka",
+    "tipo": "Acessórios",
+    "categoria": "Perfumaria",
+    "genero": "Feminino",
+    "preco": 90,
+    "precoAntigo": null,
+    "descricao": "Perfume Fabulous Red — fragrância marcante e duradoura. 50 ml. O toque final que faz a diferença.",
+    "cores": [
+      "#8e1420",
+      "#c9a24a"
+    ],
+    "colorway": {
+      "base": "#8e1420",
+      "mesh": "#8e1420",
+      "stripe": "#c9a24a",
+      "sole": "#efe9dc",
+      "accent": "#c9a24a",
+      "lace": "#8e1420"
+    },
+    "tamanhos": [
+      "Único"
+    ],
+    "estoque": 20,
+    "img": "perfume-fabulous.jpg",
+    "destaque": true,
+    "tag": "Best-seller"
+  },
+  {
+    "id": "rsf-perfume-f1black",
+    "nome": "Perfume F1 Black",
+    "marca": "Mikka",
+    "tipo": "Acessórios",
+    "categoria": "Perfumaria",
+    "genero": "Masculino",
+    "preco": 90,
+    "precoAntigo": null,
+    "descricao": "Perfume F1 Black — fragrância marcante e duradoura. 50 ml. O toque final que faz a diferença.",
+    "cores": [
+      "#161616",
+      "#e3b768"
+    ],
+    "colorway": {
+      "base": "#161616",
+      "mesh": "#161616",
+      "stripe": "#e3b768",
+      "sole": "#efe9dc",
+      "accent": "#e3b768",
+      "lace": "#161616"
+    },
+    "tamanhos": [
+      "Único"
+    ],
+    "estoque": 18,
+    "img": "perfume-f1black.jpg",
+    "destaque": true,
+    "tag": null
+  },
+  {
+    "id": "rsf-perfume-black-oud",
+    "nome": "Perfume Black Oud",
+    "marca": "Mikka",
+    "tipo": "Acessórios",
+    "categoria": "Perfumaria",
+    "genero": "Unissex",
+    "preco": 90,
+    "precoAntigo": null,
+    "descricao": "Perfume Black Oud — fragrância marcante e duradoura. 50 ml. O toque final que faz a diferença.",
+    "cores": [
+      "#1c241c",
+      "#c9a24a"
+    ],
+    "colorway": {
+      "base": "#1c241c",
+      "mesh": "#1c241c",
+      "stripe": "#c9a24a",
+      "sole": "#efe9dc",
+      "accent": "#c9a24a",
+      "lace": "#1c241c"
+    },
+    "tamanhos": [
+      "Único"
+    ],
+    "estoque": 16,
+    "img": "perfume-black-oud.jpg",
+    "destaque": true,
+    "tag": null
+  },
+  {
+    "id": "rsf-oculos-01",
+    "nome": "Aviador Clássico",
+    "marca": "Mikka",
+    "tipo": "Óculos",
+    "categoria": "Óculos de sol",
+    "genero": "Unissex",
+    "preco": 100,
+    "precoAntigo": null,
+    "descricao": "Aviador Clássico com proteção UV400 e acabamento premium. Acompanha estojo e flanela Mikka.",
+    "cores": [
+      "#3a2a1e",
+      "#c9a24a"
+    ],
+    "colorway": {
+      "base": "#3a2a1e",
+      "mesh": "#3a2a1e",
+      "stripe": "#c9a24a",
+      "sole": "#efe9dc",
+      "accent": "#c9a24a",
+      "lace": "#3a2a1e"
+    },
+    "tamanhos": [
+      "Único"
+    ],
+    "estoque": 8,
+    "img": "oculos-01.jpg",
+    "destaque": true,
+    "tag": "Best-seller"
+  },
+  {
+    "id": "rsf-oculos-02",
+    "nome": "Retrô Tartaruga",
+    "marca": "Mikka",
+    "tipo": "Óculos",
+    "categoria": "Óculos de sol",
+    "genero": "Unissex",
+    "preco": 100,
+    "precoAntigo": null,
+    "descricao": "Retrô Tartaruga com proteção UV400 e acabamento premium. Acompanha estojo e flanela Mikka.",
+    "cores": [
+      "#6b4230",
+      "#e0a35f"
+    ],
+    "colorway": {
+      "base": "#6b4230",
+      "mesh": "#6b4230",
+      "stripe": "#e0a35f",
+      "sole": "#efe9dc",
+      "accent": "#e0a35f",
+      "lace": "#6b4230"
+    },
+    "tamanhos": [
+      "Único"
+    ],
+    "estoque": 9,
+    "img": "oculos-02.jpg",
+    "destaque": true,
+    "tag": "Novo"
+  },
+  {
+    "id": "rsf-oculos-03",
+    "nome": "Esportivo Wrap",
+    "marca": "Mikka",
+    "tipo": "Óculos",
+    "categoria": "Óculos de sol",
+    "genero": "Unissex",
+    "preco": 100,
+    "precoAntigo": null,
+    "descricao": "Esportivo Wrap com proteção UV400 e acabamento premium. Acompanha estojo e flanela Mikka.",
+    "cores": [
+      "#1c2a52",
+      "#9ccdf5"
+    ],
+    "colorway": {
+      "base": "#1c2a52",
+      "mesh": "#1c2a52",
+      "stripe": "#9ccdf5",
+      "sole": "#efe9dc",
+      "accent": "#9ccdf5",
+      "lace": "#1c2a52"
+    },
+    "tamanhos": [
+      "Único"
+    ],
+    "estoque": 10,
+    "img": "oculos-03.jpg",
+    "destaque": true,
+    "tag": "Lançamento"
+  },
+  {
+    "id": "rsf-oculos-04",
+    "nome": "Redondo Vintage",
+    "marca": "Mikka",
+    "tipo": "Óculos",
+    "categoria": "Óculos de sol",
+    "genero": "Unissex",
+    "preco": 100,
+    "precoAntigo": null,
+    "descricao": "Redondo Vintage com proteção UV400 e acabamento premium. Acompanha estojo e flanela Mikka.",
+    "cores": [
+      "#c0663a",
+      "#e6bd8c"
+    ],
+    "colorway": {
+      "base": "#c0663a",
+      "mesh": "#c0663a",
+      "stripe": "#e6bd8c",
+      "sole": "#efe9dc",
+      "accent": "#e6bd8c",
+      "lace": "#c0663a"
+    },
+    "tamanhos": [
+      "Único"
+    ],
+    "estoque": 11,
+    "img": "oculos-04.jpg",
+    "destaque": false,
+    "tag": null
+  },
+  {
+    "id": "rsf-oculos-05",
+    "nome": "Quadrado Moderno",
+    "marca": "Mikka",
+    "tipo": "Óculos",
+    "categoria": "Óculos de sol",
+    "genero": "Unissex",
+    "preco": 100,
+    "precoAntigo": null,
+    "descricao": "Quadrado Moderno com proteção UV400 e acabamento premium. Acompanha estojo e flanela Mikka.",
+    "cores": [
+      "#2e2016",
+      "#d8834e"
+    ],
+    "colorway": {
+      "base": "#2e2016",
+      "mesh": "#2e2016",
+      "stripe": "#d8834e",
+      "sole": "#efe9dc",
+      "accent": "#d8834e",
+      "lace": "#2e2016"
+    },
+    "tamanhos": [
+      "Único"
+    ],
+    "estoque": 12,
+    "img": "oculos-05.jpg",
+    "destaque": true,
+    "tag": null
+  },
+  {
+    "id": "rsf-oculos-06",
+    "nome": "Aviador Espelhado",
+    "marca": "Mikka",
+    "tipo": "Óculos",
+    "categoria": "Óculos de sol",
+    "genero": "Unissex",
+    "preco": 100,
+    "precoAntigo": null,
+    "descricao": "Aviador Espelhado com proteção UV400 e acabamento premium. Acompanha estojo e flanela Mikka.",
+    "cores": [
+      "#4a4f52",
+      "#9adfc3"
+    ],
+    "colorway": {
+      "base": "#4a4f52",
+      "mesh": "#4a4f52",
+      "stripe": "#9adfc3",
+      "sole": "#efe9dc",
+      "accent": "#9adfc3",
+      "lace": "#4a4f52"
+    },
+    "tamanhos": [
+      "Único"
+    ],
+    "estoque": 13,
+    "img": "oculos-06.jpg",
+    "destaque": true,
+    "tag": "Best-seller"
+  },
+  {
+    "id": "rsf-oculos-07",
+    "nome": "Esportivo Rainbow",
+    "marca": "Mikka",
+    "tipo": "Óculos",
+    "categoria": "Óculos de sol",
+    "genero": "Unissex",
+    "preco": 100,
+    "precoAntigo": null,
+    "descricao": "Esportivo Rainbow com proteção UV400 e acabamento premium. Acompanha estojo e flanela Mikka.",
+    "cores": [
+      "#c4499c",
+      "#59e3d8"
+    ],
+    "colorway": {
+      "base": "#c4499c",
+      "mesh": "#c4499c",
+      "stripe": "#59e3d8",
+      "sole": "#efe9dc",
+      "accent": "#59e3d8",
+      "lace": "#c4499c"
+    },
+    "tamanhos": [
+      "Único"
+    ],
+    "estoque": 8,
+    "img": "oculos-07.jpg",
+    "destaque": true,
+    "tag": "Edição limitada"
+  },
+  {
+    "id": "rsf-oculos-08",
+    "nome": "Retrô Âmbar",
+    "marca": "Mikka",
+    "tipo": "Óculos",
+    "categoria": "Óculos de sol",
+    "genero": "Unissex",
+    "preco": 100,
+    "precoAntigo": null,
+    "descricao": "Retrô Âmbar com proteção UV400 e acabamento premium. Acompanha estojo e flanela Mikka.",
+    "cores": [
+      "#8a5a3b",
+      "#e3b768"
+    ],
+    "colorway": {
+      "base": "#8a5a3b",
+      "mesh": "#8a5a3b",
+      "stripe": "#e3b768",
+      "sole": "#efe9dc",
+      "accent": "#e3b768",
+      "lace": "#8a5a3b"
+    },
+    "tamanhos": [
+      "Único"
+    ],
+    "estoque": 9,
+    "img": "oculos-08.jpg",
+    "destaque": false,
+    "tag": null
+  },
+  {
+    "id": "rsf-oculos-09",
+    "nome": "Piloto Degradê",
+    "marca": "Mikka",
+    "tipo": "Óculos",
+    "categoria": "Óculos de sol",
+    "genero": "Unissex",
+    "preco": 100,
+    "precoAntigo": null,
+    "descricao": "Piloto Degradê com proteção UV400 e acabamento premium. Acompanha estojo e flanela Mikka.",
+    "cores": [
+      "#3a2a1e",
+      "#d8a63a"
+    ],
+    "colorway": {
+      "base": "#3a2a1e",
+      "mesh": "#3a2a1e",
+      "stripe": "#d8a63a",
+      "sole": "#efe9dc",
+      "accent": "#d8a63a",
+      "lace": "#3a2a1e"
+    },
+    "tamanhos": [
+      "Único"
+    ],
+    "estoque": 10,
+    "img": "oculos-09.jpg",
+    "destaque": false,
+    "tag": null
+  },
+  {
+    "id": "rsf-oculos-10",
+    "nome": "Wayfarer Noir",
+    "marca": "Mikka",
+    "tipo": "Óculos",
+    "categoria": "Óculos de sol",
+    "genero": "Unissex",
+    "preco": 100,
+    "precoAntigo": null,
+    "descricao": "Wayfarer Noir com proteção UV400 e acabamento premium. Acompanha estojo e flanela Mikka.",
+    "cores": [
+      "#141110",
+      "#6c5f51"
+    ],
+    "colorway": {
+      "base": "#141110",
+      "mesh": "#141110",
+      "stripe": "#6c5f51",
+      "sole": "#efe9dc",
+      "accent": "#6c5f51",
+      "lace": "#141110"
+    },
+    "tamanhos": [
+      "Único"
+    ],
+    "estoque": 11,
+    "img": "oculos-10.jpg",
+    "destaque": true,
+    "tag": null
+  },
+  {
+    "id": "rsf-oculos-11",
+    "nome": "Esportivo Azul",
+    "marca": "Mikka",
+    "tipo": "Óculos",
+    "categoria": "Óculos de sol",
+    "genero": "Unissex",
+    "preco": 100,
+    "precoAntigo": null,
+    "descricao": "Esportivo Azul com proteção UV400 e acabamento premium. Acompanha estojo e flanela Mikka.",
+    "cores": [
+      "#1c2a52",
+      "#62a0ff"
+    ],
+    "colorway": {
+      "base": "#1c2a52",
+      "mesh": "#1c2a52",
+      "stripe": "#62a0ff",
+      "sole": "#efe9dc",
+      "accent": "#62a0ff",
+      "lace": "#1c2a52"
+    },
+    "tamanhos": [
+      "Único"
+    ],
+    "estoque": 12,
+    "img": "oculos-11.jpg",
+    "destaque": false,
+    "tag": null
+  },
+  {
+    "id": "rsf-oculos-12",
+    "nome": "Redondo Metal",
+    "marca": "Mikka",
+    "tipo": "Óculos",
+    "categoria": "Óculos de sol",
+    "genero": "Unissex",
+    "preco": 100,
+    "precoAntigo": null,
+    "descricao": "Redondo Metal com proteção UV400 e acabamento premium. Acompanha estojo e flanela Mikka.",
+    "cores": [
+      "#a38b74",
+      "#e6bd8c"
+    ],
+    "colorway": {
+      "base": "#a38b74",
+      "mesh": "#a38b74",
+      "stripe": "#e6bd8c",
+      "sole": "#efe9dc",
+      "accent": "#e6bd8c",
+      "lace": "#a38b74"
+    },
+    "tamanhos": [
+      "Único"
+    ],
+    "estoque": 13,
+    "img": "oculos-12.jpg",
+    "destaque": false,
+    "tag": "Novo"
+  },
+  {
+    "id": "rsf-oculos-13",
+    "nome": "Aviador Dourado",
+    "marca": "Mikka",
+    "tipo": "Óculos",
+    "categoria": "Óculos de sol",
+    "genero": "Unissex",
+    "preco": 100,
+    "precoAntigo": null,
+    "descricao": "Aviador Dourado com proteção UV400 e acabamento premium. Acompanha estojo e flanela Mikka.",
+    "cores": [
+      "#c9a24a",
+      "#f6ece0"
+    ],
+    "colorway": {
+      "base": "#c9a24a",
+      "mesh": "#c9a24a",
+      "stripe": "#f6ece0",
+      "sole": "#efe9dc",
+      "accent": "#f6ece0",
+      "lace": "#c9a24a"
+    },
+    "tamanhos": [
+      "Único"
+    ],
+    "estoque": 8,
+    "img": "oculos-13.jpg",
+    "destaque": true,
+    "tag": "Premium"
+  }
 ];
 
 /* fábrica de produtos de tamanho único (bolsas, perfumes, acessórios) */
