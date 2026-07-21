@@ -6,7 +6,7 @@
 import { useSyncExternalStore } from 'react';
 
 const KEYS = {
-  products: 'rsf.products.v5',
+  products: 'rsf.products.v6',
   orders: 'rsf.orders.v1',
   cart: 'rsf.cart.v4',
   staff: 'rsf.staff.v1',
@@ -166,19 +166,19 @@ const SEED_PRODUCTS = [
   },
 
   /* ---------- ÓCULOS (Casa Mikka) ---------- */
-  oculosProd('rsf-oculos-01', 'Aviador Clássico', 179.9, 229.9, 'Aviador atemporal com armação metálica e lentes espelhadas. Acompanha estojo de couro e flanela Mikka.', 'oculos-01.jpg', 10, true, 'Best-seller', ['#3a2a1e', '#c9a24a']),
-  oculosProd('rsf-oculos-02', 'Retrô Tartaruga', 169.9, null, 'Armação em acetato tartaruga com lentes polarizadas. Um clássico que valoriza qualquer rosto.', 'oculos-02.jpg', 12, true, 'Novo', ['#6b4230', '#e0a35f']),
-  oculosProd('rsf-oculos-03', 'Esportivo Wrap', 199.9, 249.9, 'Modelo esportivo envolvente com proteção UV400 e lentes espelhadas azuis. Leve e firme no rosto.', 'oculos-03.jpg', 8, true, 'Lançamento', ['#1c2a52', '#9ccdf5']),
-  oculosProd('rsf-oculos-04', 'Redondo Vintage', 159.9, null, 'Armação redonda metálica de inspiração vintage. Elegante e despojado ao mesmo tempo.', 'oculos-04.jpg', 14, false, null, ['#c0663a', '#e6bd8c']),
-  oculosProd('rsf-oculos-05', 'Quadrado Moderno', 189.9, 219.9, 'Linhas retas e armação encorpada para um visual contemporâneo. Lentes com proteção total.', 'oculos-05.jpg', 9, true, null, ['#2e2016', '#d8834e']),
-  oculosProd('rsf-oculos-06', 'Aviador Espelhado', 209.9, null, 'Aviador com lentes espelhadas premium e acabamento impecável. O queridinho da casa.', 'oculos-06.jpg', 7, true, 'Best-seller', ['#4a4f52', '#9adfc3']),
-  oculosProd('rsf-oculos-07', 'Esportivo Rainbow', 219.9, 269.9, 'Lente única espelhada em degradê arco-íris. Para quem quer se destacar com estilo.', 'oculos-07.jpg', 6, true, 'Edição limitada', ['#c4499c', '#59e3d8']),
-  oculosProd('rsf-oculos-08', 'Retrô Âmbar', 159.9, null, 'Acetato âmbar translúcido com lentes marrons. Sofisticação em tom quente.', 'oculos-08.jpg', 11, false, null, ['#8a5a3b', '#e3b768']),
-  oculosProd('rsf-oculos-09', 'Piloto Degradê', 189.9, 229.9, 'Estilo piloto com lentes degradê e armação leve. Conforto para o dia todo.', 'oculos-09.jpg', 10, false, null, ['#3a2a1e', '#d8a63a']),
-  oculosProd('rsf-oculos-10', 'Wayfarer Noir', 169.9, null, 'O wayfarer preto absoluto — atemporal, versátil e sempre elegante.', 'oculos-10.jpg', 13, true, null, ['#141110', '#6c5f51']),
-  oculosProd('rsf-oculos-11', 'Esportivo Azul', 199.9, null, 'Modelo esportivo com lentes espelhadas azuis e pegada firme. Ideal para o sol forte.', 'oculos-11.jpg', 8, false, null, ['#1c2a52', '#62a0ff']),
-  oculosProd('rsf-oculos-12', 'Redondo Metal', 179.9, 219.9, 'Armação metálica fina e lentes redondas espelhadas. Leveza e personalidade.', 'oculos-12.jpg', 9, false, null, ['#a38b74', '#e6bd8c']),
-  oculosProd('rsf-oculos-13', 'Aviador Dourado', 229.9, 279.9, 'Aviador com armação dourada e lentes premium. O toque de luxo da coleção.', 'oculos-13.jpg', 5, true, 'Premium', ['#c9a24a', '#f6ece0']),
+  oculosProd('rsf-oculos-01', 'Aviador Clássico', 100, null, 'Aviador atemporal com armação metálica e lentes espelhadas. Acompanha estojo de couro e flanela Mikka.', 'oculos-01.jpg', 10, true, 'Best-seller', ['#3a2a1e', '#c9a24a']),
+  oculosProd('rsf-oculos-02', 'Retrô Tartaruga', 100, null, 'Armação em acetato tartaruga com lentes polarizadas. Um clássico que valoriza qualquer rosto.', 'oculos-02.jpg', 12, true, 'Novo', ['#6b4230', '#e0a35f']),
+  oculosProd('rsf-oculos-03', 'Esportivo Wrap', 100, null, 'Modelo esportivo envolvente com proteção UV400 e lentes espelhadas azuis. Leve e firme no rosto.', 'oculos-03.jpg', 8, true, 'Lançamento', ['#1c2a52', '#9ccdf5']),
+  oculosProd('rsf-oculos-04', 'Redondo Vintage', 100, null, 'Armação redonda metálica de inspiração vintage. Elegante e despojado ao mesmo tempo.', 'oculos-04.jpg', 14, false, null, ['#c0663a', '#e6bd8c']),
+  oculosProd('rsf-oculos-05', 'Quadrado Moderno', 100, null, 'Linhas retas e armação encorpada para um visual contemporâneo. Lentes com proteção total.', 'oculos-05.jpg', 9, true, null, ['#2e2016', '#d8834e']),
+  oculosProd('rsf-oculos-06', 'Aviador Espelhado', 100, null, 'Aviador com lentes espelhadas premium e acabamento impecável. O queridinho da casa.', 'oculos-06.jpg', 7, true, 'Best-seller', ['#4a4f52', '#9adfc3']),
+  oculosProd('rsf-oculos-07', 'Esportivo Rainbow', 100, null, 'Lente única espelhada em degradê arco-íris. Para quem quer se destacar com estilo.', 'oculos-07.jpg', 6, true, 'Edição limitada', ['#c4499c', '#59e3d8']),
+  oculosProd('rsf-oculos-08', 'Retrô Âmbar', 100, null, 'Acetato âmbar translúcido com lentes marrons. Sofisticação em tom quente.', 'oculos-08.jpg', 11, false, null, ['#8a5a3b', '#e3b768']),
+  oculosProd('rsf-oculos-09', 'Piloto Degradê', 100, null, 'Estilo piloto com lentes degradê e armação leve. Conforto para o dia todo.', 'oculos-09.jpg', 10, false, null, ['#3a2a1e', '#d8a63a']),
+  oculosProd('rsf-oculos-10', 'Wayfarer Noir', 100, null, 'O wayfarer preto absoluto — atemporal, versátil e sempre elegante.', 'oculos-10.jpg', 13, true, null, ['#141110', '#6c5f51']),
+  oculosProd('rsf-oculos-11', 'Esportivo Azul', 100, null, 'Modelo esportivo com lentes espelhadas azuis e pegada firme. Ideal para o sol forte.', 'oculos-11.jpg', 8, false, null, ['#1c2a52', '#62a0ff']),
+  oculosProd('rsf-oculos-12', 'Redondo Metal', 100, null, 'Armação metálica fina e lentes redondas espelhadas. Leveza e personalidade.', 'oculos-12.jpg', 9, false, null, ['#a38b74', '#e6bd8c']),
+  oculosProd('rsf-oculos-13', 'Aviador Dourado', 100, null, 'Aviador com armação dourada e lentes premium. O toque de luxo da coleção.', 'oculos-13.jpg', 5, true, 'Premium', ['#c9a24a', '#f6ece0']),
 
   /* ---------- TÊNIS (fotos reais da coleção) ---------- */
   {
@@ -481,7 +481,7 @@ export const LOJA = {
   pixChave: '+556292368358',
   whatsapp: '556292368358',
   email: 'contato@casamikka.com.br',
-  endereco: 'Av. República do Líbano, 1875 — St. Oeste, Goiânia - GO, 74115-030',
+  endereco: 'R. 261, 450 — Qd 24 Lt 54, St. Coimbra, Goiânia - GO, 74533-050',
   horario: 'Seg a Sáb — 9h às 19h',
   cidade: 'GOIANIA'
 };
