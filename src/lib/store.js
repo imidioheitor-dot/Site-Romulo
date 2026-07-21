@@ -2280,8 +2280,10 @@ function oculosProd(id, nome, preco, precoAntigo, descricao, img, estoque, desta
   };
 }
 
-/* senha padrão da equipe: romulo2026 (troque no painel) */
-const SEED_STAFF = { passHash: hashPass('romulo2026') };
+/* Senha da equipe guardada SOMENTE como hash — o texto puro não fica no
+   código nem no bundle. Para trocar a senha, use "Alterar senha" no painel
+   (isso regrava o hash em localStorage). */
+const SEED_STAFF = { passHash: 'hltbjm510' };
 
 function hashPass(p) {
   // hash simples para não guardar a senha em texto puro no navegador
