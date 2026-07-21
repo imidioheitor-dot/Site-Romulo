@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import {
   FiLock, FiLogOut, FiPackage, FiBox, FiSettings, FiCheck, FiX, FiTruck,
-  FiClock, FiPlus, FiMinus, FiEdit2, FiTrash2, FiEye, FiSave, FiSearch, FiExternalLink
+  FiClock, FiPlus, FiMinus, FiEdit2, FiTrash2, FiEye, FiSave, FiSearch, FiExternalLink, FiUpload
 } from 'react-icons/fi';
 import LiquidGlass from '../components/fx/LiquidGlass';
 import AnimatedTitle from '../components/AnimatedTitle';
@@ -53,7 +53,6 @@ function Login() {
               <input type="password" value={pass} onChange={e => setPass(e.target.value)} placeholder="••••••••" autoFocus />
             </div>
             <button type="submit" className="btn btn-primary cursor-target" style={{ width: '100%' }}>Entrar</button>
-            <p className="login-card__hint muted">Senha padrão inicial: <code>romulo2026</code> — altere após o primeiro acesso.</p>
           </form>
         </LiquidGlass>
         <div className="page-end-space" />
@@ -302,6 +301,33 @@ function ProdutoForm({ produto, onClose, onSaved }) {
   const set = (k, v) => setF(prev => ({ ...prev, [k]: v }));
   const setCw = (k, v) => setF(prev => ({ ...prev, colorway: { ...prev.colorway, [k]: v } }));
 
+  // envia foto do computador/celular: redimensiona e guarda embutida no produto
+  const onPickFile = file => {
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      const img = new Image();
+      img.onload = () => {
+        const max = 1000;
+        let { width, height } = img;
+        const r = Math.min(1, max / Math.max(width, height));
+        width = Math.round(width * r);
+        height = Math.round(height * r);
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+        set('img', canvas.toDataURL('image/jpeg', 0.85));
+      };
+      img.src = ev.target.result;
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const previewSrc = f.img
+    ? (/^(data:|https?:|blob:)/.test(f.img) ? f.img : `${import.meta.env.BASE_URL}products/${f.img}`)
+    : null;
+
   const salvar = e => {
     e.preventDefault();
     const payload = {
@@ -309,7 +335,7 @@ function ProdutoForm({ produto, onClose, onSaved }) {
       preco: parseFloat(f.preco) || 0,
       precoAntigo: f.precoAntigo ? parseFloat(f.precoAntigo) : null,
       estoque: parseInt(f.estoque, 10) || 0,
-      tamanhos: String(f.tamanhos).split(',').map(t => parseInt(t.trim(), 10)).filter(Boolean),
+      tamanhos: String(f.tamanhos).split(',').map(t => t.trim()).filter(Boolean).map(t => (/^\d+$/.test(t) ? parseInt(t, 10) : t)),
       cores: String(f.cores).split(',').map(c => c.trim()).filter(Boolean),
       tag: f.tag || null,
       destaque: !!f.destaque
@@ -346,7 +372,24 @@ function ProdutoForm({ produto, onClose, onSaved }) {
             <div className="field"><label>Etiqueta (ex: Novo)</label><input value={f.tag || ''} onChange={e => set('tag', e.target.value)} /></div>
             <div className="field"><label>Tamanhos (vírgula)</label><input value={f.tamanhos} onChange={e => set('tamanhos', e.target.value)} /></div>
             <div className="field"><label>Cores hex (vírgula)</label><input value={f.cores} onChange={e => set('cores', e.target.value)} /></div>
-            <div className="field"><label>Arquivo da foto (public/products/)</label><input value={f.img || ''} onChange={e => set('img', e.target.value)} placeholder="ex: meu-tenis.jpg" /></div>
+            <div className="field field--photo">
+              <label>Foto do produto</label>
+              <div className="pform__photo">
+                <div className="pform__photo-preview">
+                  {previewSrc
+                    ? <img src={previewSrc} alt="Prévia" />
+                    : <span className="pform__photo-empty">Sem foto</span>}
+                </div>
+                <div className="pform__photo-actions">
+                  <label className="btn btn-ghost cursor-target pform__upload">
+                    <FiUpload /> Enviar foto
+                    <input type="file" accept="image/*" hidden onChange={e => onPickFile(e.target.files && e.target.files[0])} />
+                  </label>
+                  {f.img && <button type="button" className="btn btn-quiet cursor-target" onClick={() => set('img', '')}>Remover</button>}
+                  <p className="muted pform__photo-hint">Envie do computador ou celular. A imagem fica salva junto do produto.</p>
+                </div>
+              </div>
+            </div>
             <div className="field field--check">
               <label className="pform__check cursor-target">
                 <input type="checkbox" checked={!!f.destaque} onChange={e => set('destaque', e.target.checked)} /> Exibir em destaque

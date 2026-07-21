@@ -15,7 +15,7 @@ export default function Footer() {
               Calçados que unem conforto e elegância para o seu dia a dia — selecionados a dedo, com o preço justo.
             </p>
             <div className="footer__social">
-              <a className="footer__ic cursor-target" href="#" aria-label="Instagram"><FiInstagram /></a>
+              <a className="footer__ic cursor-target" href={LOJA.instagramUrl} target="_blank" rel="noreferrer" aria-label="Instagram"><FiInstagram /></a>
               <a className="footer__ic cursor-target" href={`https://wa.me/${LOJA.whatsapp}`} target="_blank" rel="noreferrer" aria-label="WhatsApp"><FiPhone /></a>
               <a className="footer__ic cursor-target" href={`mailto:${LOJA.email}`} aria-label="E-mail"><FiMail /></a>
             </div>

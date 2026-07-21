@@ -68,11 +68,11 @@ export default function Contato() {
               <span>{LOJA.horario}</span>
             </div>
           </div>
-          <a className="contato__card reveal cursor-target" href="#">
+          <a className="contato__card reveal cursor-target" href={LOJA.instagramUrl} target="_blank" rel="noreferrer">
             <span className="contato__ic"><FiInstagram /></span>
             <div>
               <strong>Instagram</strong>
-              <span>@romulosantosflores</span>
+              <span>{LOJA.instagram}</span>
             </div>
             <FiExternalLink className="contato__go" />
           </a>

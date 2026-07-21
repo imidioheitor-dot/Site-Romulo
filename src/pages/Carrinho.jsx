@@ -305,8 +305,8 @@ export default function Carrinho() {
                       <strong>{LOJA.nome}</strong>
                     </div>
                     <div className="pix-detail">
-                      <span className="muted">Chave Pix (telefone)</span>
-                      <strong>{LOJA.pixTelefone}</strong>
+                      <span className="muted">Chave Pix (e-mail)</span>
+                      <strong>{LOJA.pixChave}</strong>
                     </div>
                     <div className="pix-detail">
                       <span className="muted">Identificador</span>
