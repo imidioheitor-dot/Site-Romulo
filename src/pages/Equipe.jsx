@@ -1,7 +1,7 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import {
   FiLock, FiLogOut, FiPackage, FiBox, FiSettings, FiCheck, FiX, FiTruck,
-  FiClock, FiPlus, FiMinus, FiEdit2, FiTrash2, FiEye, FiSave, FiSearch, FiExternalLink, FiUpload
+  FiClock, FiPlus, FiMinus, FiEdit2, FiTrash2, FiEye, FiSave, FiSearch, FiExternalLink, FiUpload, FiDownload
 } from 'react-icons/fi';
 import LiquidGlass from '../components/fx/LiquidGlass';
 import AnimatedTitle from '../components/AnimatedTitle';
@@ -9,7 +9,8 @@ import ProductMedia from '../components/ProductMedia';
 import {
   useSession, login, logout, changePassword,
   useOrders, updateOrderStatus, ORDER_STATUS,
-  useProducts, saveProduct, deleteProduct, adjustStock, LOJA, CATEGORIAS
+  useProducts, saveProduct, deleteProduct, adjustStock, LOJA, CATEGORIAS,
+  exportCatalog, importCatalog, isStoragePersistent
 } from '../lib/store';
 import { brl, dataBR } from '../lib/format';
 import { useToast } from '../components/Toast';
@@ -248,11 +249,37 @@ function Estoque() {
   const toast = useToast();
   const [busca, setBusca] = useState('');
   const [editando, setEditando] = useState(null);
+  const importRef = useRef(null);
 
   const lista = products.filter(p => p.nome.toLowerCase().includes(busca.toLowerCase()) || p.marca.toLowerCase().includes(busca.toLowerCase()));
 
   const totalPares = products.reduce((s, p) => s + p.estoque, 0);
   const semEstoque = products.filter(p => p.estoque <= 0).length;
+
+  const baixarCatalogo = () => {
+    const blob = new Blob([exportCatalog()], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `casa-mikka-catalogo-${new Date().toISOString().slice(0, 10)}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast('Catálogo baixado. Guarde este arquivo.', 'ok');
+  };
+
+  const carregarCatalogo = file => {
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      try {
+        const n = importCatalog(ev.target.result);
+        toast(`Catálogo carregado — ${n} produtos.`, 'ok');
+      } catch (err) {
+        toast('Arquivo inválido. Selecione um catálogo exportado aqui.', 'danger');
+      }
+    };
+    reader.readAsText(file);
+  };
 
   return (
     <div className="estoque">
@@ -262,12 +289,26 @@ function Estoque() {
         <Stat label="Esgotados" value={semEstoque} tone={semEstoque ? 'danger' : 'base'} />
       </div>
 
+      {!isStoragePersistent() && (
+        <div className="estoque__warn">
+          ⚠️ Este navegador não está salvando as alterações de forma permanente
+          (comum ao abrir o arquivo direto no celular ou em aba anônima). Use
+          <strong> Baixar catálogo</strong> para guardar o que você adicionar, ou
+          publique o site para salvar automaticamente.
+        </div>
+      )}
+
       <div className="estoque__toolbar">
-        <div className="catalogo__search cursor-target" style={{ maxWidth: 360 }}>
+        <div className="catalogo__search cursor-target" style={{ maxWidth: 340 }}>
           <FiSearch />
           <input placeholder="Buscar produto…" value={busca} onChange={e => setBusca(e.target.value)} />
         </div>
-        <button className="btn btn-primary cursor-target" onClick={() => setEditando({ ...EMPTY })}><FiPlus /> Novo produto</button>
+        <div className="estoque__toolbar-actions">
+          <button className="btn btn-ghost cursor-target" onClick={baixarCatalogo} title="Salva todos os produtos e fotos num arquivo"><FiDownload /> Baixar catálogo</button>
+          <button className="btn btn-ghost cursor-target" onClick={() => importRef.current && importRef.current.click()} title="Recarrega um catálogo salvo"><FiUpload /> Carregar catálogo</button>
+          <input ref={importRef} type="file" accept="application/json,.json" hidden onChange={e => { carregarCatalogo(e.target.files && e.target.files[0]); e.target.value = ''; }} />
+          <button className="btn btn-primary cursor-target" onClick={() => setEditando({ ...EMPTY })}><FiPlus /> Novo produto</button>
+        </div>
       </div>
 
       <div className="estoque__list">
@@ -308,7 +349,7 @@ function ProdutoForm({ produto, onClose, onSaved }) {
     reader.onload = ev => {
       const img = new Image();
       img.onload = () => {
-        const max = 1000;
+        const max = 900;
         let { width, height } = img;
         const r = Math.min(1, max / Math.max(width, height));
         width = Math.round(width * r);
@@ -317,7 +358,7 @@ function ProdutoForm({ produto, onClose, onSaved }) {
         canvas.width = width;
         canvas.height = height;
         canvas.getContext('2d').drawImage(img, 0, 0, width, height);
-        set('img', canvas.toDataURL('image/jpeg', 0.85));
+        set('img', canvas.toDataURL('image/jpeg', 0.82));
       };
       img.src = ev.target.result;
     };

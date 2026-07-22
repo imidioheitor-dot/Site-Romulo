@@ -2292,32 +2292,53 @@ function hashPass(p) {
   return 'h' + (h >>> 0).toString(36) + p.length;
 }
 
-/* ---------- primitivas ---------- */
+/* ---------- primitivas (camada resiliente) ----------
+   Guarda uma cópia em memória (mem) que funciona mesmo quando o
+   localStorage está indisponível (ex.: Safari em aba privada) ou cheio.
+   Quando o localStorage funciona, ele é usado para persistir entre visitas. */
+const mem = new Map();
+let storagePersistent = true;
+
+function lsGet(key) {
+  try { return localStorage.getItem(key); } catch { storagePersistent = false; return null; }
+}
+function lsSet(key, val) {
+  try { localStorage.setItem(key, val); return true; }
+  catch { storagePersistent = false; return false; }
+}
+function safeParse(raw, fallback) {
+  try { return JSON.parse(raw); } catch { return fallback; }
+}
+
 function read(key, fallback) {
-  try {
-    const raw = localStorage.getItem(key);
-    return raw ? JSON.parse(raw) : fallback;
-  } catch {
-    return fallback;
-  }
+  if (mem.has(key)) return mem.get(key);
+  const raw = lsGet(key);
+  const value = raw ? safeParse(raw, fallback) : fallback;
+  mem.set(key, value);
+  return value;
 }
 
 function write(key, value) {
-  localStorage.setItem(key, JSON.stringify(value));
+  // guarda uma nova referência (arrays) para o useSyncExternalStore detectar a mudança
+  mem.set(key, Array.isArray(value) ? value.slice() : value);
+  lsSet(key, JSON.stringify(value));
   window.dispatchEvent(new CustomEvent(EVENT, { detail: key }));
 }
 
+/* true quando as alterações estão sendo salvas no navegador (persistem entre visitas) */
+export function isStoragePersistent() { return storagePersistent; }
+
 function ensureSeed() {
-  if (!localStorage.getItem(KEYS.products)) write(KEYS.products, SEED_PRODUCTS);
-  if (!localStorage.getItem(KEYS.staff)) write(KEYS.staff, SEED_STAFF);
+  if (!mem.has(KEYS.products) && !lsGet(KEYS.products)) write(KEYS.products, SEED_PRODUCTS);
+  if (!mem.has(KEYS.staff) && !lsGet(KEYS.staff)) write(KEYS.staff, SEED_STAFF);
 }
 ensureSeed();
 
-/* cache de snapshots para useSyncExternalStore não entrar em loop */
-const snapshots = new Map();
-
 function subscribe(cb) {
-  const handler = () => cb();
+  const handler = e => {
+    if (e && e.type === 'storage') mem.clear(); // outra aba mudou: recarrega do storage
+    cb();
+  };
   window.addEventListener(EVENT, handler);
   window.addEventListener('storage', handler);
   return () => {
@@ -2327,12 +2348,7 @@ function subscribe(cb) {
 }
 
 function getSnapshot(key, fallback) {
-  const raw = localStorage.getItem(key);
-  const cached = snapshots.get(key);
-  if (cached && cached.raw === raw) return cached.value;
-  const value = raw ? JSON.parse(raw) : fallback;
-  snapshots.set(key, { raw, value });
-  return value;
+  return read(key, fallback);
 }
 
 export function useStoreKey(name, fallback) {
@@ -2368,6 +2384,29 @@ export function adjustStock(id, delta) {
   if (!p) return;
   p.estoque = Math.max(0, (p.estoque || 0) + delta);
   write(KEYS.products, list);
+}
+
+/* ---------- exportar / importar catálogo (backup local em arquivo) ----------
+   Permite ao lojista salvar todos os produtos + fotos num arquivo .json e
+   recarregar depois, garantindo que o trabalho não se perca entre visitas. */
+export function exportCatalog() {
+  return JSON.stringify({ tipo: 'casa-mikka-catalogo', versao: 1, data: new Date().toISOString(), produtos: getProducts() });
+}
+
+export function importCatalog(text, { mesclar = false } = {}) {
+  const parsed = JSON.parse(text);
+  const produtos = Array.isArray(parsed) ? parsed : parsed && parsed.produtos;
+  if (!Array.isArray(produtos) || !produtos.length) throw new Error('Arquivo sem produtos válidos.');
+  const norm = produtos.map(p => ({ ...p, id: p.id || 'rsf-' + Math.random().toString(36).slice(2, 8) }));
+  if (mesclar) {
+    const atual = getProducts();
+    const byId = new Map(atual.map(p => [p.id, p]));
+    norm.forEach(p => byId.set(p.id, p));
+    write(KEYS.products, [...byId.values()]);
+    return byId.size;
+  }
+  write(KEYS.products, norm);
+  return norm.length;
 }
 
 /* ---------- carrinho ---------- */
