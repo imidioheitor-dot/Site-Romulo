@@ -7,6 +7,7 @@ import Footer from './components/Footer';
 import Dock from './components/fx/Dock';
 import TargetCursor from './components/fx/TargetCursor';
 import MagicBento from './components/fx/MagicBento';
+import Boundary from './components/fx/Boundary';
 import { ToastProvider } from './components/Toast';
 
 import Home from './pages/Home';
@@ -21,6 +22,20 @@ function Loader() {
   return (
     <div style={{ minHeight: '70vh', display: 'grid', placeItems: 'center' }}>
       <div className="rsf-spinner" />
+    </div>
+  );
+}
+
+function RouteError() {
+  return (
+    <div style={{ minHeight: '70vh', display: 'grid', placeItems: 'center', textAlign: 'center', padding: '48px 20px' }}>
+      <div style={{ maxWidth: 460 }}>
+        <h2 className="h2" style={{ marginBottom: 12 }}>Não foi possível carregar esta página</h2>
+        <p className="muted" style={{ marginBottom: 22 }}>
+          Tente recarregar. Se o problema continuar, pode ser uma limitação gráfica do aparelho.
+        </p>
+        <button className="btn btn-primary cursor-target" onClick={() => window.location.reload()}>Recarregar</button>
+      </div>
     </div>
   );
 }
@@ -51,39 +66,45 @@ export default function App() {
       {/* Fundo interativo (MagicBento) nas áreas escuras — fora da landing page */}
       {!isLanding && (
         <div className="bento-bg-layer" aria-hidden="true">
-          <MagicBento
-            className="bento-bg"
-            textAutoHide
-            enableStars={false}
-            enableSpotlight
-            enableBorderGlow
-            enableTilt={false}
-            enableMagnetism={false}
-            clickEffect={false}
-            spotlightRadius={340}
-            glowColor="192, 102, 58"
-          />
+          <Boundary>
+            <MagicBento
+              className="bento-bg"
+              textAutoHide
+              enableStars={false}
+              enableSpotlight
+              enableBorderGlow
+              enableTilt={false}
+              enableMagnetism={false}
+              clickEffect={false}
+              spotlightRadius={340}
+              glowColor="192, 102, 58"
+            />
+          </Boundary>
         </div>
       )}
 
-      <TargetCursor targetSelector=".cursor-target" spinDuration={3} hideDefaultCursor parallaxOn />
+      <Boundary>
+        <TargetCursor targetSelector=".cursor-target" spinDuration={3} hideDefaultCursor parallaxOn />
+      </Boundary>
 
       <Nav />
 
       <main key={loc.pathname} className="route-fade">
-        <Suspense fallback={<Loader />}>
-          <Routes location={loc}>
-            <Route path="/" element={<Home />} />
-            <Route path="/catalogo" element={<Catalogo />} />
-            <Route path="/catalogo/:tipo" element={<Catalogo />} />
-            <Route path="/produto/:id" element={<Produto />} />
-            <Route path="/carrinho" element={<Carrinho />} />
-            <Route path="/contato" element={<Contato />} />
-            <Route path="/localizacao" element={<Localizacao />} />
-            <Route path="/equipe" element={<Equipe />} />
-            <Route path="*" element={<Home />} />
-          </Routes>
-        </Suspense>
+        <Boundary fallback={<RouteError />}>
+          <Suspense fallback={<Loader />}>
+            <Routes location={loc}>
+              <Route path="/" element={<Home />} />
+              <Route path="/catalogo" element={<Catalogo />} />
+              <Route path="/catalogo/:tipo" element={<Catalogo />} />
+              <Route path="/produto/:id" element={<Produto />} />
+              <Route path="/carrinho" element={<Carrinho />} />
+              <Route path="/contato" element={<Contato />} />
+              <Route path="/localizacao" element={<Localizacao />} />
+              <Route path="/equipe" element={<Equipe />} />
+              <Route path="*" element={<Home />} />
+            </Routes>
+          </Suspense>
+        </Boundary>
       </main>
 
       {!hideChrome && <Footer />}

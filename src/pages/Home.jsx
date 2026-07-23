@@ -9,6 +9,7 @@ import GradualBlur from '../components/fx/GradualBlur';
 import LogoLoop from '../components/fx/LogoLoop';
 import LiquidGlass from '../components/fx/LiquidGlass';
 import ShapeBlur from '../components/fx/ShapeBlur';
+import Boundary from '../components/fx/Boundary';
 import StickerPeel from '../components/fx/StickerPeel';
 import Cubes from '../components/fx/Cubes';
 import ProductCard from '../components/ProductCard';
@@ -201,7 +202,9 @@ export default function Home() {
       <section className="section container home-split">
         <div className="split-card split-card--tech reveal cursor-target" onClick={() => navigate('/catalogo')}>
           <div className="split-card__shape" aria-hidden="true">
-            <ShapeBlur variation={0} shapeSize={0.62} roundness={0.5} borderSize={0.045} circleSize={0.35} circleEdge={0.9} color="#d8834e" pixelRatioProp={typeof window !== 'undefined' ? window.devicePixelRatio : 1} />
+            <Boundary>
+              <ShapeBlur variation={0} shapeSize={0.62} roundness={0.5} borderSize={0.045} circleSize={0.35} circleEdge={0.9} color="#d8834e" pixelRatioProp={typeof window !== 'undefined' ? window.devicePixelRatio : 1} />
+            </Boundary>
           </div>
           <div className="split-card__sticker" aria-hidden="true">
             <StickerPeel width={230} rotate={-8} peelBackHoverPct={26} peelDirection={-24} shadowIntensity={0.5} renderImage={() => <SplitCardMedia img="card-amortecimento.jpg" colorway={techProduct?.colorway} seed={7} />} />
@@ -216,7 +219,9 @@ export default function Home() {
 
         <div className="split-card split-card--design reveal cursor-target" onClick={() => navigate(`/produto/${designProduct?.id}`)}>
           <div className="split-card__shape" aria-hidden="true">
-            <ShapeBlur variation={2} shapeSize={0.7} roundness={0.5} borderSize={0.05} circleSize={0.4} circleEdge={1} color="#cf9b6b" pixelRatioProp={typeof window !== 'undefined' ? window.devicePixelRatio : 1} />
+            <Boundary>
+              <ShapeBlur variation={2} shapeSize={0.7} roundness={0.5} borderSize={0.05} circleSize={0.4} circleEdge={1} color="#cf9b6b" pixelRatioProp={typeof window !== 'undefined' ? window.devicePixelRatio : 1} />
+            </Boundary>
           </div>
           <div className="split-card__sticker" aria-hidden="true">
             <StickerPeel width={230} rotate={9} peelBackHoverPct={26} peelDirection={20} shadowIntensity={0.5} renderImage={() => <SplitCardMedia img="card-estilo.jpg" colorway={designProduct?.colorway} seed={12} />} />

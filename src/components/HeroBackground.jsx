@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import LiquidChrome from './fx/LiquidChrome';
+import Boundary from './fx/Boundary';
 
 /**
  * Fundo do hero: tenta reproduzir o vídeo em /public/media/hero.mp4.
@@ -28,7 +29,9 @@ export default function HeroBackground() {
   return (
     <div className="hero-bg">
       <div className="hero-bg__chrome">
-        <LiquidChrome baseColor={[0.16, 0.09, 0.05]} speed={0.35} amplitude={0.45} frequencyX={2.6} frequencyY={2.2} interactive />
+        <Boundary>
+          <LiquidChrome baseColor={[0.16, 0.09, 0.05]} speed={0.35} amplitude={0.45} frequencyX={2.6} frequencyY={2.2} interactive />
+        </Boundary>
       </div>
 
       <video
