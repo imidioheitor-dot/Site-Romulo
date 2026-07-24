@@ -29,7 +29,8 @@ function useMousePositionRef(containerRef) {
 
     const handleMouseMove = ev => updatePosition(ev.clientX, ev.clientY);
     const handleTouchMove = ev => {
-      const touch = ev.touches[0];
+      const touch = ev.touches && ev.touches[0];
+      if (!touch) return;
       updatePosition(touch.clientX, touch.clientY);
     };
 
@@ -141,7 +142,7 @@ const VariableProximity = forwardRef((props, ref) => {
     });
   });
 
-  const words = label.split(' ');
+  const words = String(label ?? '').split(' ');
   let letterIndex = 0;
 
   return (

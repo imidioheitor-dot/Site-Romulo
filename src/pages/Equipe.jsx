@@ -251,9 +251,9 @@ function Estoque() {
   const [editando, setEditando] = useState(null);
   const importRef = useRef(null);
 
-  const lista = products.filter(p => p.nome.toLowerCase().includes(busca.toLowerCase()) || p.marca.toLowerCase().includes(busca.toLowerCase()));
+  const lista = products.filter(p => (p.nome || '').toLowerCase().includes(busca.toLowerCase()) || (p.marca || '').toLowerCase().includes(busca.toLowerCase()));
 
-  const totalPares = products.reduce((s, p) => s + p.estoque, 0);
+  const totalPares = products.reduce((s, p) => s + (Number(p.estoque) || 0), 0);
   const semEstoque = products.filter(p => p.estoque <= 0).length;
 
   const baixarCatalogo = () => {

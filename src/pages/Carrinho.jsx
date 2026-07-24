@@ -6,8 +6,6 @@ import {
   FiShoppingBag, FiCreditCard, FiClock, FiExternalLink
 } from 'react-icons/fi';
 import LiquidGlass from '../components/fx/LiquidGlass';
-import Antigravity from '../components/fx/Antigravity';
-import Boundary from '../components/fx/Boundary';
 import AnimatedTitle from '../components/AnimatedTitle';
 import ProductMedia from '../components/ProductMedia';
 import { useProducts, useCart, cartDetails, setCartQty, createOrder, LOJA } from '../lib/store';
@@ -179,24 +177,7 @@ export default function Carrinho() {
 
   return (
     <div className="carrinho">
-      <div className="carrinho__ambient" aria-hidden="true">
-        <Boundary>
-          <Antigravity
-            count={220}
-            magnetRadius={7}
-            ringRadius={12}
-            waveSpeed={1}
-            waveAmplitude={0.7}
-            particleSize={0.55}
-            lerpSpeed={0.05}
-            color="#c0663a"
-            autoAnimate
-            particleVariance={1}
-            depthFactor={1.1}
-            pulseSpeed={1.6}
-          />
-        </Boundary>
-      </div>
+      <div className="carrinho__ambient" aria-hidden="true" />
       <div className="container">
         <header className="carrinho__head">
           <AnimatedTitle className="display" style={{ fontSize: 'clamp(38px, 6vw, 76px)' }} pre="Sua" accent="sacola" post="." />

@@ -26,15 +26,21 @@ function Loader() {
   );
 }
 
-function RouteError() {
+function RouteError(error) {
+  const msg = error && (error.message || String(error));
   return (
     <div style={{ minHeight: '70vh', display: 'grid', placeItems: 'center', textAlign: 'center', padding: '48px 20px' }}>
-      <div style={{ maxWidth: 460 }}>
+      <div style={{ maxWidth: 480 }}>
         <h2 className="h2" style={{ marginBottom: 12 }}>Não foi possível carregar esta página</h2>
         <p className="muted" style={{ marginBottom: 22 }}>
-          Tente recarregar. Se o problema continuar, pode ser uma limitação gráfica do aparelho.
+          Tente recarregar. Se o problema continuar, pode ser uma limitação do aparelho.
         </p>
         <button className="btn btn-primary cursor-target" onClick={() => window.location.reload()}>Recarregar</button>
+        {msg && (
+          <p style={{ marginTop: 20, fontSize: 11, color: 'var(--ash)', wordBreak: 'break-word', opacity: 0.7 }}>
+            {msg}
+          </p>
+        )}
       </div>
     </div>
   );
@@ -90,7 +96,7 @@ export default function App() {
       <Nav />
 
       <main key={loc.pathname} className="route-fade">
-        <Boundary fallback={<RouteError />}>
+        <Boundary fallback={RouteError}>
           <Suspense fallback={<Loader />}>
             <Routes location={loc}>
               <Route path="/" element={<Home />} />

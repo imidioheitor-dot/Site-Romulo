@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { FiSearch, FiSliders } from 'react-icons/fi';
 import ProductCard from '../components/ProductCard';
 import VariableProximity from '../components/fx/VariableProximity';
+import Boundary from '../components/fx/Boundary';
 import { useProducts, CATEGORIAS } from '../lib/store';
 import { useReveal } from '../lib/useReveal';
 import './Catalogo.css';
@@ -48,16 +49,16 @@ export default function Catalogo() {
     let out = doTipo.filter(p => {
       const okBusca =
         !busca ||
-        p.nome.toLowerCase().includes(busca.toLowerCase()) ||
+        (p.nome || '').toLowerCase().includes(busca.toLowerCase()) ||
         (p.marca || '').toLowerCase().includes(busca.toLowerCase());
       const okGen = genero === 'Todos' || p.genero === genero;
       const okMarca = marca === 'Todas' || p.marca === marca;
       return okBusca && okGen && okMarca;
     });
     out = [...out].sort((a, b) => {
-      if (ordem === 'menor') return a.preco - b.preco;
-      if (ordem === 'maior') return b.preco - a.preco;
-      if (ordem === 'nome') return a.nome.localeCompare(b.nome);
+      if (ordem === 'menor') return (a.preco || 0) - (b.preco || 0);
+      if (ordem === 'maior') return (b.preco || 0) - (a.preco || 0);
+      if (ordem === 'nome') return (a.nome || '').localeCompare(b.nome || '');
       return (b.destaque ? 1 : 0) - (a.destaque ? 1 : 0);
     });
     return out;
@@ -74,15 +75,17 @@ export default function Catalogo() {
           {tipo === 'Todos' ? 'O catálogo completo' : `Categoria · ${tipo}`}
         </p>
         <h1 className="display rise rise-1 catalogo__title" ref={headRef}>
-          <VariableProximity
-            label={tipo === 'Todos' ? 'Encontre o seu' : tipo}
-            containerRef={headRef}
-            className="catalogo__vp cursor-target"
-            fromFontVariationSettings="'wght' 300, 'opsz' 12"
-            toFontVariationSettings="'wght' 900, 'opsz' 40"
-            radius={130}
-            falloff="gaussian"
-          />
+          <Boundary fallback={<span>{tipo === 'Todos' ? 'Encontre o seu' : tipo}</span>}>
+            <VariableProximity
+              label={tipo === 'Todos' ? 'Encontre o seu' : tipo}
+              containerRef={headRef}
+              className="catalogo__vp cursor-target"
+              fromFontVariationSettings="'wght' 300, 'opsz' 12"
+              toFontVariationSettings="'wght' 900, 'opsz' 40"
+              radius={130}
+              falloff="gaussian"
+            />
+          </Boundary>
           {tipo === 'Todos' && <> <em>estilo</em>.</>}
         </h1>
         <p className="lead rise rise-2" style={{ marginTop: 18 }}>

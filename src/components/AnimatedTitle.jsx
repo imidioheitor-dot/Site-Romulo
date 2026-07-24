@@ -1,5 +1,6 @@
 import { useRef } from 'react';
 import VariableProximity from './fx/VariableProximity';
+import Boundary from './fx/Boundary';
 
 /**
  * Título com o efeito de texto (VariableProximity): as letras engrossam
@@ -20,15 +21,17 @@ export default function AnimatedTitle({
   const ref = useRef(null);
   return (
     <Tag className={`${className} animated-title`} ref={ref} style={style}>
-      <VariableProximity
-        label={pre}
-        containerRef={ref}
-        className="cursor-target"
-        fromFontVariationSettings="'wght' 300, 'opsz' 12"
-        toFontVariationSettings="'wght' 900, 'opsz' 40"
-        radius={radius}
-        falloff="gaussian"
-      />
+      <Boundary fallback={<span>{pre}</span>}>
+        <VariableProximity
+          label={pre}
+          containerRef={ref}
+          className="cursor-target"
+          fromFontVariationSettings="'wght' 300, 'opsz' 12"
+          toFontVariationSettings="'wght' 900, 'opsz' 40"
+          radius={radius}
+          falloff="gaussian"
+        />
+      </Boundary>
       {accent ? <> <em className="h-serif">{accent}</em></> : null}
       {post ? post : null}
     </Tag>

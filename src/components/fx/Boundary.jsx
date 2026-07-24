@@ -2,20 +2,19 @@ import { Component } from 'react';
 
 /**
  * Boundary — captura erros de renderização (ex.: falha ao criar contexto
- * WebGL em aparelhos fracos / Safari) para que um efeito decorativo ou uma
- * página nunca derrubem o site inteiro. Sem isto, um erro de WebGL no
- * carrinho deixava toda a aplicação em branco.
+ * WebGL em aparelhos fracos / Safari, ou um dado inesperado) para que um
+ * efeito decorativo ou uma página nunca derrubem o site inteiro.
  *
- * fallback: o que mostrar quando há erro (por padrão nada — some o efeito).
+ * fallback: node OU função (erro) => node. Por padrão não mostra nada.
  */
 export default class Boundary extends Component {
   constructor(props) {
     super(props);
-    this.state = { failed: false };
+    this.state = { failed: false, error: null };
   }
 
-  static getDerivedStateFromError() {
-    return { failed: true };
+  static getDerivedStateFromError(error) {
+    return { failed: true, error };
   }
 
   componentDidCatch() {
@@ -23,7 +22,11 @@ export default class Boundary extends Component {
   }
 
   render() {
-    if (this.state.failed) return this.props.fallback ?? null;
+    if (this.state.failed) {
+      const { fallback } = this.props;
+      if (typeof fallback === 'function') return fallback(this.state.error);
+      return fallback ?? null;
+    }
     return this.props.children;
   }
 }
