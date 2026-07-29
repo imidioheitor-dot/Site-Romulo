@@ -339,6 +339,13 @@ function Estoque() {
 
 function ProdutoForm({ produto, onClose, onSaved }) {
   const [f, setF] = useState(produto);
+
+  // esconde o dock enquanto o formulário está aberto (evita cobrir os botões)
+  useEffect(() => {
+    document.body.classList.add('modal-open');
+    return () => document.body.classList.remove('modal-open');
+  }, []);
+
   const set = (k, v) => setF(prev => ({ ...prev, [k]: v }));
   const setCw = (k, v) => setF(prev => ({ ...prev, colorway: { ...prev.colorway, [k]: v } }));
 

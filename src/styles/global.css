@@ -399,3 +399,20 @@ img {
 .page-end-space {
   height: 130px;
 }
+
+/* garante que o dock flutuante nunca cubra botões no rodapé do conteúdo
+   (ex.: "Novo produto" no estoque, "Enviar pedido" no checkout) */
+main.route-fade {
+  padding-bottom: 32px;
+}
+@media (max-width: 820px) {
+  main.route-fade {
+    padding-bottom: 108px;
+  }
+}
+
+/* enquanto um modal está aberto, esconde o dock para não sobrepor os
+   botões do formulário (Salvar/Cancelar) no celular */
+body.modal-open .dock-outer {
+  display: none !important;
+}
