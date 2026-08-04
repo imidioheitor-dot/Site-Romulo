@@ -9,10 +9,17 @@ interativos (WebGL / GSAP / shaders), com catálogo, carrinho, pagamento via
 
 ```bash
 npm install
-npm run dev        # ambiente de desenvolvimento
+npm run dev        # ambiente de desenvolvimento (site)
+npm run dev:api    # (opcional, outro terminal) backend compartilhado local
 npm run build      # gera a versão de produção em dist/
 npm run preview    # pré-visualiza o build de produção
+npm test           # testes da API (estoque, pedidos, senha)
 ```
+
+Com `npm run dev` sozinho o site roda em **modo local** (só `localStorage`).
+Rodando também `npm run dev:api`, o Vite manda `/api` para o servidor local,
+que executa exatamente o mesmo código da Netlify Function — com os dados em
+`.netlify-blobs-local/` no lugar do Netlify Blobs.
 
 ## Estrutura
 
@@ -44,9 +51,80 @@ No painel a equipe pode:
 - **Estoque** — ajustar quantidades, editar preços, cadastrar/remover modelos.
 - **Configurações** — trocar a senha.
 
-> Os dados (produtos, estoque, pedidos, carrinho, senha) são persistidos no
-> `localStorage` do navegador — não exigem servidor. Para uma operação com
-> múltiplos dispositivos, basta plugar as funções de `src/lib/store.js` a uma API/BD.
+Uma faixa no topo do painel mostra se o **servidor compartilhado** está ligado
+(estoque e pedidos valendo para todos os aparelhos) ou se o painel está em
+**modo local**. Com o servidor ligado, ela também traz *Atualizar* e
+*Publicar catálogo*.
+
+## Backend compartilhado (estoque e pedidos)
+
+O site funciona em duas camadas empilhadas:
+
+1. **`localStorage`** — sempre presente. Sem servidor nenhum (hospedagem
+   estática, arquivo único aberto no celular, função fora do ar), o site
+   continua inteiro: catálogo, carrinho, checkout e painel funcionam, só que
+   as alterações valem apenas naquele aparelho.
+2. **API compartilhada** — quando existe, ela passa a ser a fonte da verdade.
+   Estoque e pedidos ficam iguais em todos os aparelhos.
+
+A API é uma **Netlify Function** (`netlify/functions/api.mjs`) guardando os
+dados no **Netlify Blobs**. Não há banco para provisionar nem chave para criar:
+publicando o site na Netlify, o backend sobe junto.
+
+### Rotas
+
+| Rota | Quem pode | O que faz |
+| --- | --- | --- |
+| `GET /api/status` | público | diz se o backend existe (é o que liga o modo compartilhado) |
+| `GET /api/catalogo` | público | catálogo + estoque; aceita `?rev=` e responde só "sem mudança" quando nada mudou |
+| `PUT /api/catalogo` | **senha da equipe** | grava o catálogo (com detecção de conflito entre aparelhos) |
+| `POST /api/pedidos` | público | checkout — o **total é calculado no servidor**, pelo catálogo |
+| `GET /api/pedidos` | **senha da equipe** | lista de pedidos (dados de cliente nunca são públicos) |
+| `PATCH /api/pedidos` | **senha da equipe** | muda o status; confirmar a venda **baixa o estoque no servidor** |
+| `GET /api/comprovante?id=` | **senha da equipe** | comprovante de um pedido (guardado à parte, por ser pesado) |
+| `POST /api/login` | público | confere a senha e devolve o token de escrita |
+| `PUT /api/senha` | **senha da equipe** | troca a senha da equipe |
+
+### A senha do painel é o token de escrita
+
+A mesma senha usada para entrar em `/equipe` autoriza as rotas de escrita
+(vai no cabeçalho `Authorization: Bearer …`). Não há segundo segredo para
+administrar: quem sabe a senha gerencia a loja de qualquer aparelho, e trocá-la
+em *Configurações* já vale para o servidor.
+
+Por padrão vale a senha inicial do painel (`romulo2026`). Em produção,
+recomenda-se definir a senha nas variáveis de ambiente do site na Netlify:
+
+- `EQUIPE_SENHA` — a senha em texto (o servidor guarda só o hash), ou
+- `EQUIPE_SENHA_HASH` — o hash pronto, se preferir não escrever a senha lá.
+
+Trocar a senha pelo painel grava o novo hash no Blobs, que passa a ter
+prioridade sobre as variáveis de ambiente. Tentativas repetidas de senha
+errada do mesmo IP são bloqueadas por alguns minutos.
+
+### Atualização ao vivo
+
+Cada aba consulta `/api/catalogo?rev=<versão que já tenho>` a cada 20 segundos —
+e também quando a aba volta ao foco ou a internet retorna. Quando nada mudou, a
+resposta é só o número da versão, então o custo é mínimo; quando alguém mexeu no
+estoque, a página se atualiza sozinha, sem recarregar.
+
+Se dois aparelhos salvarem o catálogo ao mesmo tempo, o segundo recebe um
+conflito (409) com a versão mais nova e **reaplica** a própria alteração em cima
+dela, em vez de apagar o trabalho do outro.
+
+### Testes
+
+```bash
+npm test                              # 75 verificações da API (sem rede, sem Netlify)
+npm run build && npm run serve:full   # site + API juntos em http://localhost:8888
+npm i -D playwright-core && npm run test:e2e   # 31 verificações no navegador
+```
+
+O `test:e2e` sobe o site construído com e sem backend e checa no Chromium:
+publicação do catálogo, escrita protegida, checkout público, baixa de estoque
+ao confirmar a venda, atualização ao vivo entre dois "aparelhos" e o
+funcionamento completo em modo local.
 
 ## Adicionar as fotos e o vídeo
 
@@ -63,6 +141,20 @@ LogoLoop, LiquidChrome, BlurText, ChromaGrid, Dock e uma superfície de
 **Liquid Glass** (vidro líquido com refração real via SVG) usada nos cartões,
 no checkout e nos painéis.
 
+## Publicar na Netlify
+
+O repositório já vem configurado (`netlify.toml`): build `npm run build`,
+publicação em `dist/` e funções em `netlify/functions/`. Basta conectar o
+repositório na Netlify — o backend compartilhado sobe junto, sem passo extra.
+
+Depois de publicar, entre em `/equipe` com a senha: no primeiro acesso o
+catálogo local é enviado ao servidor automaticamente e a loja passa a operar
+compartilhada.
+
+Hospedando em outro lugar (Vercel, GitHub Pages, arquivo único), o site
+continua funcionando — só que em modo local, sem estoque compartilhado.
+
 ## Tecnologias
 
 React · React Router · Vite · GSAP · Motion · OGL / Three.js (WebGL) · qrcode
+· Netlify Functions · Netlify Blobs

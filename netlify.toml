@@ -2,6 +2,19 @@
   command = "npm run build"
   publish = "dist"
 
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"
+
+# API compartilhada (estoque + pedidos) — Netlify Functions + Netlify Blobs.
+# A própria função já declara `path = /api/*`; este redirect é a rede de
+# segurança para o caso de o roteamento por path não estar disponível.
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/api/:splat"
+  status = 200
+  force = true
+
 # SPA fallback (o site usa HashRouter, mas isto garante rotas diretas)
 [[redirects]]
   from = "/*"

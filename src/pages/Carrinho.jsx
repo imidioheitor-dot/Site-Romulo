@@ -30,6 +30,7 @@ export default function Carrinho() {
   const [qrDataUrl, setQrDataUrl] = useState('');
   const [copied, setCopied] = useState(false);
   const [pedido, setPedido] = useState(null);
+  const [enviando, setEnviando] = useState(false);
   const fileRef = useRef(null);
 
   useEffect(() => window.scrollTo(0, 0), [step, pedido]);
@@ -72,6 +73,31 @@ export default function Carrinho() {
     setTimeout(() => setCopied(false), 2200);
   };
 
+  /* Reduz o print antes de enviar: comprovante de celular costuma ter vários
+     MB e o que importa é a leitura, não a resolução. */
+  const comprimirImagem = dataUrl =>
+    new Promise(resolve => {
+      const img = new Image();
+      img.onload = () => {
+        const max = 1400;
+        let { width, height } = img;
+        const r = Math.min(1, max / Math.max(width, height));
+        width = Math.round(width * r);
+        height = Math.round(height * r);
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+        try {
+          resolve(canvas.toDataURL('image/jpeg', 0.82));
+        } catch {
+          resolve(dataUrl);
+        }
+      };
+      img.onerror = () => resolve(dataUrl);
+      img.src = dataUrl;
+    });
+
   const onFile = e => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -80,7 +106,14 @@ export default function Carrinho() {
       return;
     }
     const reader = new FileReader();
-    reader.onload = () => setComprovante({ name: file.name, type: file.type, data: reader.result });
+    reader.onload = async () => {
+      if (file.type.startsWith('image/')) {
+        const menor = await comprimirImagem(reader.result);
+        setComprovante({ name: file.name, type: 'image/jpeg', data: menor });
+      } else {
+        setComprovante({ name: file.name, type: file.type, data: reader.result });
+      }
+    };
     reader.readAsDataURL(file);
   };
 
@@ -101,25 +134,33 @@ export default function Carrinho() {
     setStep(2);
   };
 
-  const finalizar = () => {
+  const finalizar = async () => {
     if (!comprovante) {
       toast('Anexe o comprovante do Pix.', 'danger');
       return;
     }
-    const order = createOrder({
-      cliente,
-      itens: items.map(i => ({
-        productId: i.productId,
-        nome: i.produto.nome,
-        tamanho: i.tamanho,
-        qtd: i.qtd,
-        preco: i.produto.preco
-      })),
-      total,
-      comprovante
-    });
-    setPedido(order);
-    toast('Pedido enviado! Aguardando confirmação.', 'ok');
+    if (enviando) return;
+    setEnviando(true);
+    try {
+      const order = await createOrder({
+        cliente,
+        itens: items.map(i => ({
+          productId: i.productId,
+          nome: i.produto.nome,
+          tamanho: i.tamanho,
+          qtd: i.qtd,
+          preco: i.produto.preco
+        })),
+        total,
+        comprovante
+      });
+      setPedido(order);
+      toast('Pedido enviado! Aguardando confirmação.', 'ok');
+    } catch (err) {
+      toast((err && err.message) || 'Não foi possível enviar o pedido. Tente de novo.', 'danger');
+    } finally {
+      setEnviando(false);
+    }
   };
 
   /* ---------- Confirmação ---------- */
@@ -354,8 +395,10 @@ export default function Carrinho() {
                 )}
                 {step === 2 && (
                   <>
-                    <button className="btn btn-primary resumo__btn cursor-target" onClick={finalizar}>Enviar pedido <FiCheck /></button>
-                    <button className="btn btn-ghost resumo__btn cursor-target" onClick={() => setStep(1)}>Voltar</button>
+                    <button className="btn btn-primary resumo__btn cursor-target" onClick={finalizar} disabled={enviando}>
+                      {enviando ? 'Enviando…' : <>Enviar pedido <FiCheck /></>}
+                    </button>
+                    <button className="btn btn-ghost resumo__btn cursor-target" onClick={() => setStep(1)} disabled={enviando}>Voltar</button>
                   </>
                 )}
 
