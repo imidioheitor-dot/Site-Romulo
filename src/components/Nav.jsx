@@ -30,7 +30,7 @@ export default function Nav() {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  useEffect(() => setOpen(false), [loc.pathname]);
+  useEffect(() => { setOpen(false); }, [loc.pathname]);
 
   return (
     <header className={`nav ${scrolled ? 'nav--scrolled' : ''}`}>

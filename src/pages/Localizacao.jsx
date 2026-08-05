@@ -9,7 +9,7 @@ import './Localizacao.css';
 const mapsQuery = encodeURIComponent(LOJA.endereco);
 
 export default function Localizacao() {
-  useEffect(() => window.scrollTo(0, 0), []);
+  useEffect(() => { window.scrollTo(0, 0); }, []);
   useReveal([]);
 
   return (

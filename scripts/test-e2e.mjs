@@ -397,8 +397,60 @@ try {
   );
   ok(voltouSozinho, 'e a navegação volta a funcionar sem precisar de F5');
 
+  /* ============================================================
+     Regressão do "n is not a function" ao trocar de aba.
+
+     `useEffect(() => window.scrollTo(0, 0), deps)` tem corpo de EXPRESSÃO:
+     o que `scrollTo` devolver vira a função de limpeza do efeito. Em
+     navegador limpo isso é `undefined` e não dá em nada — mas basta uma
+     extensão, um polyfill de rolagem suave ou um quirk de celular embrulhar
+     `scrollTo` para a limpeza virar um valor qualquer. Aí, no desmonte (ou
+     quando as dependências mudam), o React chama esse valor: TypeError.
+     ============================================================ */
+  grupo('9. Efeito de rolagem não pode virar função de limpeza');
+
+  const comScrollEnvolvido = await novoAparelho();
+  const falhasLimpeza = [];
+  comScrollEnvolvido.page.on('console', m => {
+    if (m.type() === 'error' && /not a function/i.test(m.text())) falhasLimpeza.push(m.text().slice(0, 120));
+  });
+  // imita o ambiente do relato: algo faz scrollTo devolver um valor
+  await comScrollEnvolvido.ctx.addInitScript(() => {
+    const original = window.scrollTo.bind(window);
+    window.scrollTo = (...a) => { original(...a); return 'valor-qualquer'; };
+  });
+
+  await comScrollEnvolvido.page.goto(`${BASE}/#/catalogo`, { waitUntil: 'domcontentloaded' });
+  await comScrollEnvolvido.page.waitForSelector('.pcard', { timeout: 20000 });
+  await comScrollEnvolvido.page.click('.pcard');
+  await comScrollEnvolvido.page.waitForSelector('.produto__add', { timeout: 20000 });
+  await comScrollEnvolvido.page.click('.produto__size-grid button:first-child');
+  await comScrollEnvolvido.page.click('.produto__add');
+
+  // percorre as etapas do carrinho: cada uma muda `step` e roda a limpeza
+  await comScrollEnvolvido.page.goto(`${BASE}/#/carrinho`, { waitUntil: 'domcontentloaded' });
+  await comScrollEnvolvido.page.waitForSelector('.resumo__btn', { timeout: 20000 });
+  await comScrollEnvolvido.page.click('.resumo__btn');
+  await comScrollEnvolvido.page.waitForSelector('.carrinho__form-grid');
+  await comScrollEnvolvido.page.fill('.carrinho__form-grid .field:nth-child(1) input', 'Teste Rolagem');
+  await comScrollEnvolvido.page.fill('.carrinho__form-grid .field:nth-child(2) input', '62 90000-0000');
+  await comScrollEnvolvido.page.click('.resumo__btn');
+  await comScrollEnvolvido.page.waitForTimeout(1200);
+  // e troca de rota algumas vezes, que é quando o desmonte acontece
+  for (const rota of ['/#/catalogo', '/#/carrinho', '/#/contato', '/#/catalogo']) {
+    await comScrollEnvolvido.page.goto(`${BASE}${rota}`, { waitUntil: 'domcontentloaded' });
+    await comScrollEnvolvido.page.waitForTimeout(700);
+  }
+
+  ok(falhasLimpeza.length === 0, 'nenhum "is not a function" mesmo com scrollTo devolvendo valor',
+    falhasLimpeza[0]);
+  const carrinhoVivo = await comScrollEnvolvido.page.evaluate(
+    () => !/Não foi possível carregar/.test(document.body.textContent || '')
+  );
+  ok(carrinhoVivo, 'e as telas continuam funcionando, sem o aviso de erro');
+
   /* ============================================================ */
-  grupo('9. Troca de senha vale para o servidor');
+  grupo('10. Troca de senha vale para o servidor');
 
   await equipe.page.click('.painel__tab:nth-child(3)');
   await equipe.page.waitForSelector('.config__form');

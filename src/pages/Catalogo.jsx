@@ -33,7 +33,7 @@ export default function Catalogo() {
   const [ordem, setOrdem] = useState('destaque');
   const headRef = useRef(null);
 
-  useEffect(() => window.scrollTo(0, 0), [tipoParam]);
+  useEffect(() => { window.scrollTo(0, 0); }, [tipoParam]);
   useEffect(() => { setGenero('Todos'); setMarca('Todas'); }, [tipoParam]);
 
   // produtos do tipo atual (para derivar filtros e lista)

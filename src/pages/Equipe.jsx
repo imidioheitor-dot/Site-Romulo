@@ -20,7 +20,7 @@ import './Equipe.css';
 
 export default function Equipe() {
   const session = useSession();
-  useEffect(() => window.scrollTo(0, 0), []);
+  useEffect(() => { window.scrollTo(0, 0); }, []);
   return session ? <Painel /> : <Login />;
 }
 
