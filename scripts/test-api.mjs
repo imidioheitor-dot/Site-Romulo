@@ -6,7 +6,7 @@
 
 import { criarRoteador } from '../netlify/lib/api.mjs';
 import { armazemMemoria, armazemBlobs } from '../netlify/lib/armazem.mjs';
-import { hashSenha, SENHA_HASH_PADRAO } from '../netlify/lib/dados.mjs';
+import { hashSenha, SENHA_HASH_PADRAO, criarHashSenha, conferirSenha, ehHashForte } from '../netlify/lib/dados.mjs';
 
 const SENHA = 'romulo2026';
 const BASE = 'https://loja.test';
@@ -107,6 +107,7 @@ await grupo('Login e troca de senha', async () => {
 
   const bom = await chamar('POST', 'login', { corpo: { senha: SENHA } });
   ok(bom.status === 200 && bom.dados.token === SENHA, 'login devolve a senha como token de escrita');
+  ok(bom.dados.senhaFraca === true, 'e avisa que a senha de fábrica é fraca (o painel mostra o alerta)');
 
   const troca = await chamar('PUT', 'senha', { corpo: { nova: 'novaSenha123' }, token: SENHA });
   ok(troca.status === 200, 'troca de senha autenticada → 200');
@@ -121,16 +122,143 @@ await grupo('Login e troca de senha', async () => {
   ok(curta.status === 400, 'recusa senha com menos de 6 caracteres');
 });
 
+/* ------------------------------------------------------------
+   O hash antigo (djb2, 32 bits) é forjável: dá para calcular um texto
+   diferente com o mesmo hash e entrar sem saber a senha. O solver abaixo faz
+   exatamente isso, para o teste provar que o formato novo fecha a porta.
+
+   djb2:  h = h*33 + c  (mod 2^32), começando em 5381.
+   Fixamos os primeiros caracteres e resolvemos os últimos por busca. ------- */
+function forjarColisao(senha) {
+  const alvo = ((() => {
+    let h = 5381;
+    for (let i = 0; i < senha.length; i++) h = ((h << 5) + h + senha.charCodeAt(i)) | 0;
+    return h >>> 0;
+  })());
+
+  const L = senha.length;
+  const livres = 6;                 // 3 caracteres de busca + 3 de ajuste
+  if (L < livres + 1) return null;
+
+  const prefixo = 'z'.repeat(L - livres);
+  let hp = 5381;
+  for (let i = 0; i < prefixo.length; i++) hp = ((hp << 5) + hp + prefixo.charCodeAt(i)) | 0;
+
+  // contribuição do prefixo depois de deslocar pelos 6 caracteres livres
+  let base = hp >>> 0;
+  for (let i = 0; i < livres; i++) base = (base * 33) >>> 0;
+
+  const U = (alvo - base + 4294967296 * 2) % 4294967296;
+  const P5 = 39135393, P4 = 1185921, P3 = 35937;   // 33^5, 33^4, 33^3
+  const MIN = 33, MAX = 126;
+  const MAX_AJUSTE = MAX * 1089 + MAX * 33 + MAX;
+
+  for (let a = MIN; a <= MAX; a++) {
+    for (let b = MIN; b <= MAX; b++) {
+      for (let c = MIN; c <= MAX; c++) {
+        const A = (a * P5 + b * P4 + c * P3) % 4294967296;
+        const v = (U - A + 4294967296) % 4294967296;
+        if (v > MAX_AJUSTE) continue;
+        for (let d = MIN; d <= MAX; d++) {
+          const resto = v - d * 1089;
+          if (resto < MIN * 33 + MIN) break;          // d já grande demais
+          if (resto > MAX * 33 + MAX) continue;       // d ainda pequeno demais
+          // resto = e*33 + f, com e e f também em [MIN, MAX]
+          const eDe = Math.max(MIN, Math.ceil((resto - MAX) / 33));
+          const eAte = Math.min(MAX, Math.floor((resto - MIN) / 33));
+          for (let e = eDe; e <= eAte; e++) {
+            const f = resto - e * 33;
+            if (f < MIN || f > MAX) continue;
+            return prefixo + String.fromCharCode(a, b, c, d, e, f);
+          }
+        }
+      }
+    }
+  }
+  return null;
+}
+
+await grupo('Senha guardada com scrypt (formato novo)', async () => {
+  const hash = await criarHashSenha('senhaDaLoja123');
+  ok(ehHashForte(hash), 'a senha nova é guardada em scrypt$… (não mais em 32 bits)');
+  ok(!hash.includes('senhaDaLoja123'), 'o texto da senha não aparece no que fica gravado');
+  ok(await conferirSenha('senhaDaLoja123', hash), 'a senha certa confere');
+  ok(!(await conferirSenha('senhaDaLoja124', hash)), 'senha parecida não confere');
+
+  const outro = await criarHashSenha('senhaDaLoja123');
+  ok(outro !== hash, 'o mesmo texto gera hashes diferentes (sal aleatório)');
+  ok(await conferirSenha('senhaDaLoja123', outro), 'e os dois continuam conferindo');
+
+  ok(await conferirSenha(SENHA, SENHA_HASH_PADRAO), 'o formato antigo continua sendo lido (ninguém fica trancado para fora)');
+});
+
+await grupo('Token forjado: a falha que o scrypt fecha', async () => {
+  const forjada = forjarColisao(SENHA);
+  ok(!!forjada && forjada !== SENHA, `existe um texto diferente com o mesmo hash antigo (${JSON.stringify(forjada)})`);
+  ok(hashSenha(forjada) === hashSenha(SENHA), 'ele produz exatamente o mesmo hash de 32 bits');
+
+  // enquanto o segredo em uso for o hash antigo, o texto forjado abre a porta
+  const antigo = novoServidor({ equipe: { senhaHash: hashSenha(SENHA) } });
+  const comForjada = await antigo.chamar('PUT', 'catalogo', { corpo: { produtos: PRODUTOS }, token: forjada });
+  ok(comForjada.status === 200, 'com o hash antigo guardado, o token forjado escreve (a falha era real)');
+
+  // depois que a loja troca a senha, o segredo vira scrypt e a porta fecha
+  await antigo.chamar('PUT', 'senha', { corpo: { nova: 'senhaDaLoja123' }, token: SENHA });
+  const depois = await antigo.chamar('PUT', 'catalogo', { corpo: { produtos: PRODUTOS }, token: forjada });
+  ok(depois.status === 401, 'depois de trocar a senha, o mesmo token forjado é recusado');
+  const forjadaDaNova = forjarColisao('senhaDaLoja123');
+  const tentaDeNovo = await antigo.chamar('PUT', 'catalogo', { corpo: { produtos: PRODUTOS }, token: forjadaDaNova });
+  ok(tentaDeNovo.status === 401, 'e forjar o hash da senha nova também não adianta mais');
+  const comCerta = await antigo.chamar('PUT', 'catalogo', { corpo: { produtos: PRODUTOS }, token: 'senhaDaLoja123' });
+  ok(comCerta.status === 200, 'só a senha de verdade escreve');
+});
+
+await grupo('Migração do formato antigo', async () => {
+  const { chamar, armazem } = novoServidor({ equipe: { senhaHash: hashSenha(SENHA) } });
+
+  const entrou = await chamar('POST', 'login', { corpo: { senha: SENHA } });
+  ok(entrou.status === 200, 'quem já tinha senha gravada no formato antigo continua entrando');
+  ok(entrou.dados.senhaFraca === true, 'o login avisa que o formato é fraco');
+
+  const guardado = await armazem.ler('equipe');
+  ok(!ehHashForte(guardado.valor.senhaHash), 'acertar a senha NÃO reescreve o hash sozinho');
+
+  const trocou = await chamar('PUT', 'senha', { corpo: { nova: 'senhaDaLoja123' }, token: SENHA });
+  ok(trocou.status === 200 && trocou.dados.senhaFraca === false, 'trocar a senha migra para o formato forte');
+  const agora = await armazem.ler('equipe');
+  ok(ehHashForte(agora.valor.senhaHash), 'e o que fica gravado é scrypt$…');
+});
+
 await grupo('Senha vinda das variáveis de ambiente', async () => {
-  const armazem = armazemMemoria();
+  // com uma senha gravada pelo painel, para provar que o ambiente vem antes
+  const armazem = armazemMemoria({ equipe: { senhaHash: hashSenha('senha-do-painel') } });
   const roteador = criarRoteador({ armazem, ambiente: { EQUIPE_SENHA: 'senha-do-netlify' } });
-  const req = (senha) => new Request(`${BASE}/api/login`, {
+  const login = senha => new Request(`${BASE}/api/login`, {
     method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ senha })
   });
-  const boa = await roteador(req('senha-do-netlify'), { ip: 'a' });
-  ok(boa.status === 200, 'EQUIPE_SENHA no ambiente substitui a senha padrão');
-  const ruim = await roteador(req(SENHA), { ip: 'b' });
-  ok(ruim.status === 401, 'a senha padrão não vale quando EQUIPE_SENHA está definida');
+
+  const boa = await roteador(login('senha-do-netlify'), { ip: 'a' });
+  ok(boa.status === 200, 'EQUIPE_SENHA no ambiente vale como senha');
+  const corpoBoa = await boa.json();
+  ok(corpoBoa.senhaFraca === false, 'senha vinda do ambiente não é marcada como fraca (é texto, não hash de 32 bits)');
+  ok(corpoBoa.senhaFixadaNoAmbiente === true, 'e o painel é avisado de que ela vem de lá');
+
+  const padrao = await roteador(login(SENHA), { ip: 'b' });
+  ok(padrao.status === 401, 'a senha de fábrica não vale quando EQUIPE_SENHA está definida');
+
+  const doPainel = await roteador(login('senha-do-painel'), { ip: 'c' });
+  ok(doPainel.status === 401, 'o ambiente tem precedência sobre o que foi gravado pelo painel');
+
+  const tentaTrocar = await roteador(new Request(`${BASE}/api/senha`, {
+    method: 'PUT',
+    headers: { 'content-type': 'application/json', authorization: 'Bearer senha-do-netlify' },
+    body: JSON.stringify({ nova: 'outraSenha123' })
+  }), { ip: 'd' });
+  ok(tentaTrocar.status === 409, 'e trocar a senha pelo painel é recusado com explicação, em vez de não surtir efeito');
+
+  const hashNoAmbiente = criarRoteador({ armazem: armazemMemoria(), ambiente: { EQUIPE_SENHA_HASH: SENHA_HASH_PADRAO } });
+  const comHash = await hashNoAmbiente(login(SENHA), { ip: 'e' });
+  ok(comHash.status === 200, 'EQUIPE_SENHA_HASH (formato antigo) continua funcionando para quem já usava');
 });
 
 await grupo('Checkout público', async () => {
@@ -289,6 +417,19 @@ await grupo('Validação de conteúdo', async () => {
     }), { ip: 'x' });
   })();
   ok(jsonQuebrado.status === 400, 'corpo que não é JSON → 400');
+
+  /* O teto existe por causa do limite de corpo das funções da Netlify: acima
+     dele a plataforma recusaria antes do nosso código, e o cliente veria
+     "pedido enviado" sem o pedido ter chegado. */
+  const comprovanteGigante = await chamar('POST', 'pedidos', {
+    corpo: {
+      cliente: { nome: 'A', telefone: '1' },
+      itens: [{ productId: normalizado.dados.produtos[0].id, qtd: 1 }],
+      comprovante: { name: 'g.png', type: 'image/png', data: 'data:image/png;base64,' + 'A'.repeat(4_200_000) }
+    }
+  });
+  ok(comprovanteGigante.status === 413, 'comprovante acima do teto → 413 com recado, não falha silenciosa');
+  ok(/print/i.test(comprovanteGigante.dados.erro), 'e o recado diz o que fazer (enviar um print)');
 
   const comprovanteEstranho = await chamar('POST', 'pedidos', {
     corpo: {

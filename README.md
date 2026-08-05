@@ -97,18 +97,36 @@ em *Configurações* já vale para o servidor.
 > ⚠️ **Troque a senha de fábrica.** Este repositório é público, e a senha
 > inicial aparece no histórico dele — ou seja, qualquer pessoa pode
 > descobri-la e escrever no servidor da loja. Troque em `/equipe` →
-> *Configurações*, ou defina uma senha nas variáveis de ambiente do site na
-> Netlify (**Site configuration → Environment variables**):
->
-> - `EQUIPE_SENHA` — a senha em texto (o servidor guarda só o hash), ou
-> - `EQUIPE_SENHA_HASH` — o hash pronto, se preferir não escrever a senha lá.
->
-> A senha trocada pelo painel fica no Blobs e tem prioridade sobre essas
-> variáveis.
+> *Configurações*. Enquanto a senha de fábrica estiver valendo, o painel
+> mostra um aviso vermelho no topo.
 
-Trocar a senha pelo painel grava o novo hash no Blobs, que passa a ter
-prioridade sobre as variáveis de ambiente. Tentativas repetidas de senha
-errada do mesmo IP são bloqueadas por alguns minutos.
+**Como a senha é guardada.** Ao ser trocada pelo painel, ela vai para o Blobs
+como `scrypt` com sal — não dá para voltar dela ao texto original. O painel
+continua usando um hash simples no `localStorage` para o modo local (sem
+servidor), mas isso não é fronteira de segurança: quem manda é o servidor.
+
+**Ordem de precedência** (o primeiro que existir vence):
+
+1. `EQUIPE_SENHA` — senha em texto nas variáveis do site na Netlify
+   (*Site configuration → Environment variables*). Como é definida por quem
+   tem acesso ao painel da Netlify, ela vence tudo — e serve de caminho de
+   recuperação. Com ela definida, trocar a senha pelo painel é recusado com
+   uma explicação, em vez de não surtir efeito.
+2. `EQUIPE_SENHA_HASH` — um hash pronto, para quem prefere não escrever a
+   senha nas variáveis.
+3. A senha trocada em `/equipe` → *Configurações* (guardada em `scrypt`).
+4. A senha de fábrica.
+
+Tentativas repetidas de senha errada do mesmo IP são bloqueadas por alguns
+minutos. Tokens já conferidos ficam alguns minutos em cache na memória da
+função, para o `scrypt` não rodar de novo a cada consulta do painel.
+
+> **Nota histórica.** Até agosto/2026 o servidor guardava a senha com o mesmo
+> hash de 32 bits do painel. Com 32 bits dá para *calcular* um texto diferente
+> que produz o mesmo hash — e ele abriria a API sem que ninguém precisasse
+> descobrir a senha. O teste `Token forjado` em `scripts/test-api.mjs` faz essa
+> conta e prova que o formato atual recusa o texto forjado. Se a sua loja ainda
+> estiver com a senha de fábrica, troque-a: é a troca que grava o formato novo.
 
 ### Atualização ao vivo
 
@@ -124,7 +142,7 @@ dela, em vez de apagar o trabalho do outro.
 ### Testes
 
 ```bash
-npm test                              # 75 verificações da API (sem rede, sem Netlify)
+npm test                              # 101 verificações da API (sem rede, sem Netlify)
 npm run build && npm run serve:full   # site + API juntos em http://localhost:8888
 npm i -D playwright-core && npm run test:e2e   # 31 verificações no navegador
 ```

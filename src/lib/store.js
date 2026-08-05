@@ -2400,13 +2400,20 @@ function atualizarInfo(parcial) {
 
 api.ouvirBackend(estado => atualizarInfo({ estado, erro: estado === api.ESTADO.OFFLINE ? api.erroBackend() : null }));
 
+/* Estas três funções são definidas UMA vez, fora do componente, de propósito:
+   se a `subscribe` mudasse de identidade a cada render, o React cancelaria e
+   refaria a inscrição em todo render — troca-troca de efeitos sem necessidade,
+   justamente durante as atualizações vindas do servidor. */
+function assinarBackend(cb) {
+  ouvintesBackend.add(cb);
+  return () => { ouvintesBackend.delete(cb); };
+}
+const lerInfoBackend = () => infoBackend;
+const lerInfoBackendInicial = () => ESTADO_INICIAL_BACKEND;
+
 /* Estado do servidor compartilhado, para a interface avisar o lojista. */
 export function useBackend() {
-  return useSyncExternalStore(
-    cb => { ouvintesBackend.add(cb); return () => ouvintesBackend.delete(cb); },
-    () => infoBackend,
-    () => ESTADO_INICIAL_BACKEND
-  );
+  return useSyncExternalStore(assinarBackend, lerInfoBackend, lerInfoBackendInicial);
 }
 
 function tokenEquipe() {
@@ -2414,9 +2421,24 @@ function tokenEquipe() {
   return (sessao && sessao.token) || null;
 }
 
+let assinaturaCatalogo = null;
+
+/* Só reescreve o catálogo local quando o conteúdo mudou de verdade. Um
+   `write` troca a identidade do array e re-renderiza a árvore inteira —
+   fazer isso à toa (a cada resync forçado) é desperdício e, pior, obriga o
+   React a montar e desmontar componentes sem motivo. */
 function aplicarProdutosRemotos(produtos) {
-  if (!Array.isArray(produtos)) return;
+  if (!Array.isArray(produtos)) return false;
+  let assinatura;
+  try {
+    assinatura = JSON.stringify(produtos);
+  } catch {
+    assinatura = null;
+  }
+  if (assinatura != null && assinatura === assinaturaCatalogo) return false;
+  assinaturaCatalogo = assinatura;
   write(KEYS.products, produtos);
+  return true;
 }
 
 /* ---------- catálogo: baixar do servidor ---------- */
@@ -2780,7 +2802,15 @@ export async function login(password) {
   if (api.estadoBackend() !== api.ESTADO.OFFLINE) {
     try {
       const r = await api.entrar(password);
-      write(KEYS.session, { at: Date.now(), token: r.token, remoto: true });
+      write(KEYS.session, {
+        at: Date.now(),
+        token: r.token,
+        remoto: true,
+        // o servidor avisa quando a senha em uso ainda é a de fábrica /
+        // está guardada no formato fraco, que dá para forjar
+        senhaFraca: !!r.senhaFraca,
+        senhaNoAmbiente: !!r.senhaFixadaNoAmbiente
+      });
       write(KEYS.staff, { passHash: hashPass(password) }); // mantém o modo local em dia
       await sincronizarCatalogo({ forcar: true });
       await sincronizarPedidos({ forcar: true });
@@ -2811,7 +2841,7 @@ export async function changePassword(current, next) {
       // a senha atual é o próprio token: o servidor confere antes de trocar
       const r = await api.trocarSenhaRemota(next, current);
       write(KEYS.staff, { passHash: hashPass(next) });
-      write(KEYS.session, { at: Date.now(), token: r.token || next, remoto: true });
+      write(KEYS.session, { at: Date.now(), token: r.token || next, remoto: true, senhaFraca: false });
       return true;
     } catch (e) {
       if (!e.offline) return false;

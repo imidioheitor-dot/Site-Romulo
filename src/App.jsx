@@ -26,8 +26,9 @@ function Loader() {
   );
 }
 
-function RouteError(error) {
+function RouteError(error, pilha) {
   const msg = error && (error.message || String(error));
+  const culpado = (pilha || '').split('\n').map(l => l.trim()).filter(Boolean).slice(0, 3).join(' ← ');
   return (
     <div style={{ minHeight: '70vh', display: 'grid', placeItems: 'center', textAlign: 'center', padding: '48px 20px' }}>
       <div style={{ maxWidth: 480 }}>
@@ -39,6 +40,7 @@ function RouteError(error) {
         {msg && (
           <p style={{ marginTop: 20, fontSize: 11, color: 'var(--ash)', wordBreak: 'break-word', opacity: 0.7 }}>
             {msg}
+            {culpado && <><br />{culpado}</>}
           </p>
         )}
       </div>
@@ -93,10 +95,12 @@ export default function App() {
         <TargetCursor targetSelector=".cursor-target" spinDuration={3} hideDefaultCursor parallaxOn />
       </Boundary>
 
-      <Nav />
+      {/* Nav, rodapé e dock ficam cada um na sua rede de segurança: se um
+          deles falhar, o site perde só aquele pedaço — nunca a página toda. */}
+      <Boundary><Nav /></Boundary>
 
       <main key={loc.pathname} className="route-fade">
-        <Boundary fallback={RouteError}>
+        <Boundary fallback={RouteError} resetKey={loc.pathname}>
           <Suspense fallback={<Loader />}>
             <Routes location={loc}>
               <Route path="/" element={<Home />} />
@@ -113,9 +117,9 @@ export default function App() {
         </Boundary>
       </main>
 
-      {!hideChrome && <Footer />}
+      {!hideChrome && <Boundary><Footer /></Boundary>}
 
-      <Dock items={dockItems} />
+      <Boundary><Dock items={dockItems} /></Boundary>
     </ToastProvider>
   );
 }

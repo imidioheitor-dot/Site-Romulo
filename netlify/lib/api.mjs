@@ -9,7 +9,8 @@
 
 import {
   SERVICO, SENHA_HASH_PADRAO, LIMITES, STATUS_PEDIDO,
-  ErroApi, hashSenha, statusValido,
+  ErroApi, statusValido,
+  conferirSenha, conferirSenhaTexto, criarHashSenha, ehHashForte, marcaToken,
   normalizarCatalogo, normalizarCliente, normalizarItens, normalizarComprovante,
   novoIdPedido, pedidoResumido
 } from './dados.mjs';
@@ -65,14 +66,22 @@ function bloqueado(ip) {
 
 function limparFalhas(ip) { tentativas.delete(ip); }
 
-/* comparação de tamanho constante para não vazar o hash por tempo de resposta */
-function mesmoSegredo(a, b) {
-  const x = String(a || '');
-  const y = String(b || '');
-  let dif = x.length ^ y.length;
-  const n = Math.max(x.length, y.length);
-  for (let i = 0; i < n; i++) dif |= (x.charCodeAt(i) || 0) ^ (y.charCodeAt(i) || 0);
-  return dif === 0;
+/* Cache de tokens já conferidos. Sem ele, o scrypt rodaria de novo a cada
+   consulta do painel (que pergunta por pedidos novos a cada 20 s). A chave
+   embute o segredo guardado, então trocar a senha invalida tudo sozinho. */
+const tokensOk = new Map();
+const CACHE_MS = 5 * 60 * 1000;
+
+function tokenNoCache(marca) {
+  const ate = tokensOk.get(marca);
+  if (!ate) return false;
+  if (Date.now() > ate) { tokensOk.delete(marca); return false; }
+  return true;
+}
+
+function guardarToken(marca) {
+  if (tokensOk.size > 200) tokensOk.clear();
+  tokensOk.set(marca, Date.now() + CACHE_MS);
 }
 
 /* ---------- leitura/escrita com repetição em caso de concorrência ---------- */
@@ -101,14 +110,51 @@ async function atualizarDoc(armazem, chave, vazio, mutar) {
   throw new ErroApi(409, 'Outra pessoa salvou ao mesmo tempo. Recarregue e tente de novo.', ultimo);
 }
 
-/* ---------- senha da equipe ---------- */
+/* ---------- senha da equipe ----------
+   Ordem de precedência: o que a loja gravou pelo painel, depois as variáveis
+   de ambiente do site, depois a senha de fábrica. */
 
-async function hashAtivo(armazem, ambiente) {
+/* Precedência: variável de ambiente do site (quem tem acesso ao painel da
+   Netlify manda mais que qualquer coisa gravada pela API — e isso dá um
+   caminho de recuperação), depois a senha trocada no painel, depois a de
+   fábrica. */
+async function segredoAtivo(armazem, ambiente) {
+  if (ambiente.EQUIPE_SENHA) return { tipo: 'texto', valor: ambiente.EQUIPE_SENHA, fonte: 'ambiente' };
+  if (ambiente.EQUIPE_SENHA_HASH) return { tipo: 'hash', valor: ambiente.EQUIPE_SENHA_HASH, fonte: 'ambiente' };
   const reg = await armazem.ler(CHAVES.equipe);
-  if (reg && reg.valor && reg.valor.senhaHash) return reg.valor.senhaHash;
-  if (ambiente.EQUIPE_SENHA_HASH) return ambiente.EQUIPE_SENHA_HASH;
-  if (ambiente.EQUIPE_SENHA) return hashSenha(ambiente.EQUIPE_SENHA);
-  return SENHA_HASH_PADRAO;
+  if (reg && reg.valor && reg.valor.senhaHash) return { tipo: 'hash', valor: reg.valor.senhaHash, fonte: 'painel' };
+  return { tipo: 'hash', valor: SENHA_HASH_PADRAO, fonte: 'fabrica' };
+}
+
+/* Verdadeiro quando o segredo em uso ainda é o hash fraco de 32 bits — que
+   dá para forjar sem descobrir a senha. A resposta do login avisa o painel. */
+function segredoFraco(segredo) {
+  return segredo.tipo === 'hash' && !ehHashForte(segredo.valor);
+}
+
+async function gravarSenha(armazem, senha) {
+  const senhaHash = await criarHashSenha(senha);
+  await armazem.gravar(CHAVES.equipe, { senhaHash, atualizadoEm: new Date().toISOString() }, {});
+  return senhaHash;
+}
+
+/* Confere o token contra o segredo em uso.
+
+   De propósito NÃO migramos o hash fraco para scrypt só porque alguém
+   acertou: como o hash fraco é forjável, quem entrasse com um texto forjado
+   passaria a ser dono da senha e trancaria a loja para fora. A troca para
+   scrypt acontece quando a senha é trocada de fato (PUT /api/senha). */
+async function senhaConfere(token, ctx) {
+  const segredo = await segredoAtivo(ctx.armazem, ctx.ambiente);
+  const marca = marcaToken(token, segredo.valor);
+  if (tokenNoCache(marca)) return { ok: true, segredo };
+
+  const ok = segredo.tipo === 'texto'
+    ? conferirSenhaTexto(token, segredo.valor)
+    : await conferirSenha(token, segredo.valor);
+
+  if (ok) guardarToken(marca);
+  return { ok, segredo };
 }
 
 function tokenDaRequisicao(req) {
@@ -122,13 +168,13 @@ async function exigirEquipe(req, ctx) {
   const token = tokenDaRequisicao(req);
   if (!token) throw new ErroApi(401, 'Faça login na área da equipe para alterar dados.');
   if (bloqueado(ctx.ip)) throw new ErroApi(429, 'Muitas tentativas. Aguarde alguns minutos.');
-  const esperado = await hashAtivo(ctx.armazem, ctx.ambiente);
-  if (!mesmoSegredo(hashSenha(token), esperado)) {
+  const { ok, segredo } = await senhaConfere(token, ctx);
+  if (!ok) {
     registrarFalha(ctx.ip);
     throw new ErroApi(401, 'Senha da equipe incorreta.');
   }
   limparFalhas(ctx.ip);
-  return token;
+  return { token, segredo };
 }
 
 /* ---------- corpo da requisição ---------- */
@@ -342,22 +388,33 @@ async function rotaLogin(req, ctx) {
   if (!senha) throw new ErroApi(400, 'Informe a senha.');
   if (bloqueado(ctx.ip)) throw new ErroApi(429, 'Muitas tentativas. Aguarde alguns minutos.');
 
-  const esperado = await hashAtivo(ctx.armazem, ctx.ambiente);
-  if (!mesmoSegredo(hashSenha(senha), esperado)) {
+  const { ok, segredo } = await senhaConfere(senha, ctx);
+  if (!ok) {
     registrarFalha(ctx.ip);
     throw new ErroApi(401, 'Senha da equipe incorreta.');
   }
   limparFalhas(ctx.ip);
-  return json({ ok: true, servico: SERVICO, token: senha });
+
+  // avisa o painel quando a senha em uso ainda está no formato fraco
+  return json({
+    ok: true,
+    servico: SERVICO,
+    token: senha,
+    senhaFraca: segredoFraco(segredo),
+    senhaFixadaNoAmbiente: segredo.fonte === 'ambiente'
+  });
 }
 
 async function rotaSenha(req, ctx) {
-  await exigirEquipe(req, ctx);
+  const { segredo } = await exigirEquipe(req, ctx);
+  if (segredo.fonte === 'ambiente') {
+    throw new ErroApi(409, 'A senha está fixada nas variáveis do site (EQUIPE_SENHA). Troque por lá, no painel da Netlify.');
+  }
   const corpo = await corpoJson(req);
   const nova = String(corpo.nova || '');
   if (nova.length < 6) throw new ErroApi(400, 'A nova senha precisa ter ao menos 6 caracteres.');
-  await ctx.armazem.gravar(CHAVES.equipe, { senhaHash: hashSenha(nova), atualizadoEm: new Date().toISOString() }, {});
-  return json({ ok: true, servico: SERVICO, token: nova });
+  await gravarSenha(ctx.armazem, nova);
+  return json({ ok: true, servico: SERVICO, token: nova, senhaFraca: false });
 }
 
 /* ============================================================
