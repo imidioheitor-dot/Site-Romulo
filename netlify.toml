@@ -6,16 +6,19 @@
   directory = "netlify/functions"
   node_bundler = "esbuild"
 
-# API compartilhada (estoque + pedidos) — Netlify Functions + Netlify Blobs.
-# A própria função já declara `path = /api/*`; este redirect é a rede de
-# segurança para o caso de o roteamento por path não estar disponível.
-[[redirects]]
-  from = "/api/*"
-  to = "/.netlify/functions/api/:splat"
-  status = 200
-  force = true
+# A API compartilhada (estoque + pedidos) é servida pela função em
+# netlify/functions/api.mjs, que declara os próprios caminhos:
+#   export const config = { path: ['/api', '/api/*'] }
+#
+# NÃO acrescente um redirect de /api/* para /.netlify/functions/api aqui.
+# Ao declarar um path customizado, a função deixa de atender no endpoint
+# padrão /.netlify/functions/<nome> — um redirect para lá aponta para algo
+# que não existe mais, e com `force` ele ainda passa na frente do
+# roteamento por path: o resultado é 404 em toda a API.
 
-# SPA fallback (o site usa HashRouter, mas isto garante rotas diretas)
+# SPA fallback (o site usa HashRouter, mas isto garante rotas diretas).
+# Sem `force`, de propósito: assim ele só age quando nada mais atendeu —
+# arquivos estáticos e os caminhos da função vêm antes.
 [[redirects]]
   from = "/*"
   to = "/index.html"

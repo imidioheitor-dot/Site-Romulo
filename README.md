@@ -155,6 +155,14 @@ O repositório já vem configurado (`netlify.toml`): build `npm run build`,
 publicação em `dist/` e funções em `netlify/functions/`. Basta conectar o
 repositório na Netlify — o backend compartilhado sobe junto, sem passo extra.
 
+> **Não crie um redirect de `/api/*` para `/.netlify/functions/api`.** A função
+> declara os próprios caminhos (`config.path`), e ao fazer isso ela **deixa de
+> atender no endereço padrão `/.netlify/functions/<nome>`**. Um redirect para lá
+> aponta para algo que não existe mais — e com `force` ele ainda passa na frente
+> do roteamento por path, derrubando a API inteira em 404. O `netlify.toml`
+> guarda só o fallback do SPA, sem `force`, justamente para não atropelar nem os
+> arquivos estáticos nem os caminhos da função.
+
 Depois de publicar, entre em `/equipe` com a senha: no primeiro acesso o
 catálogo local é enviado ao servidor automaticamente e a loja passa a operar
 compartilhada.
