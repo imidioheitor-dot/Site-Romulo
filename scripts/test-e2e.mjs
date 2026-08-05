@@ -328,7 +328,77 @@ try {
   ok(pedidosServidor.pedidos.length === 1, 'o pedido offline não vazou para o servidor da outra hospedagem');
 
   /* ============================================================ */
-  grupo('8. Troca de senha vale para o servidor');
+  grupo('8. Nenhuma exceção deixa a tela em branco');
+
+  const quebrado = await novoAparelho();
+  const raizVazia = pagina => pagina.evaluate(() => {
+    const r = document.getElementById('root');
+    return !r || r.childElementCount === 0;
+  });
+
+  /* (a) dado corrompido numa PÁGINA: produto sem a lista de tamanhos.
+     Vai na origem sem backend, senão o próprio resync conserta o catálogo
+     antes de a página tentar desenhá-lo. */
+  await quebrado.page.goto(`${BASE_SEM_API}/#/catalogo`, { waitUntil: 'domcontentloaded' });
+  await quebrado.page.waitForSelector('.pcard', { timeout: 20000 });
+  await quebrado.page.evaluate(() => {
+    localStorage.setItem('rsf.products.v7', JSON.stringify([
+      { id: 'quebrado', nome: 'Produto Quebrado', preco: 10, estoque: 1, cores: [] } // sem `tamanhos`
+    ]));
+  });
+  // reload de verdade: só trocar o hash não faz o app reler o localStorage
+  await quebrado.page.goto(`${BASE_SEM_API}/#/produto/quebrado`, { waitUntil: 'domcontentloaded' });
+  await quebrado.page.reload({ waitUntil: 'domcontentloaded' });
+  await quebrado.page.waitForTimeout(3000);
+  const produtoQuebradoNaTela = await quebrado.page.evaluate(
+    () => (localStorage.getItem('rsf.products.v7') || '').includes('Produto Quebrado')
+  );
+  ok(produtoQuebradoNaTela, 'o dado inválido realmente chegou à página (o teste não passa à toa)');
+  ok(!(await raizVazia(quebrado.page)), 'produto com dado inválido não apaga a tela');
+  const textoRecuperacao = await quebrado.page.textContent('body');
+  ok(/Recarregar|não foi possível carregar|Voltar ao catálogo/i.test(textoRecuperacao),
+    'e a pessoa vê um caminho de volta, não uma tela morta');
+
+  // (b) dado corrompido na MOLDURA (Nav lê o carrinho), fora das rotas —
+  // antes isso derrubava a árvore inteira do React
+  await quebrado.page.evaluate(() => {
+    localStorage.setItem('rsf.cart.v4', JSON.stringify({ isso: 'não é uma lista' }));
+  });
+  await quebrado.page.goto(`${BASE_SEM_API}/#/catalogo`, { waitUntil: 'domcontentloaded' });
+  await quebrado.page.reload({ waitUntil: 'domcontentloaded' });
+  await quebrado.page.waitForTimeout(3000);
+  ok(!(await raizVazia(quebrado.page)), 'carrinho corrompido não apaga a tela');
+  const aindaTemCatalogo = await quebrado.page.$$eval('.pcard', e => e.length).catch(() => 0);
+  ok(aindaTemCatalogo > 0, `o catálogo continua no ar mesmo com a moldura falhando (${aindaTemCatalogo} produtos)`);
+  const navSumiu = (await quebrado.page.$$eval('nav', e => e.length).catch(() => 0)) === 0;
+  ok(navSumiu, 'só o pedaço quebrado (o menu) sai do ar — é o boundary da moldura agindo');
+
+  /* (c) falha PASSAGEIRA: é o caso do relato (quebra durante uma atualização
+     e depois o dado volta ao normal). Tem de se curar sozinho, sem F5. */
+  const passageiro = await novoAparelho();
+  await passageiro.page.goto(`${BASE_SEM_API}/#/catalogo`, { waitUntil: 'domcontentloaded' });
+  await passageiro.page.waitForSelector('.pcard', { timeout: 20000 });
+  const bons = await passageiro.page.evaluate(() => localStorage.getItem('rsf.products.v7'));
+  await passageiro.page.evaluate(() => {
+    localStorage.setItem('rsf.products.v7', JSON.stringify([{ id: 'x', nome: 'X', preco: 1, estoque: 1, cores: [] }]));
+  });
+  await passageiro.page.goto(`${BASE_SEM_API}/#/produto/x`, { waitUntil: 'domcontentloaded' });
+  await passageiro.page.reload({ waitUntil: 'domcontentloaded' });
+  await passageiro.page.waitForTimeout(1500);
+  ok(!(await raizVazia(passageiro.page)), 'durante a falha, a tela não fica em branco');
+
+  // o dado se conserta (como um resync que traz o catálogo bom de volta)
+  await passageiro.page.evaluate(v => localStorage.setItem('rsf.products.v7', v), bons);
+  await passageiro.page.evaluate(() => window.dispatchEvent(new Event('storage')));
+  await passageiro.page.goto(`${BASE_SEM_API}/#/catalogo`, { waitUntil: 'domcontentloaded' });
+  const voltouSozinho = await ate(
+    async () => (await passageiro.page.$$eval('.pcard', e => e.length).catch(() => 0)) > 0,
+    { limite: 15000, titulo: 'catálogo voltar sem recarregar' }
+  );
+  ok(voltouSozinho, 'e a navegação volta a funcionar sem precisar de F5');
+
+  /* ============================================================ */
+  grupo('9. Troca de senha vale para o servidor');
 
   await equipe.page.click('.painel__tab:nth-child(3)');
   await equipe.page.waitForSelector('.config__form');

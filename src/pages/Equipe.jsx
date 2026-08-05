@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo, useRef } from 'react';
 import {
   FiLock, FiLogOut, FiPackage, FiBox, FiSettings, FiCheck, FiX, FiTruck,
   FiClock, FiPlus, FiMinus, FiEdit2, FiTrash2, FiEye, FiSave, FiSearch, FiExternalLink, FiUpload, FiDownload,
-  FiCloud, FiCloudOff, FiRefreshCw, FiUploadCloud
+  FiCloud, FiCloudOff, FiRefreshCw, FiUploadCloud, FiAlertTriangle
 } from 'react-icons/fi';
 import LiquidGlass from '../components/fx/LiquidGlass';
 import AnimatedTitle from '../components/AnimatedTitle';
@@ -127,10 +127,12 @@ function Painel() {
 /* ---------------- ESTADO DO SERVIDOR COMPARTILHADO ---------------- */
 function BackendBar() {
   const backend = useBackend();
+  const sessao = useSession();
   const toast = useToast();
   const [ocupado, setOcupado] = useState(false);
 
   const online = backend.estado === 'online';
+  const senhaFraca = online && sessao && sessao.senhaFraca;
 
   const atualizar = async () => {
     setOcupado(true);
@@ -149,6 +151,18 @@ function BackendBar() {
   };
 
   return (
+    <>
+    {senhaFraca && (
+      <div className="senha-alerta">
+        <FiAlertTriangle />
+        <div>
+          <strong>Troque a senha da equipe.</strong>{' '}
+          A senha em uso ainda é a de fábrica, que está no histórico público do
+          projeto — e é ela que autoriza mexer no estoque e nos pedidos.
+          Vá em <strong>Configurações</strong> e escolha uma nova.
+        </div>
+      </div>
+    )}
     <div className={`backend-bar ${online ? 'is-on' : 'is-off'}`}>
       <span className="backend-bar__ic">{online ? <FiCloud /> : <FiCloudOff />}</span>
       <div className="backend-bar__txt">
@@ -182,6 +196,7 @@ function BackendBar() {
         </div>
       )}
     </div>
+    </>
   );
 }
 

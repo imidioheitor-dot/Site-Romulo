@@ -98,21 +98,30 @@ export default function Carrinho() {
       img.src = dataUrl;
     });
 
+  /* Teto do que o servidor aceita receber num pedido. Acima disso a própria
+     hospedagem recusa o envio antes do nosso código rodar — e o cliente veria
+     "pedido enviado" sem o pedido ter chegado na loja. Então cortamos aqui,
+     com um recado que diz o que fazer. */
+  const LIMITE_ENVIO = 4_000_000; // ~3 MB de arquivo depois de virar data URL
+
   const onFile = e => {
     const file = e.target.files?.[0];
     if (!file) return;
-    if (file.size > 5 * 1024 * 1024) {
-      toast('Arquivo muito grande (máx. 5MB).', 'danger');
-      return;
-    }
     const reader = new FileReader();
     reader.onload = async () => {
-      if (file.type.startsWith('image/')) {
-        const menor = await comprimirImagem(reader.result);
-        setComprovante({ name: file.name, type: 'image/jpeg', data: menor });
-      } else {
-        setComprovante({ name: file.name, type: file.type, data: reader.result });
+      const ehImagem = file.type.startsWith('image/');
+      const dados = ehImagem ? await comprimirImagem(reader.result) : reader.result;
+      if (String(dados).length > LIMITE_ENVIO) {
+        toast(
+          ehImagem
+            ? 'Essa imagem é pesada demais. Tire um print da tela do banco e envie ele.'
+            : 'PDF pesado demais (máx. 3MB). Envie um print da tela do comprovante.',
+          'danger'
+        );
+        if (fileRef.current) fileRef.current.value = '';
+        return;
       }
+      setComprovante({ name: file.name, type: ehImagem ? 'image/jpeg' : file.type, data: dados });
     };
     reader.readAsDataURL(file);
   };
@@ -368,7 +377,7 @@ export default function Carrinho() {
                     <button className="pix-drop cursor-target" onClick={() => fileRef.current?.click()}>
                       <FiUploadCloud size={26} />
                       <strong>Clique para anexar</strong>
-                      <span className="muted">PNG, JPG ou PDF · até 5MB</span>
+                      <span className="muted">PNG, JPG ou PDF · até 3MB</span>
                     </button>
                   )}
                 </div>

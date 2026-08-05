@@ -614,6 +614,26 @@
   gap: 10px;
   align-items: center;
 }
+/* ---------- aviso de senha fraca ---------- */
+.senha-alerta {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin: 4px 0 14px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  border: 1px solid rgba(217, 88, 63, 0.45);
+  background: rgba(217, 88, 63, 0.1);
+  color: var(--bone);
+  font-size: 13.5px;
+  line-height: 1.5;
+}
+.senha-alerta svg {
+  flex: none;
+  margin-top: 2px;
+  color: var(--danger, #d9583f);
+}
+
 /* ---------- estado do servidor compartilhado ---------- */
 .backend-bar {
   display: flex;
