@@ -1,16 +1,18 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
 import {
   FiLock, FiLogOut, FiPackage, FiBox, FiSettings, FiCheck, FiX, FiTruck,
-  FiClock, FiPlus, FiMinus, FiEdit2, FiTrash2, FiEye, FiSave, FiSearch, FiExternalLink, FiUpload, FiDownload
+  FiClock, FiPlus, FiMinus, FiEdit2, FiTrash2, FiEye, FiSave, FiSearch, FiExternalLink, FiUpload, FiDownload,
+  FiCloud, FiCloudOff, FiRefreshCw, FiUploadCloud
 } from 'react-icons/fi';
 import LiquidGlass from '../components/fx/LiquidGlass';
 import AnimatedTitle from '../components/AnimatedTitle';
 import ProductMedia from '../components/ProductMedia';
 import {
   useSession, login, logout, changePassword,
-  useOrders, updateOrderStatus, ORDER_STATUS,
+  useOrders, updateOrderStatus, ORDER_STATUS, obterComprovante,
   useProducts, saveProduct, deleteProduct, adjustStock, LOJA, CATEGORIAS,
-  exportCatalog, importCatalog, isStoragePersistent
+  exportCatalog, importCatalog, isStoragePersistent,
+  useBackend, sincronizarCatalogo, sincronizarPedidos, publicarCatalogoAtual
 } from '../lib/store';
 import { brl, dataBR } from '../lib/format';
 import { useToast } from '../components/Toast';
@@ -26,16 +28,23 @@ export default function Equipe() {
 function Login() {
   const [pass, setPass] = useState('');
   const [erro, setErro] = useState(false);
+  const [entrando, setEntrando] = useState(false);
   const toast = useToast();
 
-  const entrar = e => {
+  const entrar = async e => {
     e.preventDefault();
-    if (login(pass)) {
-      toast('Bem-vindo à área da equipe.', 'ok');
-    } else {
-      setErro(true);
-      toast('Senha incorreta.', 'danger');
-      setTimeout(() => setErro(false), 600);
+    if (entrando) return;
+    setEntrando(true);
+    try {
+      if (await login(pass)) {
+        toast('Bem-vindo à área da equipe.', 'ok');
+      } else {
+        setErro(true);
+        toast('Senha incorreta.', 'danger');
+        setTimeout(() => setErro(false), 600);
+      }
+    } finally {
+      setEntrando(false);
     }
   };
 
@@ -53,7 +62,9 @@ function Login() {
               <label>Senha</label>
               <input type="password" value={pass} onChange={e => setPass(e.target.value)} placeholder="••••••••" autoFocus />
             </div>
-            <button type="submit" className="btn btn-primary cursor-target" style={{ width: '100%' }}>Entrar</button>
+            <button type="submit" className="btn btn-primary cursor-target" style={{ width: '100%' }} disabled={entrando}>
+              {entrando ? 'Entrando…' : 'Entrar'}
+            </button>
           </form>
         </LiquidGlass>
         <div className="page-end-space" />
@@ -93,6 +104,8 @@ function Painel() {
           </button>
         </header>
 
+        <BackendBar />
+
         <nav className="painel__tabs">
           {tabs.map(t => (
             <button key={t.id} className={`painel__tab cursor-target ${tab === t.id ? 'is-on' : ''}`} onClick={() => setTab(t.id)}>
@@ -107,6 +120,67 @@ function Painel() {
 
         <div className="page-end-space" />
       </div>
+    </div>
+  );
+}
+
+/* ---------------- ESTADO DO SERVIDOR COMPARTILHADO ---------------- */
+function BackendBar() {
+  const backend = useBackend();
+  const toast = useToast();
+  const [ocupado, setOcupado] = useState(false);
+
+  const online = backend.estado === 'online';
+
+  const atualizar = async () => {
+    setOcupado(true);
+    await sincronizarCatalogo({ forcar: true });
+    await sincronizarPedidos({ forcar: true });
+    setOcupado(false);
+    toast('Dados atualizados.', 'ok');
+  };
+
+  const publicar = async () => {
+    setOcupado(true);
+    const r = await publicarCatalogoAtual();
+    setOcupado(false);
+    if (r.ok && r.remoto) toast('Catálogo publicado no servidor da loja.', 'ok');
+    else toast((r.erro && r.erro.message) || 'Não foi possível publicar agora.', 'danger');
+  };
+
+  return (
+    <div className={`backend-bar ${online ? 'is-on' : 'is-off'}`}>
+      <span className="backend-bar__ic">{online ? <FiCloud /> : <FiCloudOff />}</span>
+      <div className="backend-bar__txt">
+        {online ? (
+          <>
+            <strong>Servidor compartilhado ligado</strong>
+            <span className="muted">
+              Estoque e pedidos valem para todos os aparelhos
+              {backend.rev != null && ` · versão ${backend.rev}`}
+              {!backend.publicado && ' · catálogo ainda não publicado'}
+            </span>
+          </>
+        ) : (
+          <>
+            <strong>Modo local</strong>
+            <span className="muted">
+              Sem servidor: as alterações valem só neste aparelho. Publique o site
+              na Netlify para compartilhar estoque e pedidos.
+            </span>
+          </>
+        )}
+      </div>
+      {online && (
+        <div className="backend-bar__actions">
+          <button className="btn btn-quiet btn-sm cursor-target" onClick={atualizar} disabled={ocupado}>
+            <FiRefreshCw /> Atualizar
+          </button>
+          <button className="btn btn-quiet btn-sm cursor-target" onClick={publicar} disabled={ocupado}>
+            <FiUploadCloud /> Publicar catálogo
+          </button>
+        </div>
+      )}
     </div>
   );
 }
@@ -127,9 +201,24 @@ function Pedidos() {
 
   const lista = filtro === 'todos' ? orders : orders.filter(o => o.status === filtro);
 
-  const confirmar = o => {
-    updateOrderStatus(o.id, ORDER_STATUS.PAGO);
-    toast(`Pedido #${o.id} confirmado. Estoque atualizado.`, 'ok');
+  const mudarStatus = async (o, status, mensagem) => {
+    const r = await updateOrderStatus(o.id, status);
+    if (r && r.ok) toast(mensagem, 'ok');
+    else toast((r && r.erro && r.erro.message) || 'Não foi possível atualizar o pedido.', 'danger');
+  };
+
+  const confirmar = o => mudarStatus(o, ORDER_STATUS.PAGO, `Pedido #${o.id} confirmado. Estoque atualizado.`);
+
+  // o comprovante fica guardado à parte no servidor: busca só ao abrir
+  const abrirComprovante = async o => {
+    setVer({ pedido: o, comprovante: o.comprovante || null, carregando: !o.comprovante });
+    if (o.comprovante) return;
+    try {
+      const c = await obterComprovante(o.id);
+      setVer(v => (v && v.pedido.id === o.id ? { ...v, comprovante: c, carregando: false } : v));
+    } catch {
+      setVer(v => (v && v.pedido.id === o.id ? { ...v, carregando: false, erro: true } : v));
+    }
   };
 
   return (
@@ -179,8 +268,8 @@ function Pedidos() {
                 </div>
 
                 <div className="pedido__actions">
-                  {o.comprovante && (
-                    <button className="btn btn-quiet btn-sm cursor-target" onClick={() => setVer(o)}>
+                  {(o.comprovante || o.temComprovante) && (
+                    <button className="btn btn-quiet btn-sm cursor-target" onClick={() => abrirComprovante(o)}>
                       <FiEye /> Comprovante
                     </button>
                   )}
@@ -195,11 +284,11 @@ function Pedidos() {
                   {o.status === ORDER_STATUS.AGUARDANDO && (
                     <>
                       <button className="btn btn-primary btn-sm cursor-target" onClick={() => confirmar(o)}><FiCheck /> Confirmar venda</button>
-                      <button className="btn btn-danger btn-sm cursor-target" onClick={() => { updateOrderStatus(o.id, ORDER_STATUS.CANCELADO); toast('Pedido cancelado.', 'info'); }}><FiX /></button>
+                      <button className="btn btn-danger btn-sm cursor-target" onClick={() => mudarStatus(o, ORDER_STATUS.CANCELADO, 'Pedido cancelado.')}><FiX /></button>
                     </>
                   )}
                   {o.status === ORDER_STATUS.PAGO && (
-                    <button className="btn btn-primary btn-sm cursor-target" onClick={() => { updateOrderStatus(o.id, ORDER_STATUS.ENVIADO); toast('Marcado como enviado.', 'ok'); }}><FiTruck /> Marcar enviado</button>
+                    <button className="btn btn-primary btn-sm cursor-target" onClick={() => mudarStatus(o, ORDER_STATUS.ENVIADO, 'Marcado como enviado.')}><FiTruck /> Marcar enviado</button>
                   )}
                 </div>
               </div>
@@ -212,13 +301,21 @@ function Pedidos() {
         <div className="modal" onClick={() => setVer(null)}>
           <div className="modal__box" onClick={e => e.stopPropagation()}>
             <div className="modal__head">
-              <strong>Comprovante · #{ver.id}</strong>
+              <strong>Comprovante · #{ver.pedido.id}</strong>
               <button className="cursor-target" onClick={() => setVer(null)}><FiX size={18} /></button>
             </div>
-            {ver.comprovante?.type?.startsWith('image') ? (
-              <img src={ver.comprovante.data} alt="Comprovante" />
-            ) : (
-              <a className="btn btn-quiet cursor-target" href={ver.comprovante.data} download={ver.comprovante.name}>Baixar {ver.comprovante.name}</a>
+            {ver.carregando && <div className="painel__empty">Carregando comprovante…</div>}
+            {!ver.carregando && !ver.comprovante && (
+              <div className="painel__empty">Não foi possível carregar o comprovante deste pedido.</div>
+            )}
+            {!ver.carregando && ver.comprovante && (
+              ver.comprovante.type?.startsWith('image') ? (
+                <img src={ver.comprovante.data} alt="Comprovante" />
+              ) : (
+                <a className="btn btn-quiet cursor-target" href={ver.comprovante.data} download={ver.comprovante.name}>
+                  Baixar {ver.comprovante.name}
+                </a>
+              )
             )}
           </div>
         </div>
@@ -270,15 +367,24 @@ function Estoque() {
   const carregarCatalogo = file => {
     if (!file) return;
     const reader = new FileReader();
-    reader.onload = ev => {
+    reader.onload = async ev => {
       try {
-        const n = importCatalog(ev.target.result);
-        toast(`Catálogo carregado — ${n} produtos.`, 'ok');
+        const { total, sync } = await importCatalog(ev.target.result);
+        toast(`Catálogo carregado — ${total} produtos.`, 'ok');
+        avisarSync(sync);
       } catch (err) {
         toast('Arquivo inválido. Selecione um catálogo exportado aqui.', 'danger');
       }
     };
     reader.readAsText(file);
+  };
+
+  /* As alterações valem na hora no aparelho; se o envio ao servidor falhar,
+     o lojista precisa saber que ainda não está compartilhado. */
+  const avisarSync = sync => {
+    if (sync && sync.ok === false && sync.erro && !sync.erro.offline) {
+      toast(sync.erro.message || 'Salvo neste aparelho, mas não no servidor.', 'danger');
+    }
   };
 
   return (
@@ -320,25 +426,32 @@ function Estoque() {
               <span className="muted">{p.marca} · {p.categoria} · {brl(p.preco)}</span>
             </div>
             <div className="erow__stock">
-              <button className="cursor-target" onClick={() => adjustStock(p.id, -1)} aria-label="Diminuir"><FiMinus /></button>
+              <button className="cursor-target" onClick={() => adjustStock(p.id, -1).then(avisarSync)} aria-label="Diminuir"><FiMinus /></button>
               <span className={p.estoque <= 0 ? 'is-zero' : ''}>{p.estoque}</span>
-              <button className="cursor-target" onClick={() => adjustStock(p.id, 1)} aria-label="Aumentar"><FiPlus /></button>
+              <button className="cursor-target" onClick={() => adjustStock(p.id, 1).then(avisarSync)} aria-label="Aumentar"><FiPlus /></button>
             </div>
             <div className="erow__actions">
-              <button className="erow__btn cursor-target" onClick={() => setEditando({ ...p, tamanhos: p.tamanhos.join(','), cores: (p.cores || []).join(','), precoAntigo: p.precoAntigo || '' })} aria-label="Editar"><FiEdit2 /></button>
-              <button className="erow__btn erow__btn--del cursor-target" onClick={() => { if (confirm(`Excluir ${p.nome}?`)) { deleteProduct(p.id); toast('Produto removido.', 'info'); } }} aria-label="Excluir"><FiTrash2 /></button>
+              <button className="erow__btn cursor-target" onClick={() => setEditando({ ...p, tamanhos: (p.tamanhos || []).join(','), cores: (p.cores || []).join(','), precoAntigo: p.precoAntigo || '' })} aria-label="Editar"><FiEdit2 /></button>
+              <button className="erow__btn erow__btn--del cursor-target" onClick={async () => { if (confirm(`Excluir ${p.nome}?`)) { avisarSync(await deleteProduct(p.id)); toast('Produto removido.', 'info'); } }} aria-label="Excluir"><FiTrash2 /></button>
             </div>
           </div>
         ))}
       </div>
 
-      {editando && <ProdutoForm produto={editando} onClose={() => setEditando(null)} onSaved={() => { setEditando(null); toast('Produto salvo.', 'ok'); }} />}
+      {editando && (
+        <ProdutoForm
+          produto={editando}
+          onClose={() => setEditando(null)}
+          onSaved={sync => { setEditando(null); toast('Produto salvo.', 'ok'); avisarSync(sync); }}
+        />
+      )}
     </div>
   );
 }
 
 function ProdutoForm({ produto, onClose, onSaved }) {
   const [f, setF] = useState(produto);
+  const [salvando, setSalvando] = useState(false);
 
   // esconde o dock enquanto o formulário está aberto (evita cobrir os botões)
   useEffect(() => {
@@ -376,8 +489,9 @@ function ProdutoForm({ produto, onClose, onSaved }) {
     ? (/^(data:|https?:|blob:)/.test(f.img) ? f.img : `${import.meta.env.BASE_URL}products/${f.img}`)
     : null;
 
-  const salvar = e => {
+  const salvar = async e => {
     e.preventDefault();
+    if (salvando) return;
     const payload = {
       ...f,
       preco: parseFloat(f.preco) || 0,
@@ -388,8 +502,10 @@ function ProdutoForm({ produto, onClose, onSaved }) {
       tag: f.tag || null,
       destaque: !!f.destaque
     };
-    saveProduct(payload);
-    onSaved();
+    setSalvando(true);
+    const sync = await saveProduct(payload);
+    setSalvando(false);
+    onSaved(sync);
   };
 
   return (
@@ -461,7 +577,9 @@ function ProdutoForm({ produto, onClose, onSaved }) {
 
           <div className="pform__actions">
             <button type="button" className="btn btn-ghost cursor-target" onClick={onClose}>Cancelar</button>
-            <button type="submit" className="btn btn-primary cursor-target"><FiSave /> Salvar produto</button>
+            <button type="submit" className="btn btn-primary cursor-target" disabled={salvando}>
+              <FiSave /> {salvando ? 'Salvando…' : 'Salvar produto'}
+            </button>
           </div>
         </form>
       </div>
@@ -476,11 +594,11 @@ function Config() {
   const [nova, setNova] = useState('');
   const [conf, setConf] = useState('');
 
-  const trocar = e => {
+  const trocar = async e => {
     e.preventDefault();
     if (nova.length < 6) return toast('A nova senha precisa ter ao menos 6 caracteres.', 'danger');
     if (nova !== conf) return toast('As senhas não coincidem.', 'danger');
-    if (changePassword(cur, nova)) {
+    if (await changePassword(cur, nova)) {
       toast('Senha atualizada com sucesso.', 'ok');
       setCur(''); setNova(''); setConf('');
     } else {
@@ -493,7 +611,10 @@ function Config() {
       <LiquidGlass radius={24} className="config__card" blur={9}>
         <form className="config__form" onSubmit={trocar}>
           <h2>Alterar senha da equipe</h2>
-          <p className="muted" style={{ marginBottom: 8 }}>A senha é compartilhada por quem gerencia a loja. Guarde com cuidado.</p>
+          <p className="muted" style={{ marginBottom: 8 }}>
+            A senha é compartilhada por quem gerencia a loja — e é ela que autoriza
+            as alterações no servidor. Guarde com cuidado.
+          </p>
           <div className="field"><label>Senha atual</label><input type="password" value={cur} onChange={e => setCur(e.target.value)} /></div>
           <div className="field"><label>Nova senha</label><input type="password" value={nova} onChange={e => setNova(e.target.value)} /></div>
           <div className="field"><label>Confirmar nova senha</label><input type="password" value={conf} onChange={e => setConf(e.target.value)} /></div>
@@ -509,6 +630,8 @@ function Config() {
             <li><FiCheck /> Ao <strong>confirmar a venda</strong>, o estoque é baixado automaticamente.</li>
             <li><FiCheck /> Ajuste o estoque manualmente na aba <strong>Estoque</strong> a qualquer momento.</li>
             <li><FiCheck /> Cadastre novos modelos com foto (em <code>public/products/</code>) ou apenas com as cores da ilustração.</li>
+            <li><FiCheck /> Com o <strong>servidor compartilhado</strong> ligado, o que você muda aqui aparece em todos os aparelhos em poucos segundos.</li>
+            <li><FiCheck /> Sem servidor, o painel continua funcionando — só que as alterações ficam neste aparelho.</li>
           </ul>
         </div>
       </LiquidGlass>

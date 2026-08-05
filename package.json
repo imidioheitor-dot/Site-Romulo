@@ -5,11 +5,16 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:api": "node scripts/api-local.mjs --port 8888",
     "build": "vite build",
     "build:single": "vite build --config vite.config.single.mjs && node scripts/inline-assets.mjs",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "serve:full": "node scripts/api-local.mjs --port 8888 --static dist",
+    "test": "node scripts/test-api.mjs",
+    "test:e2e": "node scripts/test-e2e.mjs"
   },
   "dependencies": {
+    "@netlify/blobs": "^10.7.12",
     "@react-three/fiber": "^8.18.0",
     "gsap": "^3.12.5",
     "motion": "^11.15.0",

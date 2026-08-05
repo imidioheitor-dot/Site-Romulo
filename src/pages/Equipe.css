@@ -614,6 +614,55 @@
   gap: 10px;
   align-items: center;
 }
+/* ---------- estado do servidor compartilhado ---------- */
+.backend-bar {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin: 4px 0 22px;
+  padding: 12px 16px;
+  border-radius: 14px;
+  border: 1px solid rgba(230, 189, 140, 0.22);
+  background: rgba(255, 255, 255, 0.03);
+}
+.backend-bar.is-off {
+  border-color: rgba(217, 88, 63, 0.35);
+  background: rgba(217, 88, 63, 0.07);
+}
+.backend-bar__ic {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  flex: none;
+  border-radius: 10px;
+  background: rgba(230, 189, 140, 0.12);
+  color: var(--gold, #e6bd8c);
+}
+.backend-bar.is-off .backend-bar__ic {
+  background: rgba(217, 88, 63, 0.14);
+  color: var(--danger, #d9583f);
+}
+.backend-bar__txt {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 200px;
+  flex: 1 1 260px;
+  font-size: 13.5px;
+  line-height: 1.45;
+}
+.backend-bar__actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+@media (max-width: 720px) {
+  .backend-bar__actions { width: 100%; }
+  .backend-bar__actions .btn { flex: 1 1 auto; justify-content: center; }
+}
+
 .estoque__warn {
   margin: 14px 0 4px;
   padding: 12px 16px;

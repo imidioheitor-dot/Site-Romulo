@@ -1,9 +1,15 @@
 /* ============================================================
-   Camada de dados — persistência em localStorage
-   Produtos / estoque / pedidos / carrinho / sessão de equipe
+   Camada de dados — produtos / estoque / pedidos / carrinho / equipe
+
+   Duas camadas empilhadas:
+   1. localStorage — sempre presente, faz o site funcionar sozinho.
+   2. API compartilhada (Netlify Functions + Netlify Blobs) — quando existe,
+      vira a fonte da verdade e sincroniza estoque e pedidos entre aparelhos.
+   Se a API sumir, a camada 1 continua respondendo: nada quebra.
    ============================================================ */
 
 import { useSyncExternalStore } from 'react';
+import * as api from './api';
 
 const KEYS = {
   products: 'rsf.products.v7',
@@ -2306,6 +2312,9 @@ function lsSet(key, val) {
   try { localStorage.setItem(key, val); return true; }
   catch { storagePersistent = false; return false; }
 }
+function lsDel(key) {
+  try { localStorage.removeItem(key); } catch { /* ignora */ }
+}
 function safeParse(raw, fallback) {
   try { return JSON.parse(raw); } catch { return fallback; }
 }
@@ -2321,7 +2330,8 @@ function read(key, fallback) {
 function write(key, value) {
   // guarda uma nova referência (arrays) para o useSyncExternalStore detectar a mudança
   mem.set(key, Array.isArray(value) ? value.slice() : value);
-  lsSet(key, JSON.stringify(value));
+  if (value == null) lsDel(key);
+  else lsSet(key, JSON.stringify(value));
   window.dispatchEvent(new CustomEvent(EVENT, { detail: key }));
 }
 
@@ -2356,6 +2366,216 @@ export function useStoreKey(name, fallback) {
   return useSyncExternalStore(subscribe, () => getSnapshot(key, fallback));
 }
 
+/* ============================================================
+   Backend compartilhado (Netlify Functions + Netlify Blobs)
+
+   O localStorage continua sendo a base: tudo funciona sem servidor.
+   Quando a API responde, ela vira a fonte da verdade do catálogo e dos
+   pedidos, e o localStorage passa a ser o espelho local (offline).
+   ============================================================ */
+
+let catalogoRev = null;   // versão do catálogo no servidor (null = ainda não sei)
+let pedidosRev = null;
+let sincronizacaoIniciada = false;
+
+const ESTADO_INICIAL_BACKEND = {
+  estado: api.ESTADO.DESCONHECIDO, // desconhecido | online | offline
+  rev: null,
+  publicado: false,     // já existe catálogo no servidor?
+  sincronizando: false,
+  ultimaSync: null,
+  erro: null
+};
+
+let infoBackend = ESTADO_INICIAL_BACKEND;
+const ouvintesBackend = new Set();
+
+function atualizarInfo(parcial) {
+  const proximo = { ...infoBackend, ...parcial };
+  const mudou = Object.keys(proximo).some(k => proximo[k] !== infoBackend[k]);
+  if (!mudou) return;
+  infoBackend = proximo;
+  ouvintesBackend.forEach(cb => { try { cb(); } catch { /* ignora */ } });
+}
+
+api.ouvirBackend(estado => atualizarInfo({ estado, erro: estado === api.ESTADO.OFFLINE ? api.erroBackend() : null }));
+
+/* Estado do servidor compartilhado, para a interface avisar o lojista. */
+export function useBackend() {
+  return useSyncExternalStore(
+    cb => { ouvintesBackend.add(cb); return () => ouvintesBackend.delete(cb); },
+    () => infoBackend,
+    () => ESTADO_INICIAL_BACKEND
+  );
+}
+
+function tokenEquipe() {
+  const sessao = read(KEYS.session, null);
+  return (sessao && sessao.token) || null;
+}
+
+function aplicarProdutosRemotos(produtos) {
+  if (!Array.isArray(produtos)) return;
+  write(KEYS.products, produtos);
+}
+
+/* ---------- catálogo: baixar do servidor ---------- */
+export async function sincronizarCatalogo({ forcar = false } = {}) {
+  atualizarInfo({ sincronizando: true });
+  try {
+    const dados = await api.buscarCatalogo(forcar ? null : catalogoRev);
+    catalogoRev = dados.rev;
+
+    if (dados.semMudanca) {
+      atualizarInfo({ sincronizando: false, rev: dados.rev, ultimaSync: Date.now(), erro: null });
+      return { ok: true, mudou: false };
+    }
+
+    const publicado = Array.isArray(dados.produtos) && dados.produtos.length > 0;
+    if (publicado) aplicarProdutosRemotos(dados.produtos);
+
+    atualizarInfo({ sincronizando: false, rev: dados.rev, publicado, ultimaSync: Date.now(), erro: null });
+
+    // Servidor ainda vazio e a equipe está logada: publica o catálogo local
+    // (é assim que a loja "nasce" no backend, sem passo manual).
+    if (!publicado && tokenEquipe()) await publicarCatalogoAtual();
+
+    return { ok: true, mudou: publicado, publicado };
+  } catch (e) {
+    atualizarInfo({ sincronizando: false, erro: e.message });
+    return { ok: false, erro: e };
+  }
+}
+
+/* ---------- catálogo: enviar para o servidor ---------- */
+async function enviarCatalogo(lista, mutacao) {
+  const token = tokenEquipe();
+  if (!api.backendAtivo() || !token) return { ok: true, remoto: false };
+
+  try {
+    const r = await api.publicarCatalogo(lista, { rev: catalogoRev, token });
+    catalogoRev = r.rev;
+    aplicarProdutosRemotos(r.produtos);
+    atualizarInfo({ rev: r.rev, publicado: true, ultimaSync: Date.now(), erro: null });
+    return { ok: true, remoto: true };
+  } catch (e) {
+    // Alguém salvou primeiro: reaplica a mesma mudança sobre a versão nova.
+    if (e.conflito && e.dados && Array.isArray(e.dados.produtos) && mutacao) {
+      catalogoRev = e.dados.rev;
+      const refeita = mutacao(e.dados.produtos);
+      write(KEYS.products, refeita);
+      try {
+        const r2 = await api.publicarCatalogo(refeita, { rev: catalogoRev, token });
+        catalogoRev = r2.rev;
+        aplicarProdutosRemotos(r2.produtos);
+        atualizarInfo({ rev: r2.rev, publicado: true, ultimaSync: Date.now(), erro: null });
+        return { ok: true, remoto: true, refeito: true };
+      } catch (e2) {
+        atualizarInfo({ erro: e2.message });
+        return { ok: false, remoto: true, erro: e2 };
+      }
+    }
+    if (!e.offline) atualizarInfo({ erro: e.message });
+    return { ok: false, remoto: true, erro: e };
+  }
+}
+
+/* Publica o catálogo local inteiro (usado no primeiro login e no botão
+   "Publicar catálogo" do painel). */
+export async function publicarCatalogoAtual() {
+  const r = await enviarCatalogo(getProducts(), null);
+  if (r.ok && r.remoto) atualizarInfo({ publicado: true });
+  return r;
+}
+
+/* Aplica a mudança no aparelho (resposta imediata) e replica no servidor. */
+function alterarProdutos(mutacao) {
+  const lista = mutacao(getProducts());
+  write(KEYS.products, lista);
+  return enviarCatalogo(lista, mutacao);
+}
+
+/* ---------- pedidos: baixar do servidor (só a equipe) ---------- */
+export async function sincronizarPedidos({ forcar = false } = {}) {
+  const token = tokenEquipe();
+  if (!token || !api.backendAtivo()) return { ok: true, remoto: false };
+  try {
+    const dados = await api.buscarPedidos(token, forcar ? null : pedidosRev);
+    pedidosRev = dados.rev;
+    if (dados.semMudanca) return { ok: true, mudou: false };
+    mesclarPedidosRemotos(dados.pedidos || []);
+    return { ok: true, mudou: true };
+  } catch (e) {
+    return { ok: false, erro: e };
+  }
+}
+
+/* O servidor manda a lista sem os comprovantes (que são pesados e ficam
+   guardados à parte). Preservamos o comprovante que já estiver no aparelho. */
+function mesclarPedidosRemotos(remotos) {
+  const locais = read(KEYS.orders, []);
+  const porId = new Map(locais.map(o => [o.id, o]));
+  const mesclados = remotos.map(o => {
+    const local = porId.get(o.id);
+    return local && local.comprovante ? { ...o, comprovante: local.comprovante } : o;
+  });
+  const idsRemotos = new Set(remotos.map(o => o.id));
+  // pedidos que ficaram só no aparelho (feitos sem servidor) continuam na lista
+  const sobras = locais.filter(o => !idsRemotos.has(o.id) && o.somenteLocal);
+  write(KEYS.orders, [...mesclados, ...sobras].sort((a, b) => String(b.criadoEm).localeCompare(String(a.criadoEm))));
+}
+
+function guardarPedidoLocal(pedido) {
+  const orders = read(KEYS.orders, []);
+  const i = orders.findIndex(o => o.id === pedido.id);
+  if (i >= 0) orders[i] = { ...orders[i], ...pedido };
+  else orders.unshift(pedido);
+  write(KEYS.orders, orders);
+}
+
+/* ---------- sincronização ao vivo ----------
+   Sem WebSocket: uma consulta curta de tempos em tempos (e sempre que a aba
+   volta ao foco). Quando nada mudou, o servidor responde só com o número da
+   versão, então o custo é mínimo. */
+export function iniciarSincronizacao({ intervalo = 20000 } = {}) {
+  if (sincronizacaoIniciada || typeof window === 'undefined') return () => {};
+  sincronizacaoIniciada = true;
+
+  let parado = false;
+  let timer = null;
+
+  const ciclo = async () => {
+    if (parado) return;
+    if (!document.hidden) {
+      await sincronizarCatalogo();
+      if (tokenEquipe()) await sincronizarPedidos();
+    }
+    if (!parado) timer = setTimeout(ciclo, intervalo);
+  };
+
+  const agora = () => {
+    if (parado || document.hidden) return;
+    sincronizarCatalogo();
+    if (tokenEquipe()) sincronizarPedidos();
+  };
+
+  ciclo();
+
+  const aoVoltar = () => { if (!document.hidden) agora(); };
+  window.addEventListener('focus', aoVoltar);
+  window.addEventListener('online', agora);
+  document.addEventListener('visibilitychange', aoVoltar);
+
+  return () => {
+    parado = true;
+    sincronizacaoIniciada = false;
+    if (timer) clearTimeout(timer);
+    window.removeEventListener('focus', aoVoltar);
+    window.removeEventListener('online', agora);
+    document.removeEventListener('visibilitychange', aoVoltar);
+  };
+}
+
 /* ---------- categorias (tipos de produto) ---------- */
 export const CATEGORIAS = ['Tênis', 'Roupas', 'Óculos', 'Bolsas', 'Cuecas', 'Acessórios'];
 
@@ -2367,23 +2587,25 @@ export function getProducts() {
 }
 
 export function saveProduct(product) {
-  const list = getProducts();
-  const i = list.findIndex(p => p.id === product.id);
-  if (i >= 0) list[i] = product;
-  else list.unshift({ ...product, id: 'rsf-' + Math.random().toString(36).slice(2, 8) });
-  write(KEYS.products, list);
+  const id = product.id || 'rsf-' + Math.random().toString(36).slice(2, 8);
+  const produto = { ...product, id };
+  return alterarProdutos(lista => {
+    const i = lista.findIndex(p => p.id === id);
+    const nova = lista.slice();
+    if (i >= 0) nova[i] = produto;
+    else nova.unshift(produto);
+    return nova;
+  });
 }
 
 export function deleteProduct(id) {
-  write(KEYS.products, getProducts().filter(p => p.id !== id));
+  return alterarProdutos(lista => lista.filter(p => p.id !== id));
 }
 
 export function adjustStock(id, delta) {
-  const list = getProducts();
-  const p = list.find(x => x.id === id);
-  if (!p) return;
-  p.estoque = Math.max(0, (p.estoque || 0) + delta);
-  write(KEYS.products, list);
+  return alterarProdutos(lista =>
+    lista.map(p => (p.id === id ? { ...p, estoque: Math.max(0, (p.estoque || 0) + delta) } : p))
+  );
 }
 
 /* ---------- exportar / importar catálogo (backup local em arquivo) ----------
@@ -2393,20 +2615,22 @@ export function exportCatalog() {
   return JSON.stringify({ tipo: 'casa-mikka-catalogo', versao: 1, data: new Date().toISOString(), produtos: getProducts() });
 }
 
-export function importCatalog(text, { mesclar = false } = {}) {
+export async function importCatalog(text, { mesclar = false } = {}) {
   const parsed = JSON.parse(text);
   const produtos = Array.isArray(parsed) ? parsed : parsed && parsed.produtos;
   if (!Array.isArray(produtos) || !produtos.length) throw new Error('Arquivo sem produtos válidos.');
   const norm = produtos.map(p => ({ ...p, id: p.id || 'rsf-' + Math.random().toString(36).slice(2, 8) }));
-  if (mesclar) {
-    const atual = getProducts();
-    const byId = new Map(atual.map(p => [p.id, p]));
+
+  let total = norm.length;
+  const sync = await alterarProdutos(lista => {
+    if (!mesclar) return norm;
+    const byId = new Map(lista.map(p => [p.id, p]));
     norm.forEach(p => byId.set(p.id, p));
-    write(KEYS.products, [...byId.values()]);
-    return byId.size;
-  }
-  write(KEYS.products, norm);
-  return norm.length;
+    const mesclada = [...byId.values()];
+    total = mesclada.length;
+    return mesclada;
+  });
+  return { total, sync };
 }
 
 /* ---------- carrinho ---------- */
@@ -2454,7 +2678,27 @@ export const ORDER_STATUS = {
   CANCELADO: 'cancelado'
 };
 
-export function createOrder({ cliente, itens, total, comprovante }) {
+/* Checkout público. Com servidor, o pedido cai na conta da loja (qualquer
+   aparelho da equipe vê). Sem servidor, fica salvo no aparelho do cliente,
+   exatamente como antes. */
+export async function createOrder({ cliente, itens, total, comprovante }) {
+  if (api.backendAtivo()) {
+    try {
+      const r = await api.enviarPedido({
+        cliente,
+        itens: itens.map(i => ({ productId: i.productId, tamanho: i.tamanho, qtd: i.qtd })),
+        comprovante
+      });
+      const pedido = { ...r.pedido, comprovante: comprovante || null };
+      guardarPedidoLocal(pedido);
+      clearCart();
+      return pedido;
+    } catch (e) {
+      // erro de validação precisa chegar ao cliente; queda de rede não.
+      if (!e.offline && e.status !== 503) throw e;
+    }
+  }
+
   const orders = read(KEYS.orders, []);
   const id = 'RSF' + Date.now().toString(36).toUpperCase().slice(-6);
   const order = {
@@ -2464,7 +2708,9 @@ export function createOrder({ cliente, itens, total, comprovante }) {
     cliente,
     itens,
     total,
-    comprovante // dataURL da imagem/pdf do comprovante
+    comprovante, // dataURL da imagem/pdf do comprovante
+    temComprovante: !!comprovante,
+    somenteLocal: true
   };
   orders.unshift(order);
   write(KEYS.orders, orders);
@@ -2472,46 +2718,110 @@ export function createOrder({ cliente, itens, total, comprovante }) {
   return order;
 }
 
-export function updateOrderStatus(orderId, status) {
+export async function updateOrderStatus(orderId, status) {
+  const token = tokenEquipe();
+  const pedidoLocal = read(KEYS.orders, []).find(o => o.id === orderId);
+
+  if (api.backendAtivo() && token && pedidoLocal && !pedidoLocal.somenteLocal) {
+    try {
+      const r = await api.mudarStatusPedido(orderId, status, token);
+      pedidosRev = r.rev;
+      guardarPedidoLocal(r.pedido);
+      if (r.catalogo) {
+        catalogoRev = r.catalogo.rev;
+        aplicarProdutosRemotos(r.catalogo.produtos);
+        atualizarInfo({ rev: r.catalogo.rev });
+      }
+      return { ok: true, remoto: true };
+    } catch (e) {
+      if (!e.offline) return { ok: false, erro: e };
+    }
+  }
+
   const orders = read(KEYS.orders, []);
   const order = orders.find(o => o.id === orderId);
-  if (!order) return;
+  if (!order) return { ok: false, erro: new Error('Pedido não encontrado.') };
 
   // confirmar a venda baixa o estoque automaticamente (uma única vez)
   if (status === ORDER_STATUS.PAGO && order.status === ORDER_STATUS.AGUARDANDO) {
-    const products = getProducts();
-    order.itens.forEach(item => {
-      const p = products.find(x => x.id === item.productId);
-      if (p) p.estoque = Math.max(0, p.estoque - item.qtd);
-    });
-    write(KEYS.products, products);
+    await alterarProdutos(lista =>
+      lista.map(p => {
+        const item = order.itens.find(i => i.productId === p.id);
+        return item ? { ...p, estoque: Math.max(0, (p.estoque || 0) - item.qtd) } : p;
+      })
+    );
   }
 
   order.status = status;
   write(KEYS.orders, orders);
+  return { ok: true, remoto: false };
 }
 
-/* ---------- autenticação da equipe ---------- */
+/* Comprovantes ficam num blob separado: busca sob demanda ao abrir o modal. */
+export async function obterComprovante(orderId) {
+  const local = read(KEYS.orders, []).find(o => o.id === orderId);
+  if (local && local.comprovante) return local.comprovante;
+  const token = tokenEquipe();
+  if (!api.backendAtivo() || !token) return null;
+  const r = await api.buscarComprovante(orderId, token);
+  if (r && r.comprovante) {
+    guardarPedidoLocal({ id: orderId, comprovante: r.comprovante });
+    return r.comprovante;
+  }
+  return null;
+}
+
+/* ---------- autenticação da equipe ----------
+   A senha do painel é também o token de escrita da API: ela vai no cabeçalho
+   Authorization das rotas protegidas. */
 export const useSession = () => useStoreKey('session', null);
 
-export function login(password) {
+export async function login(password) {
+  if (api.estadoBackend() !== api.ESTADO.OFFLINE) {
+    try {
+      const r = await api.entrar(password);
+      write(KEYS.session, { at: Date.now(), token: r.token, remoto: true });
+      write(KEYS.staff, { passHash: hashPass(password) }); // mantém o modo local em dia
+      await sincronizarCatalogo({ forcar: true });
+      await sincronizarPedidos({ forcar: true });
+      return true;
+    } catch (e) {
+      if (!e.offline) return false; // senha errada / bloqueio: não tenta local
+    }
+  }
+
   const staff = read(KEYS.staff, SEED_STAFF);
   if (hashPass(password) === staff.passHash) {
-    write(KEYS.session, { at: Date.now() });
+    write(KEYS.session, { at: Date.now(), token: password, remoto: false });
     return true;
   }
   return false;
 }
 
 export function logout() {
-  localStorage.removeItem(KEYS.session);
-  window.dispatchEvent(new CustomEvent(EVENT, { detail: KEYS.session }));
+  pedidosRev = null;
+  write(KEYS.session, null);
 }
 
-export function changePassword(current, next) {
+export async function changePassword(current, next) {
   const staff = read(KEYS.staff, SEED_STAFF);
+
+  if (api.backendAtivo()) {
+    try {
+      // a senha atual é o próprio token: o servidor confere antes de trocar
+      const r = await api.trocarSenhaRemota(next, current);
+      write(KEYS.staff, { passHash: hashPass(next) });
+      write(KEYS.session, { at: Date.now(), token: r.token || next, remoto: true });
+      return true;
+    } catch (e) {
+      if (!e.offline) return false;
+    }
+  }
+
   if (hashPass(current) !== staff.passHash) return false;
   write(KEYS.staff, { passHash: hashPass(next) });
+  const sessao = read(KEYS.session, null);
+  if (sessao) write(KEYS.session, { ...sessao, token: next });
   return true;
 }
 
