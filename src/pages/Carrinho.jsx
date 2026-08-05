@@ -33,7 +33,7 @@ export default function Carrinho() {
   const [enviando, setEnviando] = useState(false);
   const fileRef = useRef(null);
 
-  useEffect(() => window.scrollTo(0, 0), [step, pedido]);
+  useEffect(() => { window.scrollTo(0, 0); }, [step, pedido]);
 
   const txid = useMemo(() => 'RSF' + Date.now().toString(36).toUpperCase().slice(-6), [step === 2]);
 

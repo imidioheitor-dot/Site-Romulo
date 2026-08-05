@@ -11,7 +11,7 @@ export default function Contato() {
   const toast = useToast();
   const [form, setForm] = useState({ nome: '', contato: '', assunto: 'Dúvida sobre produto', msg: '' });
 
-  useEffect(() => window.scrollTo(0, 0), []);
+  useEffect(() => { window.scrollTo(0, 0); }, []);
   useReveal([]);
 
   const enviar = e => {
