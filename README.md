@@ -43,8 +43,10 @@ pedido passa para **"pago · preparando"**.
 
 ## Área da equipe
 
-Acesse em `/equipe`. Senha padrão inicial: **`romulo2026`**
-(altere em *Configurações* após o primeiro acesso).
+Acesse em `/equipe`. A senha de fábrica está no histórico deste repositório
+(que é público), então **troque-a em *Configurações* no primeiro acesso** —
+ver *Backend compartilhado* abaixo, porque essa mesma senha autoriza as
+alterações no servidor.
 
 No painel a equipe pode:
 - **Pedidos** — ver comprovantes, confirmar vendas (baixa o estoque), marcar como enviado ou cancelar.
@@ -92,11 +94,17 @@ A mesma senha usada para entrar em `/equipe` autoriza as rotas de escrita
 administrar: quem sabe a senha gerencia a loja de qualquer aparelho, e trocá-la
 em *Configurações* já vale para o servidor.
 
-Por padrão vale a senha inicial do painel (`romulo2026`). Em produção,
-recomenda-se definir a senha nas variáveis de ambiente do site na Netlify:
-
-- `EQUIPE_SENHA` — a senha em texto (o servidor guarda só o hash), ou
-- `EQUIPE_SENHA_HASH` — o hash pronto, se preferir não escrever a senha lá.
+> ⚠️ **Troque a senha de fábrica.** Este repositório é público, e a senha
+> inicial aparece no histórico dele — ou seja, qualquer pessoa pode
+> descobri-la e escrever no servidor da loja. Troque em `/equipe` →
+> *Configurações*, ou defina uma senha nas variáveis de ambiente do site na
+> Netlify (**Site configuration → Environment variables**):
+>
+> - `EQUIPE_SENHA` — a senha em texto (o servidor guarda só o hash), ou
+> - `EQUIPE_SENHA_HASH` — o hash pronto, se preferir não escrever a senha lá.
+>
+> A senha trocada pelo painel fica no Blobs e tem prioridade sobre essas
+> variáveis.
 
 Trocar a senha pelo painel grava o novo hash no Blobs, que passa a ter
 prioridade sobre as variáveis de ambiente. Tentativas repetidas de senha
