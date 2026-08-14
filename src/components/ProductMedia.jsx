@@ -9,9 +9,10 @@ import TenisArt from './TenisArt';
 export default function ProductMedia({ produto, className = '', style, artStyle }) {
   const [failed, setFailed] = useState(false);
   const raw = produto?.img;
-  // aceita foto enviada localmente (data:), URL externa (http/blob) ou arquivo em public/products/
+  /* aceita: foto guardada no servidor (/api/foto?id=…), foto enviada
+     localmente (data:), URL externa (http/blob) ou arquivo em public/products/ */
   const src = raw
-    ? (/^(data:|https?:|blob:)/.test(raw) ? raw : `${import.meta.env.BASE_URL}products/${raw}`)
+    ? (/^(\/|data:|https?:|blob:)/.test(raw) ? raw : `${import.meta.env.BASE_URL}products/${raw}`)
     : null;
 
   if (!src || failed) {

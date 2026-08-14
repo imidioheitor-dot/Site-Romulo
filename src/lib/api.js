@@ -148,6 +148,12 @@ export function mudarStatusPedido(id, status, token) {
   return chamar('pedidos', { metodo: 'PATCH', corpo: { id, status }, token });
 }
 
+/* Envia UMA foto de produto para o endereço dela. É o que mantém o catálogo
+   pequeno por mais produtos que a loja cadastre. */
+export function enviarFoto(dataUrl, token) {
+  return chamar('foto', { metodo: 'POST', corpo: { data: dataUrl }, token, tempoLimite: 60000 });
+}
+
 export function buscarComprovante(id, token) {
   return chamar(`comprovante?id=${encodeURIComponent(id)}`, { token, tempoLimite: 30000 });
 }

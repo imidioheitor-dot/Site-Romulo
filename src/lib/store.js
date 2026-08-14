@@ -2608,9 +2608,28 @@ export function getProducts() {
   return read(KEYS.products, []);
 }
 
-export function saveProduct(product) {
+/* Sobe a foto para o endereço dela e devolve a referência curta que vai para
+   o catálogo. Sem servidor (ou sem sessão), a foto continua embutida — o modo
+   local não tem onde guardá-la separada. */
+async function guardarFoto(img) {
+  const token = tokenEquipe();
+  if (!img || !String(img).startsWith('data:')) return { img, ok: true };
+  if (!api.backendAtivo() || !token) return { img, ok: true, local: true };
+  try {
+    const r = await api.enviarFoto(img, token);
+    return { img: r.caminho, ok: true };
+  } catch (e) {
+    return { img, ok: false, erro: e };
+  }
+}
+
+export async function saveProduct(product) {
   const id = product.id || 'rsf-' + Math.random().toString(36).slice(2, 8);
-  const produto = { ...product, id };
+
+  const foto = await guardarFoto(product.img);
+  if (!foto.ok) return { ok: false, erro: foto.erro };
+
+  const produto = { ...product, id, img: foto.img };
   return alterarProdutos(lista => {
     const i = lista.findIndex(p => p.id === id);
     const nova = lista.slice();
@@ -2618,6 +2637,34 @@ export function saveProduct(product) {
     else nova.unshift(produto);
     return nova;
   });
+}
+
+/* Converte para o formato novo as fotos que ficaram embutidas no catálogo
+   (cadastradas antes desta mudança). Um clique no painel, sem programação. */
+export async function otimizarFotos() {
+  const token = tokenEquipe();
+  if (!api.backendAtivo() || !token) return { ok: false, motivo: 'sem-servidor' };
+
+  const lista = getProducts();
+  const pendentes = lista.filter(p => String(p.img || '').startsWith('data:'));
+  if (!pendentes.length) return { ok: true, convertidas: 0, jaOtimizado: true };
+
+  const mapa = new Map();
+  for (const p of pendentes) {
+    const r = await guardarFoto(p.img);
+    if (!r.ok) return { ok: false, convertidas: mapa.size, erro: r.erro };
+    mapa.set(p.id, r.img);
+  }
+
+  const sync = await alterarProdutos(atual =>
+    atual.map(p => (mapa.has(p.id) ? { ...p, img: mapa.get(p.id) } : p))
+  );
+  return { ok: sync.ok !== false, convertidas: mapa.size, sync };
+}
+
+/* quantas fotos ainda viajam dentro do catálogo */
+export function fotosEmbutidas() {
+  return getProducts().filter(p => String(p.img || '').startsWith('data:')).length;
 }
 
 export function deleteProduct(id) {

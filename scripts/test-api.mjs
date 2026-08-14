@@ -476,6 +476,70 @@ await grupo('Freio contra chute de senha', async () => {
   ok(outroIp.status === 200, 'o bloqueio não atinge quem está com a senha certa em outro IP');
 });
 
+await grupo('Fotos de produto com endereço próprio', async () => {
+  const { chamar } = novoServidor();
+
+  const semSenha = await chamar('POST', 'foto', { corpo: { data: IMG_1PX } });
+  ok(semSenha.status === 401, 'enviar foto sem a senha da equipe → 401');
+
+  const env = await chamar('POST', 'foto', { corpo: { data: IMG_1PX }, token: SENHA });
+  ok(env.status === 201, 'a loja envia a foto sozinha, por um envio só');
+  ok(/^\/api\/foto\?id=[a-f0-9]+$/.test(env.dados.caminho), `devolve um endereço curto (${env.dados.caminho})`);
+  ok(env.dados.caminho.length < 60, 'é isso que vai para o catálogo, não a imagem inteira');
+
+  const repetida = await chamar('POST', 'foto', { corpo: { data: IMG_1PX }, token: SENHA });
+  ok(repetida.dados.caminho === env.dados.caminho && repetida.dados.jaExistia === true,
+    'mandar a mesma foto de novo não duplica nada (o id vem do conteúdo)');
+
+  const naoImagem = await chamar('POST', 'foto', {
+    corpo: { data: 'data:application/pdf;base64,AAAA' }, token: SENHA
+  });
+  ok(naoImagem.status === 400, 'arquivo que não é imagem → 400');
+
+  const gigante = await chamar('POST', 'foto', {
+    corpo: { data: 'data:image/png;base64,' + 'A'.repeat(4_200_000) }, token: SENHA
+  });
+  ok(gigante.status === 413, 'foto acima do teto → 413 com recado');
+
+  // o catálogo guarda só a referência
+  const cat = await chamar('PUT', 'catalogo', {
+    corpo: { produtos: [{ ...PRODUTOS[0], img: env.dados.caminho }] }, token: SENHA
+  });
+  ok(cat.status === 200 && cat.dados.produtos[0].img === env.dados.caminho,
+    'o catálogo aceita e preserva a referência da foto');
+  ok(JSON.stringify(cat.dados.produtos).length < 400,
+    `catálogo continua pequeno mesmo com foto (${JSON.stringify(cat.dados.produtos).length} bytes)`);
+
+  // e o cliente busca a imagem direto, sem senha
+  const publica = await (async () => {
+    const armazem = armazemMemoria();
+    void armazem;
+    return chamar('GET', `foto?id=${env.dados.id}`);
+  })();
+  ok(publica.status === 200, 'qualquer visitante carrega a foto (rota pública)');
+
+  const semId = await chamar('GET', 'foto?id=nao-existe');
+  ok(semId.status === 400 || semId.status === 404, 'id inválido não quebra o servidor');
+});
+
+await grupo('Cabeçalhos da foto (vitrine rápida)', async () => {
+  const armazem = armazemMemoria();
+  const roteador = criarRoteador({ armazem, ambiente: {} });
+  const env = await roteador(new Request(`${BASE}/api/foto`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json', authorization: `Bearer ${SENHA}` },
+    body: JSON.stringify({ data: IMG_1PX })
+  }), { ip: 'foto' });
+  const { id } = await env.json();
+
+  const img = await roteador(new Request(`${BASE}/api/foto?id=${id}`), { ip: 'foto' });
+  ok(img.headers.get('content-type') === 'image/png', 'a resposta sai como imagem de verdade, não JSON');
+  ok(/immutable/.test(img.headers.get('cache-control') || ''),
+    'com cache permanente — o id vem do conteúdo, então trocar a foto gera outro endereço');
+  const bytes = Buffer.from(await img.arrayBuffer());
+  ok(bytes.length > 0 && bytes[0] === 0x89, 'e os bytes são mesmo o PNG enviado');
+});
+
 await grupo('Camada do Netlify Blobs', async () => {
   /* Dublê do Store do @netlify/blobs: só o que a nossa camada usa. */
   const dados = new Map();

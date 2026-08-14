@@ -205,6 +205,60 @@ try {
   );
   ok(porTemporizador, 'a sincronização periódica também traz a mudança (sem nenhuma interação)');
 
+  /* ============================================================
+     O que a loja mais faz: cadastrar produto novo, com foto, pelo painel —
+     sem tocar em código, sem GitHub, e valendo para todo mundo na hora.
+     ============================================================ */
+  grupo('4c. Cadastrar produto com foto pelo painel');
+
+  const catalogoAntes = await (await fetch(`${BASE}/api/catalogo`)).json();
+  const tamanhoAntes = JSON.stringify(catalogoAntes.produtos).length;
+
+  await equipe.page.click('.estoque__toolbar .btn-primary');       // Novo produto
+  await equipe.page.waitForSelector('.pform');
+  await equipe.page.fill('.pform__grid .field:nth-child(1) input', 'Bolsa Nova da Loja');
+  await equipe.page.fill('.pform__grid .field:nth-child(6) input', '249.90');   // preço
+  await equipe.page.fill('.pform__grid .field:nth-child(8) input', '4');        // estoque
+  await equipe.page.setInputFiles('.pform__upload input[type=file]', {
+    name: 'bolsa.png', mimeType: 'image/png', buffer: Buffer.from(PNG_1PX, 'base64')
+  });
+  await equipe.page.waitForSelector('.pform__photo-preview img', { timeout: 10000 });
+  await equipe.page.click('.pform__actions button[type=submit]');
+  await equipe.page.waitForTimeout(1500);
+
+  const chegou = await ate(async () => {
+    const c = await (await fetch(`${BASE}/api/catalogo`)).json();
+    return c.produtos.some(p => p.nome === 'Bolsa Nova da Loja');
+  }, { titulo: 'produto novo chegar ao servidor' });
+  ok(chegou, 'produto cadastrado pelo painel chega ao servidor');
+
+  const depois = await (await fetch(`${BASE}/api/catalogo`)).json();
+  const nova = depois.produtos.find(p => p.nome === 'Bolsa Nova da Loja');
+  ok(nova.preco === 249.9 && nova.estoque === 4, `preço e quantidade guardados (${nova.preco} / ${nova.estoque})`);
+  ok(/^\/api\/foto\?id=/.test(nova.img), `a foto virou um endereço próprio (${nova.img})`);
+
+  const cresceu = JSON.stringify(depois.produtos).length - tamanhoAntes;
+  ok(cresceu < 500, `o catálogo cresceu só ${cresceu} bytes — a imagem não viaja dentro dele`);
+
+  const imagem = await fetch(`${BASE}${nova.img}`);
+  ok(imagem.status === 200 && (imagem.headers.get('content-type') || '').startsWith('image/'),
+    'e a foto é servida como imagem para qualquer visitante');
+
+  // o cliente, em OUTRO aparelho, vê o produto novo com a foto
+  await cliente.page.goto(`${BASE}/#/produto/${nova.id}`, { waitUntil: 'domcontentloaded' });
+  await cliente.page.waitForSelector('.produto__title', { timeout: 20000 });
+  const nomeVisto = await cliente.page.textContent('.produto__title');
+  ok(/Bolsa Nova da Loja/.test(nomeVisto), 'o cliente vê o produto novo em outro aparelho');
+  const fotoCarregou = await cliente.page.evaluate(() => {
+    const img = document.querySelector('.produto__stage img');
+    return !!img && img.complete && img.naturalWidth > 0;
+  });
+  ok(fotoCarregou, 'e a foto carrega de verdade na página dele');
+
+  // devolve o cliente ao produto que os próximos grupos usam
+  await cliente.page.goto(`${BASE}/#/produto/${alvo.id}`, { waitUntil: 'domcontentloaded' });
+  await cliente.page.waitForSelector('.produto__stock', { timeout: 20000 });
+
   /* ============================================================ */
   grupo('5. Checkout público de ponta a ponta');
 
