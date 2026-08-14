@@ -2442,6 +2442,18 @@ function aplicarProdutosRemotos(produtos) {
 }
 
 /* ---------- catálogo: baixar do servidor ---------- */
+let otimizacaoTentada = false;
+
+/* Um catálogo com fotos embutidas demais fica grande a ponto de a hospedagem
+   recusar tanto o envio quanto a entrega — e aí a loja não consegue mais
+   cadastrar nada. Aqui a gente conserta sozinho, sem pedir nada a ninguém. */
+async function consertarCatalogoPesado() {
+  if (otimizacaoTentada || !tokenEquipe()) return false;
+  otimizacaoTentada = true;
+  const r = await otimizarFotos();
+  return !!(r.ok && r.convertidas);
+}
+
 export async function sincronizarCatalogo({ forcar = false } = {}) {
   atualizarInfo({ sincronizando: true });
   try {
@@ -2462,17 +2474,52 @@ export async function sincronizarCatalogo({ forcar = false } = {}) {
     // (é assim que a loja "nasce" no backend, sem passo manual).
     if (!publicado && tokenEquipe()) await publicarCatalogoAtual();
 
+    // Fotos embutidas vindas do formato antigo: conserta sozinho, senão o
+    // catálogo continua engordando até travar todo cadastro.
+    if (publicado && dados.produtos.some(p => String(p.img || '').startsWith('data:'))) {
+      if (await consertarCatalogoPesado()) return { ok: true, mudou: true, publicado: true, otimizado: true };
+    }
+
     return { ok: true, mudou: publicado, publicado };
   } catch (e) {
+    /* O catálogo pode ter ficado grande demais para a hospedagem entregar.
+       Nesse caso a API está viva (o /api/status responde) — o que quebrou foi
+       só o tamanho. Conserta e tenta de novo, em vez de cair no modo local. */
+    if (!otimizacaoTentada && tokenEquipe()) {
+      try {
+        await api.verificarBackend();          // a API está de pé?
+        if (await consertarCatalogoPesado()) return { ok: true, mudou: true, otimizado: true };
+      } catch { /* backend fora mesmo: segue para o modo local */ }
+    }
     atualizarInfo({ sincronizando: false, erro: e.message });
     return { ok: false, erro: e };
   }
 }
 
 /* ---------- catálogo: enviar para o servidor ---------- */
-async function enviarCatalogo(lista, mutacao) {
+/* Nenhuma foto embutida sai daqui dentro do catálogo: cada uma vai antes para
+   o endereço dela. Sem isso, o catálogo cresce ~200 KB por foto e, passando de
+   ~30, o envio inteiro é recusado pela hospedagem — e aí NADA mais salva. */
+async function converterFotosEmbutidas(lista) {
+  if (!lista.some(p => String(p.img || '').startsWith('data:'))) return { lista, ok: true };
+  const saida = [];
+  for (const p of lista) {
+    if (!String(p.img || '').startsWith('data:')) { saida.push(p); continue; }
+    const r = await guardarFoto(p.img);
+    if (!r.ok) return { lista, ok: false, erro: r.erro };
+    saida.push({ ...p, img: r.img });
+  }
+  return { lista: saida, ok: true, convertidas: true };
+}
+
+async function enviarCatalogo(listaOriginal, mutacao) {
   const token = tokenEquipe();
   if (!api.backendAtivo() || !token) return { ok: true, remoto: false };
+
+  const convertido = await converterFotosEmbutidas(listaOriginal);
+  if (!convertido.ok) return { ok: false, remoto: true, erro: convertido.erro };
+  const lista = convertido.lista;
+  if (convertido.convertidas) write(KEYS.products, lista);
 
   try {
     const r = await api.publicarCatalogo(lista, { rev: catalogoRev, token });
@@ -2639,27 +2686,20 @@ export async function saveProduct(product) {
   });
 }
 
-/* Converte para o formato novo as fotos que ficaram embutidas no catálogo
-   (cadastradas antes desta mudança). Um clique no painel, sem programação. */
+/* Conserta um catálogo que já engordou. Quem faz o trabalho é o servidor, do
+   lado dele: assim funciona até quando o catálogo já está grande demais para
+   ser baixado ou enviado — que é justamente quando a loja trava. */
 export async function otimizarFotos() {
   const token = tokenEquipe();
-  if (!api.backendAtivo() || !token) return { ok: false, motivo: 'sem-servidor' };
+  if (!token) return { ok: false, motivo: 'sem-sessao' };
 
-  const lista = getProducts();
-  const pendentes = lista.filter(p => String(p.img || '').startsWith('data:'));
-  if (!pendentes.length) return { ok: true, convertidas: 0, jaOtimizado: true };
-
-  const mapa = new Map();
-  for (const p of pendentes) {
-    const r = await guardarFoto(p.img);
-    if (!r.ok) return { ok: false, convertidas: mapa.size, erro: r.erro };
-    mapa.set(p.id, r.img);
+  try {
+    const r = await api.otimizarCatalogoRemoto(token);
+    await sincronizarCatalogo({ forcar: true });
+    return { ok: true, convertidas: r.convertidas || 0, bytesAntes: r.bytesAntes, bytesDepois: r.bytesDepois };
+  } catch (e) {
+    return { ok: false, erro: e };
   }
-
-  const sync = await alterarProdutos(atual =>
-    atual.map(p => (mapa.has(p.id) ? { ...p, img: mapa.get(p.id) } : p))
-  );
-  return { ok: sync.ok !== false, convertidas: mapa.size, sync };
 }
 
 /* quantas fotos ainda viajam dentro do catálogo */
@@ -2846,7 +2886,13 @@ export async function obterComprovante(orderId) {
 export const useSession = () => useStoreKey('session', null);
 
 export async function login(password) {
-  if (api.estadoBackend() !== api.ESTADO.OFFLINE) {
+  /* Tenta SEMPRE o servidor, mesmo que uma chamada anterior tenha falhado.
+     Um catálogo grande demais para a hospedagem entregar, por exemplo, marca
+     o backend como fora do ar — e sem esta tentativa o dono ficaria trancado
+     para fora com a senha certa, porque o aparelho novo só conhece o hash
+     local antigo. O login é uma chamada pequena: se a API estiver de pé, ela
+     passa. */
+  {
     try {
       const r = await api.entrar(password);
       write(KEYS.session, {

@@ -16,12 +16,13 @@
    ============================================================ */
 
 import { spawn } from 'node:child_process';
-import { existsSync, rmSync } from 'node:fs';
+import { existsSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const raiz = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const SENHA = 'romulo2026';
+let senhaAtual = SENHA;   // o grupo 10 troca a senha; os seguintes usam esta
 const PORTA_API = 8901;
 const PORTA_ESTATICA = 8902;
 const BASE = `http://localhost:${PORTA_API}`;
@@ -186,9 +187,11 @@ try {
 
   const subiuNoServidor = await ate(async () => {
     const c = await (await fetch(`${BASE}/api/catalogo`)).json();
-    return c.produtos.find(p => p.id === alvo.id).estoque === estoqueInicial + 1;
+    const p = (c.produtos || []).find(x => x.id === alvo.id);
+    if (!p) { globalThis.__diag = `catálogo tem ${(c.produtos||[]).length} produtos; ${alvo.id} sumiu`; return false; }
+    return p.estoque === estoqueInicial + 1;
   }, { titulo: 'estoque +1 chegar ao servidor' });
-  ok(subiuNoServidor, 'o +1 do painel sobe para o servidor na hora');
+  ok(subiuNoServidor, 'o +1 do painel sobe para o servidor na hora', globalThis.__diag);
 
   await sincronizarAgora(cliente.page);
   const clienteAtualizou = await ate(
@@ -549,6 +552,69 @@ try {
     return r.status;
   });
   ok(escreveComTokenNovo === 200, 'e continua conseguindo salvar no servidor com ele');
+  senhaAtual = 'senhaNova2026';
+  /* ============================================================
+     A loja travada: catálogo já cheio de fotos embutidas do formato antigo.
+     Nesse estado, cada salvamento reenvia megabytes e a hospedagem recusa —
+     nada mais é cadastrado. Tem de se consertar sozinho.
+     ============================================================ */
+  grupo('11. Loja travada por catálogo pesado se conserta sozinha');
+
+  /* Grava direto no armazém, e não pela API: um catálogo desse tamanho já não
+     passa pela hospedagem — que é exatamente o beco sem saída da loja. */
+  const fotoGorda = 'data:image/jpeg;base64,' + Buffer.from('X'.repeat(400_000)).toString('base64');
+  const pesados = Array.from({ length: 13 }, (_, i) => ({
+    id: `pesado${i}`, nome: `Antigo ${i}`, preco: 100, estoque: 3, tamanhos: [40], cores: ['#fff'], img: fotoGorda
+  }));
+  writeFileSync(
+    path.join(DADOS, 'catalogo.json'),
+    JSON.stringify({ rev: 99, atualizadoEm: new Date().toISOString(), produtos: pesados })
+  );
+
+  const pesoInicial = JSON.stringify(pesados).length;
+  ok(pesoInicial > 6 * 1024 * 1024, `catálogo começa com ${(pesoInicial / 1024 / 1024).toFixed(1)} MB (acima do limite da hospedagem)`);
+  const respostaGrande = await fetch(`${BASE}/api/catalogo`);
+  ok(respostaGrande.status >= 500, `nesse estado a hospedagem nem entrega o catálogo (HTTP ${respostaGrande.status})`);
+
+  const lojista = await novoAparelho();
+  await lojista.page.goto(`${BASE}/#/equipe`, { waitUntil: 'domcontentloaded' });
+  await lojista.page.fill('input[type=password]', senhaAtual);
+  await lojista.page.click('button[type=submit]');
+  await lojista.page.waitForSelector('.backend-bar', { timeout: 20000 });
+
+  const barraLojista = await lojista.page.textContent('.backend-bar');
+  ok(/Servidor compartilhado ligado/.test(barraLojista),
+    'o painel reconhece o servidor mesmo com o catálogo pesado');
+
+  // agora cadastra um produto novo — o que estava falhando na loja
+  await lojista.page.click('.painel__tab:nth-child(2)');
+  await lojista.page.waitForSelector('.estoque__list .erow', { timeout: 20000 });
+  await lojista.page.click('.estoque__toolbar .btn-primary');
+  await lojista.page.waitForSelector('.pform');
+  await lojista.page.fill('.pform__grid .field:nth-child(1) input', 'Produto Depois do Conserto');
+  await lojista.page.fill('.pform__grid .field:nth-child(6) input', '77');
+  await lojista.page.fill('.pform__grid .field:nth-child(8) input', '2');
+  await lojista.page.setInputFiles('.pform__upload input[type=file]', {
+    name: 'novo.png', mimeType: 'image/png', buffer: Buffer.from(PNG_1PX, 'base64')
+  });
+  await lojista.page.waitForSelector('.pform__photo-preview img', { timeout: 10000 });
+  await lojista.page.click('.pform__actions button[type=submit]');
+
+  const salvouMesmoTravado = await ate(async () => {
+    const c = await (await fetch(`${BASE}/api/catalogo`)).json();
+    return (c.produtos || []).some(p => p.nome === 'Produto Depois do Conserto');
+  }, { limite: 45000, titulo: 'produto novo entrar com o catálogo pesado' });
+  ok(salvouMesmoTravado, 'o produto novo é cadastrado mesmo partindo de um catálogo pesado');
+
+  const catFinal = await (await fetch(`${BASE}/api/catalogo`)).json();
+  const bytesFinal = JSON.stringify(catFinal.produtos).length;
+  ok(bytesFinal < 100_000, `o catálogo ficou leve sozinho (${bytesFinal} bytes, eram ~6 MB)`);
+  ok(catFinal.produtos.filter(p => String(p.img || '').startsWith('data:')).length === 0,
+    'nenhuma foto sobrou embutida — o conserto foi automático, sem clicar em nada');
+  const antigos = catFinal.produtos.filter(p => /^Antigo /.test(p.nome)).length;
+  ok(antigos === 13, `os 13 produtos antigos continuam lá (${antigos}), e o novo entrou`,
+    `catálogo tem ${catFinal.produtos.length} produtos: ${catFinal.produtos.slice(0,4).map(p => p.nome).join(', ')}…`);
+
 } catch (e) {
   falhou++;
   console.error('\n✗ erro no teste:', e && e.stack ? e.stack : e);

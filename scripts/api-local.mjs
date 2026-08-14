@@ -29,6 +29,9 @@ const pastaDados = path.resolve(raiz, arg('dados', '.netlify-blobs-local'));
 const pastaEstatica = arg('static', '') ? path.resolve(raiz, arg('static', '')) : null;
 // --no-api imita uma hospedagem estática (sem funções): /api cai no index.html
 const semApi = process.argv.includes('--no-api');
+/* A Netlify corta requisição E resposta de função em 6 MB. Sem imitar isso
+   aqui, o servidor local passa a mão em payloads que morreriam em produção. */
+const LIMITE_FUNCAO = Number(arg('limite', 6 * 1024 * 1024));
 
 const roteador = criarRoteador({ armazem: armazemArquivo(pastaDados), ambiente: process.env });
 
@@ -89,6 +92,14 @@ const servidor = http.createServer(async (req, res) => {
   }
 
   const corpo = ['GET', 'HEAD'].includes(req.method) ? undefined : await lerCorpo(req);
+
+  // imita a plataforma: corpo grande demais morre antes da função rodar
+  if (corpo && corpo.length > LIMITE_FUNCAO) {
+    res.writeHead(413, { 'content-type': 'text/html; charset=utf-8' });
+    res.end('<html><body>Request Entity Too Large</body></html>');
+    return;
+  }
+
   const requisicao = new Request(url, {
     method: req.method,
     headers: Object.entries(req.headers).filter(([, v]) => v != null).map(([k, v]) => [k, String(v)]),
@@ -98,8 +109,17 @@ const servidor = http.createServer(async (req, res) => {
   const resposta = await roteador(requisicao, { ip: req.socket.remoteAddress || 'local' });
   const cabecalhos = {};
   resposta.headers.forEach((v, k) => { cabecalhos[k] = v; });
+  const bytes = Buffer.from(await resposta.arrayBuffer());
+
+  // e resposta grande demais também não sai da plataforma
+  if (bytes.length > LIMITE_FUNCAO) {
+    res.writeHead(502, { 'content-type': 'text/html; charset=utf-8' });
+    res.end('<html><body>Response too large</body></html>');
+    return;
+  }
+
   res.writeHead(resposta.status, cabecalhos);
-  res.end(Buffer.from(await resposta.arrayBuffer()));
+  res.end(bytes);
 });
 
 servidor.listen(porta, () => {

@@ -70,9 +70,15 @@ salvo só naquele aparelho.
 Como o endereço da foto vem do conteúdo dela, o navegador guarda a imagem em
 cache para sempre e enviar a mesma foto duas vezes não duplica nada.
 
-> Se você já tinha cadastrado produtos antes desta mudança, aparece um botão
-> **Otimizar N foto(s)** na aba Estoque. Um clique move essas fotos para o
-> formato novo.
+**Se a loja já estava travada**, o conserto é automático: ao entrar no painel,
+o site detecta as fotos embutidas do formato antigo e pede ao servidor que ele
+mesmo as mova para os endereços próprios. O trabalho acontece inteiro dentro
+da função, então funciona até quando o catálogo já está grande demais para a
+hospedagem entregar ou receber — que é exatamente o beco sem saída. Também há
+o botão **Otimizar N foto(s)** na aba Estoque, para fazer na hora.
+
+Por segurança, o servidor nunca guarda foto dentro do catálogo: se um aparelho
+antigo mandar a imagem embutida, ele extrai e grava só a referência.
 
 Uma faixa no topo do painel mostra se o **servidor compartilhado** está ligado
 (estoque e pedidos valendo para todos os aparelhos) ou se o painel está em
@@ -107,6 +113,7 @@ publicando o site na Netlify, o backend sobe junto.
 | `GET /api/comprovante?id=` | **senha da equipe** | comprovante de um pedido (guardado à parte, por ser pesado) |
 | `POST /api/foto` | **senha da equipe** | envia UMA foto de produto e devolve o endereço dela |
 | `GET /api/foto?id=` | público | serve a foto do produto (cache permanente) |
+| `POST /api/otimizar` | **senha da equipe** | tira do catálogo as fotos embutidas (roda dentro da função) |
 | `POST /api/login` | público | confere a senha e devolve o token de escrita |
 | `PUT /api/senha` | **senha da equipe** | troca a senha da equipe |
 
@@ -165,9 +172,9 @@ dela, em vez de apagar o trabalho do outro.
 ### Testes
 
 ```bash
-npm test                              # 115 verificações da API (sem rede, sem Netlify)
+npm test                              # 127 verificações da API (sem rede, sem Netlify)
 npm run build && npm run serve:full   # site + API juntos em http://localhost:8888
-npm i -D playwright-core && npm run test:e2e   # 48 verificações no navegador
+npm i -D playwright-core && npm run test:e2e   # 55 verificações no navegador
 ```
 
 O `test:e2e` sobe o site construído com e sem backend e checa no Chromium:

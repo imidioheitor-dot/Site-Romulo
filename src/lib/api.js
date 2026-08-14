@@ -154,6 +154,16 @@ export function enviarFoto(dataUrl, token) {
   return chamar('foto', { metodo: 'POST', corpo: { data: dataUrl }, token, tempoLimite: 60000 });
 }
 
+/* Pede ao servidor que ele mesmo tire do catálogo as fotos embutidas. Roda
+   lá dentro, então funciona mesmo com o catálogo grande demais para trafegar. */
+export function otimizarCatalogoRemoto(token) {
+  return chamar('otimizar', { metodo: 'POST', corpo: {}, token, tempoLimite: 120000 });
+}
+
+export function verificarBackend() {
+  return chamar('status');
+}
+
 export function buscarComprovante(id, token) {
   return chamar(`comprovante?id=${encodeURIComponent(id)}`, { token, tempoLimite: 30000 });
 }

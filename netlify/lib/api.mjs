@@ -230,10 +230,37 @@ async function rotaCatalogoGet(req, ctx) {
   });
 }
 
+/* Tira do catálogo qualquer foto que tenha chegado embutida, guardando-a no
+   endereço dela. É o que impede o catálogo de engordar: mesmo que um aparelho
+   antigo mande a imagem dentro do JSON, o que fica gravado é só a referência. */
+async function extrairFotos(produtos, armazem) {
+  let convertidas = 0;
+  const saida = [];
+  for (const p of produtos) {
+    if (!String(p.img || '').startsWith('data:')) { saida.push(p); continue; }
+    try {
+      const foto = lerDataUrlDeImagem(p.img);
+      const existe = await armazem.ler(CHAVES.foto(foto.id));
+      if (!existe || !existe.valor) {
+        await armazem.gravar(CHAVES.foto(foto.id), {
+          tipo: foto.tipo, base64: foto.base64, criadoEm: new Date().toISOString()
+        }, {});
+      }
+      saida.push({ ...p, img: CAMINHO_FOTO(foto.id) });
+      convertidas++;
+    } catch {
+      // foto inválida: deixa o produto sem imagem em vez de perder o produto
+      saida.push({ ...p, img: '' });
+    }
+  }
+  return { produtos: saida, convertidas };
+}
+
 async function rotaCatalogoPut(req, ctx) {
   await exigirEquipe(req, ctx);
   const corpo = await corpoJson(req);
-  const produtos = normalizarCatalogo(corpo.produtos);
+  const normalizados = normalizarCatalogo(corpo.produtos);
+  const { produtos } = await extrairFotos(normalizados, ctx.armazem);
   const revBase = corpo.rev == null ? null : Number(corpo.rev);
 
   const resultado = await atualizarDoc(ctx.armazem, CHAVES.catalogo, CATALOGO_VAZIO, doc => {
@@ -422,6 +449,38 @@ async function rotaFotoGet(req, ctx) {
   });
 }
 
+/* Conserta um catálogo que já engordou: move para os endereços próprios as
+   fotos que ficaram embutidas. Roda TUDO dentro da função — o catálogo pesado
+   nunca atravessa a rede — então funciona mesmo quando ele já está grande
+   demais para ser enviado ou baixado. É a saída para uma loja travada. */
+async function rotaOtimizar(req, ctx) {
+  await exigirEquipe(req, ctx);
+
+  let antes = 0;
+  let convertidas = 0;
+
+  const resultado = await atualizarDoc(ctx.armazem, CHAVES.catalogo, CATALOGO_VAZIO, async doc => {
+    antes = JSON.stringify(doc.produtos).length;
+    const r = await extrairFotos(doc.produtos, ctx.armazem);
+    convertidas = r.convertidas;
+    if (!convertidas) return { abortar: true, semMudanca: true };
+    return { doc: { ...doc, produtos: r.produtos } };
+  });
+
+  if (resultado.abortar) {
+    return json({ ok: true, servico: SERVICO, convertidas: 0, jaOtimizado: true, bytes: antes });
+  }
+
+  return json({
+    ok: true,
+    servico: SERVICO,
+    convertidas,
+    rev: resultado.doc.rev,
+    bytesAntes: antes,
+    bytesDepois: JSON.stringify(resultado.doc.produtos).length
+  });
+}
+
 async function rotaComprovante(req, ctx) {
   await exigirEquipe(req, ctx);
   const id = new URL(req.url).searchParams.get('id');
@@ -482,6 +541,7 @@ const ROTAS = {
   'GET comprovante': rotaComprovante,
   'GET foto': rotaFotoGet,
   'POST foto': rotaFotoPost,
+  'POST otimizar': rotaOtimizar,
   'POST login': rotaLogin,
   'PUT senha': rotaSenha,
   'POST senha': rotaSenha
