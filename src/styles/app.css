@@ -46,7 +46,11 @@
 
 /* transição de rota */
 .route-fade {
-  animation: route-in 0.6s cubic-bezier(0.52, 0.01, 0, 1) both;
+  /* `backwards` e não `both`: com `both`, o transform da animação fica grudado
+     no elemento para sempre — e um ancestral com transform vira o bloco de
+     contenção de qualquer filho `position: fixed`, o que jogava as janelas do
+     painel para fora da tela. O efeito visual é o mesmo. */
+  animation: route-in 0.6s cubic-bezier(0.52, 0.01, 0, 1) backwards;
   min-height: 60vh;
 }
 

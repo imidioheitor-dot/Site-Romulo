@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import {
   FiLock, FiLogOut, FiPackage, FiBox, FiSettings, FiCheck, FiX, FiTruck,
   FiClock, FiPlus, FiMinus, FiEdit2, FiTrash2, FiEye, FiSave, FiSearch, FiExternalLink, FiUpload, FiDownload,
@@ -81,6 +82,15 @@ const STATUS_META = {
   [ORDER_STATUS.ENVIADO]: { label: 'Enviado', cls: 'ok', icon: <FiTruck size={11} /> },
   [ORDER_STATUS.CANCELADO]: { label: 'Cancelado', cls: 'danger', icon: <FiX size={11} /> }
 };
+
+/* As janelas (modal) saem da árvore da rota de propósito.
+   O <main> da rota carrega um transform da animação de troca de página, e um
+   ancestral com transform vira o bloco de contenção de qualquer filho
+   `position: fixed` — o modal deixava de se ancorar na tela e passava a se
+   centralizar dentro do <main>. Numa página longa como o Estoque isso jogava
+   a janela para milhares de pixels abaixo: só o escurecido aparecia. */
+const criarModal = conteudo =>
+  typeof document === 'undefined' ? conteudo : createPortal(conteudo, document.body);
 
 function Painel() {
   const [tab, setTab] = useState('pedidos');
@@ -313,7 +323,7 @@ function Pedidos() {
         </div>
       )}
 
-      {ver && (
+      {ver && criarModal(
         <div className="modal" onClick={() => setVer(null)}>
           <div className="modal__box" onClick={e => e.stopPropagation()}>
             <div className="modal__head">
@@ -551,7 +561,7 @@ function ProdutoForm({ produto, onClose, onSaved }) {
     onSaved(sync);
   };
 
-  return (
+  return criarModal(
     <div className="modal" onClick={onClose}>
       <div className="modal__box modal__box--wide" onClick={e => e.stopPropagation()}>
         <div className="modal__head">
