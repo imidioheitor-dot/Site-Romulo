@@ -53,6 +53,27 @@ No painel a equipe pode:
 - **Estoque** — ajustar quantidades, editar preços, cadastrar/remover modelos.
 - **Configurações** — trocar a senha.
 
+### Cadastrar um produto novo (sem mexer em código)
+
+Em `/equipe` → **Estoque** → **Novo produto**: nome, preço, quantidade e a
+foto (do computador ou da galeria do celular). Ao salvar, o produto entra no
+ar para todo mundo em segundos — não precisa de GitHub, de deploy nem de
+ninguém programar.
+
+A foto **não vai dentro do catálogo**: ela é enviada sozinha e ganha um
+endereço próprio (`/api/foto?id=…`), e o catálogo guarda só essa referência.
+É isso que permite cadastrar quantos produtos a loja quiser — antes, cada foto
+engordava o catálogo, que era reenviado inteiro a cada salvamento, e passando
+de ~30 fotos o envio estourava o limite da hospedagem e o produto acabava
+salvo só naquele aparelho.
+
+Como o endereço da foto vem do conteúdo dela, o navegador guarda a imagem em
+cache para sempre e enviar a mesma foto duas vezes não duplica nada.
+
+> Se você já tinha cadastrado produtos antes desta mudança, aparece um botão
+> **Otimizar N foto(s)** na aba Estoque. Um clique move essas fotos para o
+> formato novo.
+
 Uma faixa no topo do painel mostra se o **servidor compartilhado** está ligado
 (estoque e pedidos valendo para todos os aparelhos) ou se o painel está em
 **modo local**. Com o servidor ligado, ela também traz *Atualizar* e
@@ -84,6 +105,8 @@ publicando o site na Netlify, o backend sobe junto.
 | `GET /api/pedidos` | **senha da equipe** | lista de pedidos (dados de cliente nunca são públicos) |
 | `PATCH /api/pedidos` | **senha da equipe** | muda o status; confirmar a venda **baixa o estoque no servidor** |
 | `GET /api/comprovante?id=` | **senha da equipe** | comprovante de um pedido (guardado à parte, por ser pesado) |
+| `POST /api/foto` | **senha da equipe** | envia UMA foto de produto e devolve o endereço dela |
+| `GET /api/foto?id=` | público | serve a foto do produto (cache permanente) |
 | `POST /api/login` | público | confere a senha e devolve o token de escrita |
 | `PUT /api/senha` | **senha da equipe** | troca a senha da equipe |
 
@@ -142,9 +165,9 @@ dela, em vez de apagar o trabalho do outro.
 ### Testes
 
 ```bash
-npm test                              # 101 verificações da API (sem rede, sem Netlify)
+npm test                              # 115 verificações da API (sem rede, sem Netlify)
 npm run build && npm run serve:full   # site + API juntos em http://localhost:8888
-npm i -D playwright-core && npm run test:e2e   # 31 verificações no navegador
+npm i -D playwright-core && npm run test:e2e   # 48 verificações no navegador
 ```
 
 O `test:e2e` sobe o site construído com e sem backend e checa no Chromium:

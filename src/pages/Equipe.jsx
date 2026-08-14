@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo, useRef } from 'react';
 import {
   FiLock, FiLogOut, FiPackage, FiBox, FiSettings, FiCheck, FiX, FiTruck,
   FiClock, FiPlus, FiMinus, FiEdit2, FiTrash2, FiEye, FiSave, FiSearch, FiExternalLink, FiUpload, FiDownload,
-  FiCloud, FiCloudOff, FiRefreshCw, FiUploadCloud, FiAlertTriangle
+  FiCloud, FiCloudOff, FiRefreshCw, FiUploadCloud, FiAlertTriangle, FiImage
 } from 'react-icons/fi';
 import LiquidGlass from '../components/fx/LiquidGlass';
 import AnimatedTitle from '../components/AnimatedTitle';
@@ -12,7 +12,8 @@ import {
   useOrders, updateOrderStatus, ORDER_STATUS, obterComprovante,
   useProducts, saveProduct, deleteProduct, adjustStock, LOJA, CATEGORIAS,
   exportCatalog, importCatalog, isStoragePersistent,
-  useBackend, sincronizarCatalogo, sincronizarPedidos, publicarCatalogoAtual
+  useBackend, sincronizarCatalogo, sincronizarPedidos, publicarCatalogoAtual,
+  otimizarFotos, fotosEmbutidas
 } from '../lib/store';
 import { brl, dataBR } from '../lib/format';
 import { useToast } from '../components/Toast';
@@ -362,6 +363,9 @@ function Estoque() {
   const [busca, setBusca] = useState('');
   const [editando, setEditando] = useState(null);
   const importRef = useRef(null);
+  const backend = useBackend();
+  const [otimizando, setOtimizando] = useState(false);
+  const pendentes = fotosEmbutidas();
 
   const lista = products.filter(p => (p.nome || '').toLowerCase().includes(busca.toLowerCase()) || (p.marca || '').toLowerCase().includes(busca.toLowerCase()));
 
@@ -428,6 +432,22 @@ function Estoque() {
           <button className="btn btn-ghost cursor-target" onClick={baixarCatalogo} title="Salva todos os produtos e fotos num arquivo"><FiDownload /> Baixar catálogo</button>
           <button className="btn btn-ghost cursor-target" onClick={() => importRef.current && importRef.current.click()} title="Recarrega um catálogo salvo"><FiUpload /> Carregar catálogo</button>
           <input ref={importRef} type="file" accept="application/json,.json" hidden onChange={e => { carregarCatalogo(e.target.files && e.target.files[0]); e.target.value = ''; }} />
+          {backend.estado === 'online' && pendentes > 0 && (
+            <button
+              className="btn btn-ghost cursor-target"
+              onClick={async () => {
+                setOtimizando(true);
+                const r = await otimizarFotos();
+                setOtimizando(false);
+                if (r.ok) toast(`${r.convertidas} foto(s) otimizada(s). O catálogo ficou mais leve.`, 'ok');
+                else toast((r.erro && r.erro.message) || 'Não foi possível otimizar agora.', 'danger');
+              }}
+              disabled={otimizando}
+              title="Move para o servidor as fotos que ainda viajam dentro do catálogo"
+            >
+              <FiImage /> {otimizando ? 'Otimizando…' : `Otimizar ${pendentes} foto(s)`}
+            </button>
+          )}
           <button className="btn btn-primary cursor-target" onClick={() => setEditando({ ...EMPTY })}><FiPlus /> Novo produto</button>
         </div>
       </div>
@@ -467,6 +487,7 @@ function Estoque() {
 function ProdutoForm({ produto, onClose, onSaved }) {
   const [f, setF] = useState(produto);
   const [salvando, setSalvando] = useState(false);
+  const toast = useToast();
 
   // esconde o dock enquanto o formulário está aberto (evita cobrir os botões)
   useEffect(() => {
@@ -484,7 +505,7 @@ function ProdutoForm({ produto, onClose, onSaved }) {
     reader.onload = ev => {
       const img = new Image();
       img.onload = () => {
-        const max = 900;
+        const max = 1200;
         let { width, height } = img;
         const r = Math.min(1, max / Math.max(width, height));
         width = Math.round(width * r);
@@ -501,7 +522,7 @@ function ProdutoForm({ produto, onClose, onSaved }) {
   };
 
   const previewSrc = f.img
-    ? (/^(data:|https?:|blob:)/.test(f.img) ? f.img : `${import.meta.env.BASE_URL}products/${f.img}`)
+    ? (/^(\/|data:|https?:|blob:)/.test(f.img) ? f.img : `${import.meta.env.BASE_URL}products/${f.img}`)
     : null;
 
   const salvar = async e => {
@@ -520,6 +541,13 @@ function ProdutoForm({ produto, onClose, onSaved }) {
     setSalvando(true);
     const sync = await saveProduct(payload);
     setSalvando(false);
+
+    // falhou o envio da foto: mantém o formulário aberto para não perder o
+    // que foi digitado, e diz o motivo
+    if (sync && sync.ok === false && sync.erro && !sync.erro.offline) {
+      toast(sync.erro.message || 'Não foi possível enviar a foto. Tente de novo.', 'danger');
+      return;
+    }
     onSaved(sync);
   };
 

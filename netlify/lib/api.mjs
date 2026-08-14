@@ -11,6 +11,7 @@ import {
   SERVICO, SENHA_HASH_PADRAO, LIMITES, STATUS_PEDIDO,
   ErroApi, statusValido,
   conferirSenha, conferirSenhaTexto, criarHashSenha, ehHashForte, marcaToken,
+  lerDataUrlDeImagem, CAMINHO_FOTO,
   normalizarCatalogo, normalizarCliente, normalizarItens, normalizarComprovante,
   novoIdPedido, pedidoResumido
 } from './dados.mjs';
@@ -19,7 +20,8 @@ const CHAVES = {
   catalogo: 'catalogo',
   pedidos: 'pedidos',
   equipe: 'equipe',
-  comprovante: id => `comprovante/${id}`
+  comprovante: id => `comprovante/${id}`,
+  foto: id => `foto/${id}`
 };
 
 const CATALOGO_VAZIO = { rev: 0, atualizadoEm: null, produtos: [] };
@@ -372,6 +374,54 @@ async function rotaPedidosPatch(req, ctx) {
   });
 }
 
+/* ---------- fotos de produto ----------
+   A loja envia UMA foto por vez, para o endereço dela. O catálogo guarda só
+   a referência, então continua pequeno por mais produtos que sejam
+   cadastrados — e cada envio fica bem longe do limite de corpo das funções. */
+async function rotaFotoPost(req, ctx) {
+  await exigirEquipe(req, ctx);
+  const corpo = await corpoJson(req);
+  const foto = lerDataUrlDeImagem(corpo.data);
+
+  // id vem do conteúdo: reenviar a mesma foto não duplica nada
+  const existente = await ctx.armazem.ler(CHAVES.foto(foto.id));
+  if (!existente || !existente.valor) {
+    await ctx.armazem.gravar(
+      CHAVES.foto(foto.id),
+      { tipo: foto.tipo, base64: foto.base64, criadoEm: new Date().toISOString() },
+      {}
+    );
+  }
+
+  return json({
+    ok: true,
+    servico: SERVICO,
+    id: foto.id,
+    caminho: CAMINHO_FOTO(foto.id),
+    bytes: foto.bytes,
+    jaExistia: !!(existente && existente.valor)
+  }, { status: 201 });
+}
+
+/* Público: é o que aparece na vitrine. O id vem do conteúdo da imagem, então
+   a resposta pode ser guardada em cache para sempre — trocar a foto gera um
+   endereço novo. */
+async function rotaFotoGet(req, ctx) {
+  const id = new URL(req.url).searchParams.get('id');
+  if (!id || !/^[a-f0-9]{8,64}$/i.test(id)) throw new ErroApi(400, 'Foto inválida.');
+  const reg = await ctx.armazem.ler(CHAVES.foto(id));
+  if (!reg || !reg.valor) throw new ErroApi(404, 'Foto não encontrada.');
+
+  return new Response(Buffer.from(reg.valor.base64, 'base64'), {
+    status: 200,
+    headers: {
+      'content-type': reg.valor.tipo || 'image/jpeg',
+      'cache-control': 'public, max-age=31536000, immutable',
+      etag: `"${id}"`
+    }
+  });
+}
+
 async function rotaComprovante(req, ctx) {
   await exigirEquipe(req, ctx);
   const id = new URL(req.url).searchParams.get('id');
@@ -430,6 +480,8 @@ const ROTAS = {
   'POST pedidos': rotaPedidosPost,
   'PATCH pedidos': rotaPedidosPatch,
   'GET comprovante': rotaComprovante,
+  'GET foto': rotaFotoGet,
+  'POST foto': rotaFotoPost,
   'POST login': rotaLogin,
   'PUT senha': rotaSenha,
   'POST senha': rotaSenha
