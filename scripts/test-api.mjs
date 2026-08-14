@@ -522,6 +522,54 @@ await grupo('Fotos de produto com endereço próprio', async () => {
   ok(semId.status === 400 || semId.status === 404, 'id inválido não quebra o servidor');
 });
 
+await grupo('Loja travada por catálogo pesado', async () => {
+  // estado real de quem cadastrou produtos no formato antigo: fotos embutidas
+  const fotoGorda = 'data:image/jpeg;base64,' + Buffer.from('X'.repeat(120_000)).toString('base64');
+  const pesados = Array.from({ length: 12 }, (_, i) => ({
+    id: `p${i}`, nome: `Produto ${i}`, preco: 100, estoque: 3, tamanhos: [40], img: fotoGorda
+  }));
+
+  const { chamar, armazem } = novoServidor({
+    catalogo: { rev: 4, atualizadoEm: null, produtos: pesados }
+  });
+
+  const antes = JSON.stringify((await armazem.ler('catalogo')).valor.produtos).length;
+  ok(antes > 1_000_000, `catálogo começa pesado (${(antes / 1024 / 1024).toFixed(1)} MB)`);
+
+  const semSenha = await chamar('POST', 'otimizar');
+  ok(semSenha.status === 401, 'otimizar exige a senha da equipe');
+
+  const r = await chamar('POST', 'otimizar', { token: SENHA });
+  ok(r.status === 200, 'a loja consegue mandar o servidor consertar');
+  ok(r.dados.convertidas === 12, 'todas as fotos saíram de dentro do catálogo');
+
+  const depois = JSON.stringify((await armazem.ler('catalogo')).valor.produtos).length;
+  ok(depois < 3000, `e ele fica leve (${depois} bytes, era ${(antes / 1024 / 1024).toFixed(1)} MB)`);
+
+  const cat = await chamar('GET', 'catalogo');
+  ok(cat.dados.produtos.length === 12, 'nenhum produto se perdeu no caminho');
+  ok(cat.dados.produtos.every(p => /^\/api\/foto\?id=/.test(p.img)), 'todos apontam para a foto guardada');
+
+  const foto = await chamar('GET', `foto?id=${cat.dados.produtos[0].img.split('=')[1]}`);
+  ok(foto.status === 200, 'e as fotos continuam sendo servidas');
+
+  const denovo = await chamar('POST', 'otimizar', { token: SENHA });
+  ok(denovo.dados.jaOtimizado === true, 'rodar de novo não faz nada (é seguro repetir)');
+});
+
+await grupo('Servidor nunca guarda foto dentro do catálogo', async () => {
+  const { chamar, armazem } = novoServidor();
+  const gravou = await chamar('PUT', 'catalogo', {
+    corpo: { produtos: [{ nome: 'Com foto embutida', preco: 50, estoque: 1, tamanhos: [40], img: IMG_1PX }] },
+    token: SENHA
+  });
+  ok(gravou.status === 200, 'aceita um aparelho antigo mandando a foto embutida');
+  ok(/^\/api\/foto\?id=/.test(gravou.dados.produtos[0].img),
+    'mas guarda só a referência — o catálogo não engorda nem assim');
+  const guardado = (await armazem.ler('catalogo')).valor;
+  ok(!JSON.stringify(guardado).includes('base64'), 'nenhum base64 sobra dentro do catálogo gravado');
+});
+
 await grupo('Cabeçalhos da foto (vitrine rápida)', async () => {
   const armazem = armazemMemoria();
   const roteador = criarRoteador({ armazem, ambiente: {} });
