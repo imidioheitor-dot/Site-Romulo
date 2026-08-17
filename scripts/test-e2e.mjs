@@ -219,6 +219,21 @@ try {
 
   await equipe.page.click('.estoque__toolbar .btn-primary');       // Novo produto
   await equipe.page.waitForSelector('.pform');
+
+  /* A janela precisa abrir NA TELA. Já apareceu de ficar a milhares de pixels
+     abaixo: o <main> da rota mantinha um transform da animação, e ancestral
+     com transform vira o bloco de contenção de filho `position: fixed` — o
+     modal deixava de se ancorar na tela. Numa página longa como o Estoque,
+     só o escurecido aparecia e o formulário ficava inalcançável. */
+  const janela = await equipe.page.evaluate(() => {
+    const box = document.querySelector('.modal__box');
+    const r = box.getBoundingClientRect();
+    return { topo: Math.round(r.top), altura: Math.round(r.height), tela: window.innerHeight };
+  });
+  ok(janela.topo >= 0 && janela.topo < janela.tela,
+    `a janela do formulário abre dentro da tela (topo ${janela.topo}px, tela ${janela.tela}px)`);
+  ok(await equipe.page.isVisible('.pform__grid .field:nth-child(1) input'),
+    'e os campos estão visíveis para preencher');
   await equipe.page.fill('.pform__grid .field:nth-child(1) input', 'Bolsa Nova da Loja');
   await equipe.page.fill('.pform__grid .field:nth-child(6) input', '249.90');   // preço
   await equipe.page.fill('.pform__grid .field:nth-child(8) input', '4');        // estoque
