@@ -45,7 +45,7 @@
   padding: 20px;
   border-radius: var(--r-md);
   border: 1px solid var(--line);
-  background: rgba(224, 183, 138, 0.03);
+  background: rgba(150, 112, 50, 0.03);
 }
 
 .local__ic {
@@ -55,7 +55,7 @@
   display: grid;
   place-items: center;
   color: var(--ice);
-  background: rgba(224, 183, 138, 0.08);
+  background: rgba(150, 112, 50, 0.08);
   border: 1px solid var(--line);
   font-size: 18px;
   flex-shrink: 0;

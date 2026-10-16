@@ -18,7 +18,7 @@
   font-size: 13px;
   font-weight: 400;
   color: var(--bone);
-  background: linear-gradient(145deg, rgba(18, 26, 43, 0.95), rgba(9, 13, 22, 0.95));
+  background: linear-gradient(145deg, rgba(248, 242, 231, 0.95), rgba(248, 242, 231, 0.95));
   -webkit-backdrop-filter: blur(20px);
   backdrop-filter: blur(20px);
   border: 1px solid var(--line-strong);

@@ -17,8 +17,8 @@
   max-width: 100%;
   padding: 1.25em;
   border-radius: 20px;
-  border: 1px solid rgba(224, 183, 138, 0.14);
-  background: #241a12;
+  border: 1px solid rgba(150, 112, 50, 0.14);
+  background: #fffaf0;
   font-weight: 300;
   overflow: hidden;
   transition: box-shadow 0.3s ease, transform 0.3s ease;
@@ -49,7 +49,7 @@
   font-size: 12px;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: var(--ice, #e6bd8c);
+  color: var(--ice, #b8893a);
 }
 
 .magic-bento-card__title {
@@ -90,8 +90,8 @@
   padding: 6px;
   background: radial-gradient(
     var(--glow-radius) circle at var(--glow-x) var(--glow-y),
-    rgba(192, 102, 58, calc(var(--glow-intensity) * 0.8)) 0%,
-    rgba(192, 102, 58, calc(var(--glow-intensity) * 0.4)) 30%,
+    rgba(184, 138, 60, calc(var(--glow-intensity) * 0.8)) 0%,
+    rgba(184, 138, 60, calc(var(--glow-intensity) * 0.4)) 30%,
     transparent 60%
   );
   border-radius: inherit;
@@ -112,7 +112,7 @@
 .magic-bento-card--border-glow:hover {
   box-shadow:
     0 4px 20px rgba(12, 20, 40, 0.5),
-    0 0 30px rgba(192, 102, 58, 0.2);
+    0 0 30px rgba(184, 138, 60, 0.2);
 }
 
 .particle-container {
@@ -127,13 +127,13 @@
   left: -2px;
   right: -2px;
   bottom: -2px;
-  background: rgba(192, 102, 58, 0.2);
+  background: rgba(184, 138, 60, 0.2);
   border-radius: 50%;
   z-index: -1;
 }
 
 .global-spotlight {
-  mix-blend-mode: screen;
+  mix-blend-mode: normal;
   will-change: transform, opacity;
   pointer-events: none;
 }
@@ -214,7 +214,7 @@
   min-height: 0;
   height: 100%;
   border-radius: 24px;
-  border-color: rgba(224, 183, 138, 0.08);
+  border-color: rgba(150, 112, 50, 0.08);
   background: rgba(10, 15, 28, 0.55) !important;
   grid-column: auto !important;
   grid-row: auto !important;

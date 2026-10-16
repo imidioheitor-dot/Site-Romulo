@@ -1,9 +1,15 @@
-# Rômulo Santos Flores — Loja de Calçados
+# Mikka Home — Loja de decoração
 
-Site de vendas da **Rômulo Santos Flores**: calçados para o dia a dia com
-elegância e preço justo. Interface escura, minimalista e cheia de efeitos
-interativos (WebGL / GSAP / shaders), com catálogo, carrinho, pagamento via
-**Pix**, e uma **área da equipe** para gestão de estoque e pedidos.
+Site da **Mikka Home** ("Da nossa casa para seu lar!"): decoração natalina, mesa posta e almofadas,
+em tema claro (creme e dourado). Catálogo, carrinho, pagamento via **Pix** e uma **área da equipe**
+para gestão de estoque e pedidos. Atendimento: Elvira (vendas) +55 62 99414-6169 e Romulo
+(proprietário) +55 62 99236-8358. Loja: Rua 261, nº 450, Setor Campinas, Goiânia-GO.
+
+## Fotos dos produtos
+
+Os 8 produtos novos usam ilustrações douradas (`src/components/ArteProduto.jsx`) até haver fotos reais.
+Para trocar, entre em `/#/equipe` → **Estoque**, edite o produto e envie a foto: ela substitui a ilustração.
+A marca está em `public/brand/logo-mikka.jpg`.
 
 ## Como rodar
 
@@ -24,7 +30,7 @@ que executa exatamente o mesmo código da Netlify Function — com os dados em
 ## Estrutura
 
 - **Início** (`/`) — landing scrolável com vídeo de fundo, hero animado e destaques.
-- **Catálogo** (`/catalogo`) — todos os modelos, com busca e filtros.
+- **Catálogo** (`/catalogo`) — Natal, Mesa Posta, Almofadas e Decoração.
 - **Produto** (`/produto/:id`) — detalhe, seleção de tamanho e adicionar ao carrinho.
 - **Carrinho** (`/carrinho`) — sacola → dados → **pagamento via Pix** (QR Code + copia e cola + envio do comprovante).
 - **Contato** (`/contato`) — canais de atendimento e formulário que abre o WhatsApp.

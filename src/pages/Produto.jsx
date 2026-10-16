@@ -18,6 +18,7 @@ export default function Produto() {
   const produto = products.find(p => p.id === id);
   const [tamanho, setTamanho] = useState(null);
   const [qtd, setQtd] = useState(1);
+  const [fotoAtual, setFotoAtual] = useState(null);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -25,6 +26,7 @@ export default function Produto() {
     const t = products.find(p => p.id === id)?.tamanhos;
     setTamanho(t && t.length === 1 ? t[0] : null);
     setQtd(1);
+    setFotoAtual(null);
   }, [id, products]);
 
   const relacionados = useMemo(
@@ -47,7 +49,7 @@ export default function Produto() {
 
   const handleAdd = () => {
     if (!tamanho) {
-      toast('Selecione um tamanho primeiro.', 'danger');
+      toast('Escolha uma opção primeiro.', 'danger');
       return;
     }
     addToCart(produto.id, tamanho, qtd);
@@ -67,13 +69,25 @@ export default function Produto() {
           <LiquidGlass radius={28} className="produto__glass" blur={6}>
             <div className="produto__stage">
               {produto.tag && <span className="tag" style={{ position: 'absolute', top: 20, left: 20, zIndex: 5 }}>{produto.tag}</span>}
-              <ProductMedia produto={produto} artStyle={{ padding: '4%' }} />
+              <ProductMedia produto={produto} foto={fotoAtual || (tamanho && produto.fotoOpcao?.[tamanho]) || produto.img} artStyle={{ padding: '4%' }} />
             </div>
           </LiquidGlass>
           <div className="produto__thumbs">
-            {(produto.cores || []).map((c, i) => (
-              <span key={i} className="produto__thumb" style={{ background: c }} />
-            ))}
+            {(produto.galeria && produto.galeria.length > 1)
+              ? produto.galeria.map(g => (
+                  <button
+                    key={g}
+                    type="button"
+                    className={`produto__thumb produto__thumb--foto cursor-target ${(fotoAtual || produto.img) === g ? 'is-on' : ''}`}
+                    onClick={() => setFotoAtual(g)}
+                    aria-label="Ver foto"
+                  >
+                    <img src={`${import.meta.env.BASE_URL}${g}`} alt="" loading="lazy" />
+                  </button>
+                ))
+              : (produto.cores || []).map((c, i) => (
+                  <span key={i} className="produto__thumb" style={{ background: c }} />
+                ))}
           </div>
         </div>
 
@@ -93,7 +107,7 @@ export default function Produto() {
 
           <div className="produto__sizes">
             <div className="produto__sizes-head">
-              <span>Tamanho</span>
+              <span>{produto.tamanhos.length > 1 ? (produto.opcaoLabel || 'Opção') : 'Disponibilidade'}</span>
               {esgotado ? (
                 <span className="tag danger">Esgotado</span>
               ) : (
@@ -101,11 +115,11 @@ export default function Produto() {
               )}
             </div>
             <div className="produto__size-grid">
-              {produto.tamanhos.map(t => (
+              {(produto.tamanhos.length > 1 ? produto.tamanhos : []).map(t => (
                 <button
                   key={t}
                   className={`produto__size cursor-target ${tamanho === t ? 'is-on' : ''}`}
-                  onClick={() => setTamanho(t)}
+                  onClick={() => { setTamanho(t); setFotoAtual(null); }}
                   disabled={esgotado}
                 >
                   {t}
@@ -127,16 +141,14 @@ export default function Produto() {
 
           <div className="produto__perks">
             <span><FiTruck /> Entrega em Goiânia</span>
-            <span><FiRefreshCw /> Troca em até 30 dias</span>
+            <span><FiRefreshCw /> Retirada grátis na loja</span>
             <span><FiShield /> Compra segura via Pix</span>
           </div>
 
           <ul className="produto__facts">
-            <li><FiCheck /> Gênero: {produto.genero}</li>
-            {produto.tipo === 'Tênis' && produto.tamanhos.length > 1 && (
-              <li><FiCheck /> Numeração {produto.tamanhos[0]} ao {produto.tamanhos[produto.tamanhos.length - 1]}</li>
-            )}
-            <li><FiCheck /> Selecionado pela curadoria Casa Mikka</li>
+            
+            {(produto.inclui || []).map(t => <li key={t}><FiCheck /> {t}</li>)}
+            <li><FiCheck /> Selecionado pela curadoria Mikka Home</li>
           </ul>
         </div>
       </section>

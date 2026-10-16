@@ -17,7 +17,7 @@ import { getStore } from '@netlify/blobs';
 import { criarRoteador } from '../lib/api.mjs';
 import { armazemBlobs } from '../lib/armazem.mjs';
 
-const NOME_STORE = process.env.BLOBS_STORE || 'casa-mikka';
+const NOME_STORE = process.env.BLOBS_STORE || 'mikka-home';
 
 let roteador;
 

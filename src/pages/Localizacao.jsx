@@ -6,7 +6,7 @@ import { LOJA } from '../lib/store';
 import { useReveal } from '../lib/useReveal';
 import './Localizacao.css';
 
-const mapsQuery = encodeURIComponent(LOJA.endereco);
+const mapsQuery = encodeURIComponent(LOJA.enderecoMapa);
 
 export default function Localizacao() {
   useEffect(() => { window.scrollTo(0, 0); }, []);
@@ -18,8 +18,8 @@ export default function Localizacao() {
         <p className="eyebrow rise" style={{ marginBottom: 20 }}>Onde nos encontrar</p>
         <AnimatedTitle className="display rise rise-1" pre="Venha nos" accent="visitar" post="." />
         <p className="lead rise rise-2" style={{ marginTop: 18 }}>
-          Experimente, sinta o material e leve na hora. Nossa loja fica no coração de Goiânia,
-          com atendimento pensado para você encontrar o par certo sem pressa.
+          Venha conhecer a Mikka Home no Setor Campinas, em Goiânia. Toque nos tecidos,
+          escolha com calma e leve o Natal para casa.
         </p>
       </section>
 
@@ -48,14 +48,15 @@ export default function Localizacao() {
             <div>
               <strong>Horário de funcionamento</strong>
               <p>{LOJA.horario}</p>
-              <p className="muted">Domingos e feriados: fechado</p>
+              
             </div>
           </div>
           <div className="local__info reveal">
             <span className="local__ic"><FiPhone /></span>
             <div>
-              <strong>Telefone</strong>
-              <p>{LOJA.pixTelefone}</p>
+              <strong>WhatsApp</strong>
+              <p>{LOJA.vendedora}: {LOJA.telefone}</p>
+              <p>{LOJA.dono}: {LOJA.telefoneDono}</p>
             </div>
           </div>
 
@@ -75,19 +76,8 @@ export default function Localizacao() {
             rel="noreferrer"
             style={{ width: '100%' }}
           >
-            Chamar no WhatsApp <FiExternalLink />
+            Chamar a Elvira no WhatsApp <FiExternalLink />
           </a>
-        </div>
-      </section>
-
-      <section className="container local__gallery-wrap">
-        <p className="eyebrow reveal" style={{ marginBottom: 24 }}>Por dentro da loja</p>
-        <div className="local__gallery">
-          {['loja-01.jpg', 'loja-02.jpg', 'loja-03.jpg'].map((img, i) => (
-            <div className="local__photo reveal" key={img} style={{ transitionDelay: `${i * 80}ms` }}>
-              <img src={`${import.meta.env.BASE_URL}store/${img}`} alt="Casa Mikka — loja" loading="lazy" />
-            </div>
-          ))}
         </div>
       </section>
 

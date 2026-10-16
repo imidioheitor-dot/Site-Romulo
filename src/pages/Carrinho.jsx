@@ -51,7 +51,7 @@ export default function Carrinho() {
 
   useEffect(() => {
     if (step === 2 && total > 0) {
-      QRCode.toDataURL(pixPayload, { margin: 1, width: 320, color: { dark: '#17110d', light: '#f4f7ff' } })
+      QRCode.toDataURL(pixPayload, { margin: 1, width: 320, color: { dark: '#3a2a18', light: '#ffffff' } })
         .then(setQrDataUrl)
         .catch(() => setQrDataUrl(''));
     }
@@ -218,7 +218,7 @@ export default function Carrinho() {
         <div className="container carrinho__empty">
           <span className="carrinho__empty-ic"><FiShoppingBag size={30} /></span>
           <h1 className="h2">Sua sacola está <em className="h-serif">vazia</em></h1>
-          <p className="lead" style={{ textAlign: 'center' }}>Que tal encontrar o par perfeito para começar?</p>
+          <p className="lead" style={{ textAlign: 'center' }}>Que tal encontrar o presente perfeito para começar?</p>
           <Link to="/catalogo" className="btn btn-primary cursor-target">Ver catálogo <FiArrowRight /></Link>
         </div>
       </div>
@@ -255,7 +255,7 @@ export default function Carrinho() {
                       <div className="citem__top">
                         <div>
                           <h3>{i.produto.nome}</h3>
-                          <span className="muted">{i.produto.marca} · Tam. {i.tamanho}</span>
+                          <span className="muted">{i.tamanho === 'Único' ? i.produto.categoria : `${i.produto.opcaoLabel || 'Opção'}: ${i.tamanho}`}</span>
                         </div>
                         <button className="citem__del cursor-target" onClick={() => setCartQty(i.productId, i.tamanho, 0)} aria-label="Remover">
                           <FiTrash2 size={16} />

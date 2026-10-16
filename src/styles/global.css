@@ -5,24 +5,24 @@
    ============================================================ */
 
 :root {
-  /* Cores (nomes mantidos p/ compatibilidade; valores agora quentes) */
-  --void: #17110d;            /* espresso profundo (fundo) */
-  --void-2: #1e160f;
-  --surface: #241a12;
-  --surface-2: #2e2016;
-  --line: rgba(224, 183, 138, 0.14);
-  --line-strong: rgba(224, 183, 138, 0.28);
-  --bone: #f6ece0;            /* marfim quente (texto) */
-  --mist: #dcc8b3;
-  --ash: #a38b74;
-  --ice: #e6bd8c;             /* creme dourado (acento de texto) */
-  --electric: #c0663a;        /* terracota (ação primária) */
-  --electric-2: #d8834e;
-  --aqua: #cf9b6b;            /* caramelo */
-  --magenta: #b0553e;
-  --gold: #e3b768;
-  --danger: #d9583f;
-  --ok: #79a86a;
+  /* Mikka Home — claro e chique: creme, marfim e dourado */
+  --void: #f8f2e7;            /* creme (fundo) */
+  --void-2: #f3ebdc;
+  --surface: #fffaf0;
+  --surface-2: #f1e7d4;
+  --line: rgba(150, 112, 50, 0.18);
+  --line-strong: rgba(150, 112, 50, 0.34);
+  --bone: #3a2a18;            /* marrom café (texto) */
+  --mist: #6a5438;
+  --ash: #8d7757;
+  --ice: #9a6f1f;             /* dourado escuro (acento de texto) */
+  --electric: #b98a3c;        /* dourado (ação primária) */
+  --electric-2: #c9a24a;
+  --aqua: #c9a24a;
+  --magenta: #a8742c;
+  --gold: #b8893a;
+  --danger: #b5412f;
+  --ok: #4f7d45;
 
   /* Tipografia */
   --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
@@ -59,7 +59,7 @@ body {
 }
 
 ::selection {
-  background: rgba(192, 102, 58, 0.35);
+  background: rgba(184, 138, 60, 0.35);
   color: #fff;
 }
 
@@ -71,7 +71,7 @@ body {
   background: var(--void);
 }
 ::-webkit-scrollbar-thumb {
-  background: #3a2a1e;
+  background: #d9c6a0;
   border-radius: 8px;
   border: 2px solid var(--void);
 }
@@ -194,14 +194,14 @@ img {
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, var(--electric) 0%, #8a4526 100%);
+  background: linear-gradient(135deg, var(--electric) 0%, #8a6420 100%);
   color: #fff;
-  box-shadow: 0 8px 30px rgba(192, 102, 58, 0.35);
+  box-shadow: 0 8px 30px rgba(184, 138, 60, 0.35);
 }
 
 .btn-primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 14px 44px rgba(192, 102, 58, 0.5);
+  box-shadow: 0 14px 44px rgba(184, 138, 60, 0.5);
 }
 
 .btn-ghost {
@@ -216,12 +216,12 @@ img {
 }
 
 .btn-quiet {
-  background: rgba(224, 183, 138, 0.08);
+  background: rgba(150, 112, 50, 0.08);
   color: var(--ice);
 }
 
 .btn-quiet:hover {
-  background: rgba(224, 183, 138, 0.16);
+  background: rgba(150, 112, 50, 0.16);
 }
 
 .btn-danger {
@@ -244,10 +244,10 @@ img {
 /* ---------- vidro líquido (liquid glass) ---------- */
 .glass {
   position: relative;
-  background: linear-gradient(145deg, rgba(224, 183, 138, 0.07), rgba(224, 183, 138, 0.02));
+  background: linear-gradient(145deg, rgba(150, 112, 50, 0.07), rgba(150, 112, 50, 0.02));
   -webkit-backdrop-filter: blur(22px) saturate(1.5);
   backdrop-filter: blur(22px) saturate(1.5);
-  border: 1px solid rgba(224, 183, 138, 0.14);
+  border: 1px solid rgba(150, 112, 50, 0.14);
   border-radius: var(--r-lg);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.09),
@@ -285,7 +285,7 @@ img {
 .field input,
 .field textarea,
 .field select {
-  background: rgba(224, 183, 138, 0.05);
+  background: rgba(150, 112, 50, 0.05);
   border: 1px solid var(--line);
   border-radius: var(--r-sm);
   color: var(--bone);
@@ -301,7 +301,7 @@ img {
 .field textarea:focus,
 .field select:focus {
   border-color: var(--electric-2);
-  background: rgba(224, 183, 138, 0.09);
+  background: rgba(150, 112, 50, 0.09);
 }
 
 .field select option {
@@ -322,7 +322,7 @@ img {
   text-transform: uppercase;
   border: 1px solid var(--line);
   color: var(--ice);
-  background: rgba(224, 183, 138, 0.06);
+  background: rgba(150, 112, 50, 0.06);
 }
 
 .tag.gold {
