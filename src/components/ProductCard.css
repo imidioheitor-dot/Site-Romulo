@@ -4,7 +4,7 @@
   flex-direction: column;
   border-radius: var(--r-lg);
   overflow: hidden;
-  background: linear-gradient(160deg, rgba(18, 26, 43, 0.6), rgba(9, 13, 22, 0.5));
+  background: linear-gradient(160deg, rgba(248, 242, 231, 0.6), rgba(248, 242, 231, 0.5));
   border: 1px solid var(--line);
   cursor: pointer;
   transition:
@@ -23,8 +23,8 @@
   position: relative;
   aspect-ratio: 4 / 3;
   background:
-    radial-gradient(120% 90% at 50% 20%, rgba(224, 183, 138, 0.12), transparent 60%),
-    linear-gradient(180deg, #2a1e15, #1a120c);
+    radial-gradient(120% 90% at 50% 20%, rgba(150, 112, 50, 0.12), transparent 60%),
+    linear-gradient(180deg, #f1e7d4, #f3ebdc);
   display: grid;
   place-items: center;
   overflow: hidden;
@@ -76,7 +76,7 @@
   top: 14px;
   right: 14px;
   z-index: 3;
-  background: rgba(5, 7, 13, 0.8);
+  background: rgba(248, 242, 231, 0.8);
   color: var(--danger);
   font-size: 10px;
   font-weight: 700;
@@ -98,7 +98,7 @@
   display: grid;
   place-items: center;
   color: #fff;
-  background: rgba(192, 102, 58, 0.9);
+  background: rgba(184, 138, 60, 0.9);
   opacity: 0;
   transform: translateY(8px) scale(0.9);
   transition: all 0.45s cubic-bezier(0.52, 0.01, 0, 1);

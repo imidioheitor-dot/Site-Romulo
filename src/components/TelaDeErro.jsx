@@ -25,7 +25,7 @@ export default function TelaDeErro(erro, pilha) {
         display: 'grid',
         placeItems: 'center',
         padding: '48px 20px',
-        background: '#17110d',
+        background: '#f8f2e7',
         color: '#f2e9df',
         fontFamily: 'Inter, system-ui, sans-serif'
       }}
@@ -46,9 +46,9 @@ export default function TelaDeErro(erro, pilha) {
             gap: 8,
             padding: '12px 22px',
             borderRadius: 999,
-            border: '1px solid rgba(230,189,140,0.4)',
-            background: 'rgba(230,189,140,0.12)',
-            color: '#e6bd8c',
+            border: '1px solid rgba(184, 138, 60,0.4)',
+            background: 'rgba(184, 138, 60,0.12)',
+            color: '#b8893a',
             fontSize: 15,
             cursor: 'pointer'
           }}

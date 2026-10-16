@@ -1,6 +1,5 @@
 import { Link } from 'react-router-dom';
-import { FiInstagram, FiPhone, FiMapPin, FiMail } from 'react-icons/fi';
-import Logo from './Logo';
+import { FiPhone, FiMapPin } from 'react-icons/fi';
 import { LOJA } from '../lib/store';
 import './Footer.css';
 
@@ -10,14 +9,12 @@ export default function Footer() {
       <div className="container">
         <div className="footer__grid">
           <div className="footer__brand">
-            <Logo />
+            <img className="footer__logo" src={`${import.meta.env.BASE_URL}brand/logo-mikka.jpg`} alt="Mikka Home — Da nossa casa para seu lar!" />
             <p className="lead" style={{ marginTop: 20, fontSize: 15 }}>
-              Calçados que unem conforto e elegância para o seu dia a dia — selecionados a dedo, com o preço justo.
+              Da nossa casa para seu lar! Decoração natalina, mesa posta e almofadas com elegância e preço justo.
             </p>
             <div className="footer__social">
-              <a className="footer__ic cursor-target" href={LOJA.instagramUrl} target="_blank" rel="noreferrer" aria-label="Instagram"><FiInstagram /></a>
               <a className="footer__ic cursor-target" href={`https://wa.me/${LOJA.whatsapp}`} target="_blank" rel="noreferrer" aria-label="WhatsApp"><FiPhone /></a>
-              <a className="footer__ic cursor-target" href={`mailto:${LOJA.email}`} aria-label="E-mail"><FiMail /></a>
             </div>
           </div>
 
@@ -33,9 +30,11 @@ export default function Footer() {
           <div className="footer__col">
             <h4>Atendimento</h4>
             <a href={`https://wa.me/${LOJA.whatsapp}`} target="_blank" rel="noreferrer">
-              <FiPhone size={13} /> {LOJA.pixTelefone}
+              <FiPhone size={13} /> {LOJA.vendedora}: {LOJA.telefone}
             </a>
-            <a href={`mailto:${LOJA.email}`}><FiMail size={13} /> {LOJA.email}</a>
+            <a href={`https://wa.me/${LOJA.whatsappDono}`} target="_blank" rel="noreferrer">
+              <FiPhone size={13} /> {LOJA.dono}: {LOJA.telefoneDono}
+            </a>
             <span className="footer__addr"><FiMapPin size={13} /> {LOJA.endereco}</span>
             <span className="muted" style={{ fontSize: 12 }}>{LOJA.horario}</span>
           </div>

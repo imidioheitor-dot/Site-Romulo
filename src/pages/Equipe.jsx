@@ -361,10 +361,10 @@ function Stat({ label, value, tone }) {
 
 /* ---------------- ESTOQUE ---------------- */
 const EMPTY = {
-  nome: '', marca: '', tipo: 'Tênis', categoria: '', genero: 'Unissex', preco: '', precoAntigo: '',
-  descricao: '', estoque: 0, tamanhos: '38,39,40,41,42', tag: '',
-  cores: '#e9eef6,#c0663a', img: '',
-  colorway: { base: '#e9eef6', mesh: '#f4f7fd', stripe: '#c0663a', sole: '#f6f4ee', accent: '#8a4526', lace: '#ffffff' }
+  nome: '', marca: 'Mikka Home', tipo: 'Decoração', categoria: '', genero: 'Casa', preco: '', precoAntigo: '',
+  descricao: '', estoque: 0, tamanhos: 'Único', tag: '',
+  cores: '#b98a3c,#f3e9d8', img: '',
+  colorway: { base: '#e9eef6', mesh: '#f4f7fd', stripe: '#b98a3c', sole: '#f6f4ee', accent: '#8a6420', lace: '#ffffff' }
 };
 
 function Estoque() {
@@ -573,21 +573,21 @@ function ProdutoForm({ produto, onClose, onSaved }) {
             <div className="field"><label>Nome</label><input value={f.nome} onChange={e => set('nome', e.target.value)} required /></div>
             <div className="field"><label>Marca</label><input value={f.marca} onChange={e => set('marca', e.target.value)} /></div>
             <div className="field"><label>Categoria (aba do site)</label>
-              <select value={f.tipo || 'Tênis'} onChange={e => set('tipo', e.target.value)} className="cursor-target">
+              <select value={f.tipo || 'Decoração'} onChange={e => set('tipo', e.target.value)} className="cursor-target">
                 {CATEGORIAS.map(c => <option key={c} value={c}>{c}</option>)}
               </select>
             </div>
-            <div className="field"><label>Subcategoria (ex: Casual)</label><input value={f.categoria} onChange={e => set('categoria', e.target.value)} /></div>
+            <div className="field"><label>Subcategoria (opcional)</label><input value={f.categoria} onChange={e => set('categoria', e.target.value)} /></div>
             <div className="field"><label>Gênero</label>
               <select value={f.genero} onChange={e => set('genero', e.target.value)} className="cursor-target">
-                <option>Unissex</option><option>Masculino</option><option>Feminino</option>
+                <option>Casa</option>
               </select>
             </div>
             <div className="field"><label>Preço (R$)</label><input type="number" step="0.01" value={f.preco} onChange={e => set('preco', e.target.value)} required /></div>
             <div className="field"><label>Preço antigo (opcional)</label><input type="number" step="0.01" value={f.precoAntigo} onChange={e => set('precoAntigo', e.target.value)} /></div>
             <div className="field"><label>Estoque</label><input type="number" value={f.estoque} onChange={e => set('estoque', e.target.value)} /></div>
             <div className="field"><label>Etiqueta (ex: Novo)</label><input value={f.tag || ''} onChange={e => set('tag', e.target.value)} /></div>
-            <div className="field"><label>Tamanhos (vírgula)</label><input value={f.tamanhos} onChange={e => set('tamanhos', e.target.value)} /></div>
+            <div className="field"><label>Opções: cores ou modelos (vírgula)</label><input value={f.tamanhos} onChange={e => set('tamanhos', e.target.value)} /></div>
             <div className="field"><label>Cores hex (vírgula)</label><input value={f.cores} onChange={e => set('cores', e.target.value)} /></div>
             <div className="field field--photo">
               <label>Foto do produto</label>

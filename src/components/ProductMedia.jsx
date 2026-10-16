@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import TenisArt from './TenisArt';
+import ArteProduto from './ArteProduto';
 
 /**
  * Mostra a foto real do produto (public/products/<img>) e, caso o
@@ -18,7 +18,7 @@ export default function ProductMedia({ produto, className = '', style, artStyle 
   if (!src || failed) {
     return (
       <div className={`product-media product-media--art ${className}`} style={style}>
-        <TenisArt colorway={produto?.colorway} seed={produto?.id?.length || 1} style={artStyle} />
+        <ArteProduto produto={produto} style={artStyle} />
       </div>
     );
   }

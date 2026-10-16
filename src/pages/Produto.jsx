@@ -47,7 +47,7 @@ export default function Produto() {
 
   const handleAdd = () => {
     if (!tamanho) {
-      toast('Selecione um tamanho primeiro.', 'danger');
+      toast('Escolha uma opção primeiro.', 'danger');
       return;
     }
     addToCart(produto.id, tamanho, qtd);
@@ -93,7 +93,7 @@ export default function Produto() {
 
           <div className="produto__sizes">
             <div className="produto__sizes-head">
-              <span>Tamanho</span>
+              <span>{produto.tamanhos.length > 1 ? (produto.opcaoLabel || 'Opção') : 'Disponibilidade'}</span>
               {esgotado ? (
                 <span className="tag danger">Esgotado</span>
               ) : (
@@ -101,7 +101,7 @@ export default function Produto() {
               )}
             </div>
             <div className="produto__size-grid">
-              {produto.tamanhos.map(t => (
+              {(produto.tamanhos.length > 1 ? produto.tamanhos : []).map(t => (
                 <button
                   key={t}
                   className={`produto__size cursor-target ${tamanho === t ? 'is-on' : ''}`}
@@ -127,16 +127,14 @@ export default function Produto() {
 
           <div className="produto__perks">
             <span><FiTruck /> Entrega em Goiânia</span>
-            <span><FiRefreshCw /> Troca em até 30 dias</span>
+            <span><FiRefreshCw /> Retirada grátis na loja</span>
             <span><FiShield /> Compra segura via Pix</span>
           </div>
 
           <ul className="produto__facts">
-            <li><FiCheck /> Gênero: {produto.genero}</li>
-            {produto.tipo === 'Tênis' && produto.tamanhos.length > 1 && (
-              <li><FiCheck /> Numeração {produto.tamanhos[0]} ao {produto.tamanhos[produto.tamanhos.length - 1]}</li>
-            )}
-            <li><FiCheck /> Selecionado pela curadoria Casa Mikka</li>
+            
+            {(produto.inclui || []).map(t => <li key={t}><FiCheck /> {t}</li>)}
+            <li><FiCheck /> Selecionado pela curadoria Mikka Home</li>
           </ul>
         </div>
       </section>

@@ -38,7 +38,7 @@ export default function Catalogo() {
 
   // produtos do tipo atual (para derivar filtros e lista)
   const doTipo = useMemo(
-    () => (tipo === 'Todos' ? products : products.filter(p => (p.tipo || 'Tênis') === tipo)),
+    () => (tipo === 'Todos' ? products : products.filter(p => (p.tipo || 'Decoração') === tipo)),
     [products, tipo]
   );
 
@@ -66,7 +66,7 @@ export default function Catalogo() {
 
   useReveal([lista.length, tipo, genero, marca, ordem, busca]);
 
-  const contagem = t => (t === 'Todos' ? products.length : products.filter(p => (p.tipo || 'Tênis') === t).length);
+  const contagem = t => (t === 'Todos' ? products.length : products.filter(p => (p.tipo || 'Decoração') === t).length);
 
   return (
     <div className="catalogo">
@@ -86,11 +86,11 @@ export default function Catalogo() {
               falloff="gaussian"
             />
           </Boundary>
-          {tipo === 'Todos' && <> <em>estilo</em>.</>}
+          {tipo === 'Todos' && <> <em>encanto</em>.</>}
         </h1>
         <p className="lead rise rise-2" style={{ marginTop: 18 }}>
-          Tênis, roupas, óculos, bolsas, cuecas e acessórios — a seleção da Casa Mikka,
-          com o equilíbrio certo entre estilo, qualidade e preço.
+          Natal, mesa posta, almofadas e decoração — a seleção da Mikka Home
+          para deixar a sua casa ainda mais acolhedora.
         </p>
       </section>
 
@@ -110,37 +110,15 @@ export default function Catalogo() {
         </div>
       </section>
 
-      {tipo === 'Tênis' && (
-        <section className="container catalogo__banner-wrap">
-          <div className="catalogo__banner reveal">
-            <video
-              className="catalogo__banner-video"
-              src={`${import.meta.env.BASE_URL}media/tenis.mp4`}
-              autoPlay
-              loop
-              muted
-              playsInline
-              preload="auto"
-            />
-            <div className="catalogo__banner-scrim" />
-            <div className="catalogo__banner-text">
-              <span className="eyebrow">Coleção de tênis</span>
-              <h2>Do casual ao statement.</h2>
-              <p>Modelos selecionados a dedo — conforto e presença em cada passo.</p>
-            </div>
-          </div>
-        </section>
-      )}
-
       <section className="container catalogo__toolbar">
         <div className="catalogo__search cursor-target">
           <FiSearch />
-          <input placeholder="Buscar por nome ou marca…" value={busca} onChange={e => setBusca(e.target.value)} />
+          <input placeholder="Buscar produto…" value={busca} onChange={e => setBusca(e.target.value)} />
         </div>
 
         <div className="catalogo__filters">
-          {generos.length > 1 && <Filter label="Gênero" options={generos} value={genero} onChange={setGenero} />}
-          {marcas.length > 1 && <Filter label="Marca" options={marcas} value={marca} onChange={setMarca} />}
+          {generos.length > 2 && <Filter label="Gênero" options={generos} value={genero} onChange={setGenero} />}
+          {marcas.length > 2 && <Filter label="Marca" options={marcas} value={marca} onChange={setMarca} />}
           <div className="catalogo__order">
             <FiSliders size={14} />
             <select value={ordem} onChange={e => setOrdem(e.target.value)} className="cursor-target">
@@ -164,7 +142,7 @@ export default function Catalogo() {
           <div className="catalogo__empty">
             <p>
               {contagem(tipo) === 0 && tipo !== 'Todos'
-                ? `Novidades de ${tipo.toLowerCase()} chegando em breve. 👀`
+                ? `Novidades de ${tipo.toLowerCase()} chegando em breve.`
                 : 'Nenhum produto encontrado com esses filtros.'}
             </p>
             <button className="btn btn-quiet cursor-target" onClick={() => { setBusca(''); setGenero('Todos'); setMarca('Todas'); navigate('/catalogo'); }}>

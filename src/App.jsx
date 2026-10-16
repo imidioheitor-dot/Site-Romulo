@@ -6,7 +6,6 @@ import Nav from './components/Nav';
 import Footer from './components/Footer';
 import Dock from './components/fx/Dock';
 import TargetCursor from './components/fx/TargetCursor';
-import MagicBento from './components/fx/MagicBento';
 import Boundary from './components/fx/Boundary';
 import { ToastProvider } from './components/Toast';
 
@@ -70,26 +69,6 @@ export default function App() {
         <div className="app-bg__glow app-bg__glow--1" />
         <div className="app-bg__glow app-bg__glow--2" />
       </div>
-
-      {/* Fundo interativo (MagicBento) nas áreas escuras — fora da landing page */}
-      {!isLanding && (
-        <div className="bento-bg-layer" aria-hidden="true">
-          <Boundary>
-            <MagicBento
-              className="bento-bg"
-              textAutoHide
-              enableStars={false}
-              enableSpotlight
-              enableBorderGlow
-              enableTilt={false}
-              enableMagnetism={false}
-              clickEffect={false}
-              spotlightRadius={340}
-              glowColor="192, 102, 58"
-            />
-          </Boundary>
-        </div>
-      )}
 
       <Boundary>
         <TargetCursor targetSelector=".cursor-target" spinDuration={3} hideDefaultCursor parallaxOn />

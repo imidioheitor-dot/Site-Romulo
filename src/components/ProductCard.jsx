@@ -30,7 +30,7 @@ export default function ProductCard({ produto, index = 0 }) {
         <div className="pcard__head">
           <div>
             <h3 className="pcard__name">{produto.nome}</h3>
-            <span className="pcard__meta">{produto.marca} · {produto.genero}</span>
+            <span className="pcard__meta">{produto.categoria}</span>
           </div>
         </div>
         <div className="pcard__foot">
