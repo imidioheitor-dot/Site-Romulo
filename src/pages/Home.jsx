@@ -11,7 +11,9 @@ import Boundary from '../components/fx/Boundary';
 import StickerPeel from '../components/fx/StickerPeel';
 import Cubes from '../components/fx/Cubes';
 import ProductCard from '../components/ProductCard';
-import ArteProduto from '../components/ArteProduto';
+import ProductMedia from '../components/ProductMedia';
+import Showcase3D from '../components/Showcase3D';
+import Colecoes from '../components/Colecoes';
 import { useProducts } from '../lib/store';
 import { useReveal } from '../lib/useReveal';
 import './Home.css';
@@ -157,6 +159,27 @@ export default function Home() {
         </LiquidGlass>
       </section>
 
+      {/* ===================== GALERIA 3D ===================== */}
+      <section className="section home-showcase">
+        <div className="container home-showcase__head reveal">
+          <p className="eyebrow" style={{ marginBottom: 18 }}>Direto da nossa casa</p>
+          <h2 className="h2">Gire e <em className="h-serif">escolha</em> o seu</h2>
+          <p className="lead" style={{ marginTop: 14 }}>Passe o mouse para parar o carrossel e toque numa foto para ver o produto.</p>
+        </div>
+        <Showcase3D />
+      </section>
+
+      {/* ===================== COLEÇÕES COLORIDAS ===================== */}
+      <section className="section container home-colecs">
+        <header className="home-featured__head reveal">
+          <div>
+            <p className="eyebrow" style={{ marginBottom: 18 }}>Escolha o seu clima</p>
+            <h2 className="h2">Cores que <em className="h-serif">encantam</em></h2>
+          </div>
+        </header>
+        <Colecoes />
+      </section>
+
       {/* ===================== DESTAQUES ===================== */}
       <section className="section container home-featured">
         <header className="home-featured__head reveal">
@@ -185,7 +208,7 @@ export default function Home() {
             </Boundary>
           </div>
           <div className="split-card__sticker" aria-hidden="true">
-            <StickerPeel width={230} rotate={-8} peelBackHoverPct={26} peelDirection={-24} shadowIntensity={0.5} renderImage={() => <div style={{ width: 230, aspectRatio: '1 / 1', borderRadius: 18, overflow: 'hidden' }}><ArteProduto produto={natalProduct} /></div>} />
+            <StickerPeel width={230} rotate={-8} peelBackHoverPct={26} peelDirection={-24} shadowIntensity={0.5} renderImage={() => <div style={{ width: 230, aspectRatio: '1 / 1', borderRadius: 18, overflow: 'hidden' }}><ProductMedia produto={natalProduct} /></div>} />
           </div>
           <div className="split-card__body">
             <span className="tag">Natal</span>
@@ -202,7 +225,7 @@ export default function Home() {
             </Boundary>
           </div>
           <div className="split-card__sticker" aria-hidden="true">
-            <StickerPeel width={230} rotate={9} peelBackHoverPct={26} peelDirection={20} shadowIntensity={0.5} renderImage={() => <div style={{ width: 230, aspectRatio: '1 / 1', borderRadius: 18, overflow: 'hidden' }}><ArteProduto produto={mesaProduct} /></div>} />
+            <StickerPeel width={230} rotate={9} peelBackHoverPct={26} peelDirection={20} shadowIntensity={0.5} renderImage={() => <div style={{ width: 230, aspectRatio: '1 / 1', borderRadius: 18, overflow: 'hidden' }}><ProductMedia produto={mesaProduct} /></div>} />
           </div>
           <div className="split-card__body">
             <span className="tag">Mesa Posta</span>

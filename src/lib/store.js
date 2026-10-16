@@ -31,25 +31,31 @@ const SEED_PRODUCTS = [
   mikkaProd('mh-escapulario-porta', 'Natal', 'Escapulário de Porta',
     150, 250,
     'Escapulário natalino para a porta de entrada: o primeiro detalhe que recebe a família e os convidados. Acabamento delicado, pensado para durar muitos Natais.',
-    'porta', ['Único'], 'Opção', 6, true, 'Natal', ['#c9a24a', '#8a1f2b', '#2f5a3a']),
+    'porta', ['Único'], 'Opção', 6, true, 'Natal', ['#1b2f6b', '#1f5a3a', '#c9a24a'], null,
+    ['fotos/escapulario-azul.jpg', 'fotos/escapulario-verde.jpg']),
   mikkaProd('mh-colar-bolas', 'Natal', 'Colar de Bolas de Natal · 2 m',
     100, 180,
     'Colar de bolas de Natal com 2 metros de comprimento, para a árvore, a escada, a lareira ou o centro da mesa. Escolha a cor que combina com a sua decoração.',
-    'bolas', ['Verde', 'Dourado', 'Vermelho', 'Azul Royal', 'Vinho'], 'Cor', 15, true, 'Mais vendido', ['#2f5a3a', '#c9a24a', '#b3262e', '#2a4aa8', '#6e1e2b']),
+    'bolas', ['Verde', 'Dourado', 'Vermelho', 'Azul Royal', 'Vinho'], 'Cor', 15, true, 'Mais vendido', ['#2f5a3a', '#c9a24a', '#b3262e', '#2a4aa8', '#6e1e2b'], null,
+    ['fotos/arvore-dourada.jpg', 'fotos/arvore-vinho.jpg'],
+    { Dourado: 'fotos/arvore-dourada.jpg', Vinho: 'fotos/arvore-vinho.jpg' }),
   mikkaProd('mh-vila-natalina', 'Natal', 'Vila Natalina',
     99.9, null,
     'Uma pequena vila de Natal para montar sobre o aparador, a estante ou a mesa. Charme e aconchego que encantam adultos e crianças.',
-    'vila', ['Único'], 'Opção', 8, true, 'Encantadora', ['#f3e9d8', '#c9a24a']),
+    'vila', ['Único'], 'Opção', 8, true, 'Encantadora', ['#f3e9d8', '#c9a24a'], null,
+    ['fotos/vila-1.jpg', 'fotos/vila-2.jpg']),
   mikkaProd('mh-kit-mesa-natalino', 'Mesa Posta', 'Kit Mesa Posta Natalino',
     149.9, null,
     'Tudo para a ceia ficar pronta e elegante: 6 guardanapos, 6 jogos americanos, 6 porta-guardanapos e 1 caminho de mesa, combinando entre si.',
     'mesa', ['Único'], 'Opção', 10, true, 'Kit completo', ['#b3262e', '#c9a24a', '#f3e9d8'],
-    ['6 guardanapos', '6 jogos americanos', '6 porta-guardanapos', '1 caminho de mesa']),
+    ['6 guardanapos', '6 jogos americanos', '6 porta-guardanapos', '1 caminho de mesa'],
+    ['fotos/mesa-natalino.jpg']),
   mikkaProd('mh-kit-mesa-dia-a-dia', 'Mesa Posta', 'Kit Mesa Posta Dia a Dia',
     90, 130,
     'A mesa bonita não precisa esperar ocasião especial. Kit com 6 guardanapos, 6 jogos americanos e 6 porta-guardanapos para o almoço de todo dia.',
     'mesa', ['Único'], 'Opção', 10, false, 'Oferta', ['#e8dcc6', '#c9a24a'],
-    ['6 guardanapos', '6 jogos americanos', '6 porta-guardanapos']),
+    ['6 guardanapos', '6 jogos americanos', '6 porta-guardanapos'],
+    ['fotos/mesa-limao.jpg', 'fotos/mesa-rosas.jpg', 'fotos/mesa-floral-redondo.jpg']),
   mikkaProd('mh-centro-mesa', 'Decoração', 'Centro de Mesa',
     99.9, 130,
     'Centro de mesa que completa a decoração da sala de jantar com presença e delicadeza, para o dia a dia ou para receber.',
@@ -62,16 +68,19 @@ const SEED_PRODUCTS = [
     35, 60,
     'Almofada em tricoline, tecido de algodão com toque leve e acabamento firme. Tamanho 45×45 cm, ideal para sofás, poltronas e camas.',
     'almofada', ['Único'], 'Opção', 20, false, 'Oferta', ['#f3e9d8', '#c9a24a'],
-    ['Tamanho 45×45 cm', 'Tecido tricoline'])
+    ['Tamanho 45×45 cm', 'Tecido tricoline'],
+    ['fotos/almofadas-xadrez.jpg'])
 ];
 
 /* fábrica de produtos Mikka Home */
-function mikkaProd(id, categoria, nome, preco, precoAntigo, descricao, arte, opcoes, opcaoLabel, estoque, destaque, tag, cores, inclui = null) {
+function mikkaProd(id, categoria, nome, preco, precoAntigo, descricao, arte, opcoes, opcaoLabel, estoque, destaque, tag, cores, inclui = null, fotos = [], fotoOpcao = null) {
   return {
     id, nome, marca: 'Mikka Home', tipo: categoria, categoria, genero: 'Casa',
     preco, precoAntigo, descricao, cores, arte, opcaoLabel,
     ...(inclui ? { inclui } : {}),
-    tamanhos: opcoes, estoque, img: null, destaque, tag
+    ...(fotoOpcao ? { fotoOpcao } : {}),
+    ...(fotos.length ? { galeria: fotos } : {}),
+    tamanhos: opcoes, estoque, img: fotos[0] || null, destaque, tag
   };
 }
 

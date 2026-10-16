@@ -2,15 +2,18 @@ import { useNavigate } from 'react-router-dom';
 import { FiArrowUpRight } from 'react-icons/fi';
 import ProductMedia from './ProductMedia';
 import { brl } from '../lib/format';
+import { useTilt } from '../lib/useTilt';
 import './ProductCard.css';
 
 export default function ProductCard({ produto, index = 0 }) {
   const navigate = useNavigate();
   const esgotado = produto.estoque <= 0;
+  const tilt = useTilt(8);
 
   return (
     <article
-      className="pcard reveal cursor-target"
+      className="pcard pcard--3d reveal cursor-target"
+      {...tilt}
       style={{ transitionDelay: `${(index % 4) * 70}ms` }}
       onClick={() => navigate(`/produto/${produto.id}`)}
     >
