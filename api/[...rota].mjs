@@ -2,7 +2,7 @@
    É o MESMO roteador usado na Netlify (netlify/lib/api.mjs); só troca o armazém. */
 
 import { criarRoteador } from '../netlify/lib/api.mjs';
-import { armazemVercelBlob } from '../vercel/armazem.mjs';
+import { armazemVercelBlob, diagnostico } from '../vercel/armazem.mjs';
 
 let roteador;
 function obter() {
@@ -12,6 +12,9 @@ function obter() {
 
 async function tratar(request) {
   try {
+    if (new URL(request.url).searchParams.get('diag') === '1') {
+      return new Response(JSON.stringify(await diagnostico(armazemVercelBlob({ pasta: 'diag' }))), { headers: { 'content-type': 'application/json', 'cache-control': 'no-store' } });
+    }
     return await obter()(request, {
       ip: (request.headers.get('x-forwarded-for') || '').split(',')[0].trim() || 'desconhecido'
     });

@@ -57,3 +57,22 @@ export function armazemVercelBlob({ token = process.env.BLOB_READ_WRITE_TOKEN, p
     }
   };
 }
+
+/* Autoteste do armazém (grava, relê, confere ETag e conflito). Exposto como GET ?diag=1. */
+export async function diagnostico(armazem) {
+  const passos = {};
+  try {
+    const a = await armazem.gravar('diagnostico', { n: 1, t: Date.now() }, {});
+    passos.gravar = a.ok;
+    const l1 = await armazem.ler('diagnostico');
+    passos.reler = !!(l1 && l1.valor.n === 1);
+    const b = await armazem.gravar('diagnostico', { n: 2, t: Date.now() }, { etag: l1.etag });
+    passos.gravarComEtag = b.ok;
+    const c = await armazem.gravar('diagnostico', { n: 3 }, { etag: l1.etag });
+    passos.conflitoDetectado = c.ok === false;
+    const l2 = await armazem.ler('diagnostico');
+    passos.relerSemCache = !!(l2 && l2.valor.n === 2);
+  } catch (e) { passos.erro = String(e && e.message || e).slice(0, 200); }
+  passos.ok = !passos.erro && passos.gravar && passos.reler && passos.gravarComEtag && passos.conflitoDetectado && passos.relerSemCache;
+  return passos;
+}
