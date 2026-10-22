@@ -698,3 +698,8 @@
   .estoque__toolbar-actions { justify-content: stretch; }
   .estoque__toolbar-actions .btn { flex: 1; justify-content: center; }
 }
+
+.erow__btn:disabled {
+  opacity: 0.3;
+  pointer-events: none;
+}

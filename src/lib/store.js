@@ -511,6 +511,18 @@ export function deleteProduct(id) {
   return alterarProdutos(lista => lista.filter(p => p.id !== id));
 }
 
+/* Muda a ordem em que o produto aparece no site (passo = -1 sobe, +1 desce). */
+export function moveProduct(id, passo) {
+  return alterarProdutos(lista => {
+    const i = lista.findIndex(p => p.id === id);
+    const j = i + passo;
+    if (i < 0 || j < 0 || j >= lista.length) return lista;
+    const nova = lista.slice();
+    [nova[i], nova[j]] = [nova[j], nova[i]];
+    return nova;
+  });
+}
+
 export function adjustStock(id, delta) {
   return alterarProdutos(lista =>
     lista.map(p => (p.id === id ? { ...p, estoque: Math.max(0, (p.estoque || 0) + delta) } : p))
