@@ -44,7 +44,13 @@ export function armazemVercelBlob({ token = process.env.BLOB_READ_WRITE_TOKEN, p
         if (etag) r = await put(caminho(chave), corpo, { ...opcoes, ifMatch: etag });
         else if (novo) r = await put(caminho(chave), corpo, { ...opcoes, allowOverwrite: false });
         else r = await put(caminho(chave), corpo, { ...opcoes, allowOverwrite: true });
-        const atual = await lerBruto(chave).catch(() => null);
+        // só devolve "gravado" quando a leitura já enxerga o ETag novo (o Blob pode demorar a mostrar)
+        let atual = null;
+        for (let i = 0; i < 12; i++) {
+          atual = await lerBruto(chave).catch(() => null);
+          if (atual && atual.etag === r.etag) break;
+          await new Promise(res => setTimeout(res, 150 + i * 100));
+        }
         return { ok: true, etag: (atual && atual.etag) || r.etag };
       } catch (e) {
         if (e instanceof BlobPreconditionFailedError) return { ok: false };
