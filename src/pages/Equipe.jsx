@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 import {
   FiLock, FiLogOut, FiPackage, FiBox, FiSettings, FiCheck, FiX, FiTruck,
   FiClock, FiPlus, FiMinus, FiEdit2, FiTrash2, FiEye, FiSave, FiSearch, FiExternalLink, FiUpload, FiDownload,
-  FiCloud, FiCloudOff, FiRefreshCw, FiUploadCloud, FiAlertTriangle, FiImage
+  FiArrowUp, FiArrowDown, FiCloud, FiCloudOff, FiRefreshCw, FiUploadCloud, FiAlertTriangle, FiImage
 } from 'react-icons/fi';
 import LiquidGlass from '../components/fx/LiquidGlass';
 import AnimatedTitle from '../components/AnimatedTitle';
@@ -11,7 +11,7 @@ import ProductMedia from '../components/ProductMedia';
 import {
   useSession, login, logout, changePassword,
   useOrders, updateOrderStatus, ORDER_STATUS, obterComprovante,
-  useProducts, saveProduct, deleteProduct, adjustStock, LOJA, CATEGORIAS,
+  useProducts, saveProduct, deleteProduct, adjustStock, moveProduct, LOJA, CATEGORIAS,
   exportCatalog, importCatalog, isStoragePersistent,
   useBackend, sincronizarCatalogo, sincronizarPedidos, publicarCatalogoAtual,
   otimizarFotos, fotosEmbutidas
@@ -476,6 +476,8 @@ function Estoque() {
               <button className="cursor-target" onClick={() => adjustStock(p.id, 1).then(avisarSync)} aria-label="Aumentar"><FiPlus /></button>
             </div>
             <div className="erow__actions">
+              <button className="erow__btn cursor-target" disabled={!!busca || products[0] === p} onClick={() => moveProduct(p.id, -1).then(avisarSync)} aria-label="Subir no site" title="Subir no site"><FiArrowUp /></button>
+              <button className="erow__btn cursor-target" disabled={!!busca || products[products.length - 1] === p} onClick={() => moveProduct(p.id, 1).then(avisarSync)} aria-label="Descer no site" title="Descer no site"><FiArrowDown /></button>
               <button className="erow__btn cursor-target" onClick={() => setEditando({ ...p, tamanhos: (p.tamanhos || []).join(','), cores: (p.cores || []).join(','), precoAntigo: p.precoAntigo || '' })} aria-label="Editar"><FiEdit2 /></button>
               <button className="erow__btn erow__btn--del cursor-target" onClick={async () => { if (confirm(`Excluir ${p.nome}?`)) { avisarSync(await deleteProduct(p.id)); toast('Produto removido.', 'info'); } }} aria-label="Excluir"><FiTrash2 /></button>
             </div>

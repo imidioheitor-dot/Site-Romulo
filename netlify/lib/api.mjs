@@ -122,9 +122,11 @@ async function atualizarDoc(armazem, chave, vazio, mutar) {
    fábrica. */
 async function segredoAtivo(armazem, ambiente) {
   if (ambiente.EQUIPE_SENHA) return { tipo: 'texto', valor: ambiente.EQUIPE_SENHA, fonte: 'ambiente' };
-  if (ambiente.EQUIPE_SENHA_HASH) return { tipo: 'hash', valor: ambiente.EQUIPE_SENHA_HASH, fonte: 'ambiente' };
   const reg = await armazem.ler(CHAVES.equipe);
   if (reg && reg.valor && reg.valor.senhaHash) return { tipo: 'hash', valor: reg.valor.senhaHash, fonte: 'painel' };
+  // EQUIPE_SENHA_HASH é só a senha inicial: depois que a cliente troca a senha
+  // pelo painel, a dela passa a valer (EQUIPE_SENHA em texto continua mandando).
+  if (ambiente.EQUIPE_SENHA_HASH) return { tipo: 'hash', valor: ambiente.EQUIPE_SENHA_HASH, fonte: 'inicial' };
   return { tipo: 'hash', valor: SENHA_HASH_PADRAO, fonte: 'fabrica' };
 }
 
