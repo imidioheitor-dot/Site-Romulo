@@ -17,6 +17,9 @@ import { get, put, del, BlobPreconditionFailedError } from '@vercel/blob';
 
 export function armazemVercelBlob({ token = process.env.BLOB_READ_WRITE_TOKEN, pasta = 'kv' } = {}) {
   const sal = createHmac('sha256', String(token || 'local')).update('helu-equipe-kv').digest('hex').slice(0, 24);
+  // O Blob lê de réplicas com alguns segundos de atraso: esta instância lembra o que gravou por 2 min
+  const memo = new Map();
+  const MEMO_MS = 120000;
   const caminho = chave => `${pasta}/${sal}/${chave.replace(/[^a-z0-9/_-]/gi, '_')}.json`;
 
   async function lerBruto(chave) {
@@ -28,10 +31,13 @@ export function armazemVercelBlob({ token = process.env.BLOB_READ_WRITE_TOKEN, p
 
   return {
     async ler(chave) {
-      try { return await lerBruto(chave); } catch (e) {
-        if (e && /not.?found/i.test(e.name + ' ' + e.message)) return null;
-        throw e;
+      let lido = null;
+      try { lido = await lerBruto(chave); } catch (e) {
+        if (!(e && /not.?found/i.test(e.name + ' ' + e.message))) throw e;
       }
+      const m = memo.get(chave);
+      if (m && Date.now() - m.t < MEMO_MS && (!lido || lido.etag !== m.etag)) return { valor: JSON.parse(m.texto), etag: m.etag };
+      return lido;
     },
     async gravar(chave, valor, { etag, novo } = {}) {
       const corpo = JSON.stringify(valor);
@@ -44,9 +50,10 @@ export function armazemVercelBlob({ token = process.env.BLOB_READ_WRITE_TOKEN, p
         if (etag) r = await put(caminho(chave), corpo, { ...opcoes, ifMatch: etag });
         else if (novo) r = await put(caminho(chave), corpo, { ...opcoes, allowOverwrite: false });
         else r = await put(caminho(chave), corpo, { ...opcoes, allowOverwrite: true });
+        memo.set(chave, { texto: corpo, etag: r.etag, t: Date.now() });
         // só devolve "gravado" quando a leitura já enxerga o ETag novo (o Blob pode demorar a mostrar)
         let atual = null;
-        for (let i = 0; i < 12; i++) {
+        for (let i = 0; i < 6; i++) {
           atual = await lerBruto(chave).catch(() => null);
           if (atual && atual.etag === r.etag) break;
           await new Promise(res => setTimeout(res, 150 + i * 100));
