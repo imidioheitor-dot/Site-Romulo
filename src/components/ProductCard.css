@@ -173,12 +173,11 @@
   --ry: 0deg;
   --gx: 50%;
   --gy: 30%;
-  transform-style: preserve-3d;
   background: #fffaf0;
   box-shadow: 0 18px 40px -26px rgba(120, 80, 20, 0.45);
 }
 .pcard--3d.in:hover {
-  transform: perspective(900px) rotateX(var(--rx)) rotateY(var(--ry)) translateY(-8px) scale(1.02);
+  transform: translateY(-8px) scale(1.02);
   transition: transform 0.12s ease-out, border-color 0.4s ease, box-shadow 0.5s ease;
   box-shadow: 0 34px 60px -28px rgba(120, 80, 20, 0.55);
 }
@@ -193,9 +192,7 @@
   mix-blend-mode: soft-light;
 }
 .pcard--3d:hover::after { opacity: 1; }
-.pcard--3d .pcard__media { aspect-ratio: 4 / 5; transform: translateZ(0); }
-.pcard--3d .pcard__body { transform: translateZ(26px); }
-.pcard--3d .pcard__tag { transform: translateZ(40px); }
+.pcard--3d .pcard__media { aspect-ratio: 4 / 5; }
 
 .produto__stage { aspect-ratio: 4 / 5 !important; }
 .produto__thumb--foto {

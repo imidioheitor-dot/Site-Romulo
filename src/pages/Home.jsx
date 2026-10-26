@@ -4,12 +4,10 @@ import { FiArrowRight, FiArrowUpRight, FiHeart, FiAward, FiGift, FiRefreshCw, Fi
 
 import HeroBackground from '../components/HeroBackground';
 import RotatingText from '../components/fx/RotatingText';
-import GradualBlur from '../components/fx/GradualBlur';
 import LiquidGlass from '../components/fx/LiquidGlass';
 import ShapeBlur from '../components/fx/ShapeBlur';
 import Boundary from '../components/fx/Boundary';
 import StickerPeel from '../components/fx/StickerPeel';
-import Cubes from '../components/fx/Cubes';
 import ProductCard from '../components/ProductCard';
 import ProductMedia from '../components/ProductMedia';
 import Showcase3D from '../components/Showcase3D';
@@ -40,6 +38,7 @@ export default function Home() {
   const mesaProduct = products.find(p => p.id === 'mh-kit-mesa-natalino') || products[3] || products[0];
 
   const heroRef = useRef(null);
+  const introRef = useRef(null);
 
   useReveal([products.length]);
 
@@ -47,17 +46,19 @@ export default function Home() {
     window.scrollTo(0, 0);
   }, []);
 
-  // progresso de scroll do hero (0 → 1) dirigindo o efeito cinematográfico
+  // o vídeo recua e escurece enquanto o texto sobe; o topo só aparece depois do vídeo
   useEffect(() => {
-    const el = heroRef.current;
-    if (!el) return;
+    const hero = heroRef.current;
+    const intro = introRef.current;
+    if (!hero || !intro) return;
     let raf = 0;
     const onScroll = () => {
       cancelAnimationFrame(raf);
       raf = requestAnimationFrame(() => {
-        const total = el.offsetHeight - window.innerHeight;
-        const p = total > 0 ? Math.min(1, Math.max(0, -el.getBoundingClientRect().top / total)) : 0;
-        el.style.setProperty('--p', p.toFixed(4));
+        const p = Math.min(1, Math.max(0, 1 - intro.getBoundingClientRect().top / window.innerHeight));
+        hero.style.setProperty('--p', p.toFixed(4));
+        intro.style.setProperty('--f', Math.min(1, Math.max(0, (p - 0.08) / 0.4)).toFixed(3));
+        document.body.classList.toggle('on-hero', window.scrollY < window.innerHeight * 0.55);
       });
     };
     onScroll();
@@ -67,6 +68,7 @@ export default function Home() {
       window.removeEventListener('scroll', onScroll);
       window.removeEventListener('resize', onScroll);
       cancelAnimationFrame(raf);
+      document.body.classList.remove('on-hero');
     };
   }, []);
 
@@ -81,18 +83,20 @@ export default function Home() {
         <span className="home__bg-sheen" />
       </div>
 
-      {/* ===================== HERO SCROLÁVEL ===================== */}
-      <section className="hero" ref={heroRef}>
-        <div className="hero__sticky">
-          <HeroBackground />
+      {/* ===================== HERO: SÓ O VÍDEO EM TELA CHEIA ===================== */}
+      <section className="hero" ref={heroRef} aria-label="Abertura">
+        <HeroBackground />
+        <span className="hero__rola" aria-hidden="true" />
+      </section>
 
-          {/* Camada 1 — entrada */}
-          <div className="container hero__inner hero__layer hero__layer--1">
-            <div className="hero__eyebrow rise">
+      {/* ===================== ABERTURA: o texto sobe por cima do vídeo ===================== */}
+      <section className="hero-intro" ref={introRef}>
+          <div className="container hero-intro__inner">
+            <div className="hero__eyebrow">
               <span className="tag">Coleção Natal 2026 · Mikka Home</span>
             </div>
 
-            <h1 className="hero__title rise">
+            <h1 className="hero__title">
               <span className="hero__title-line">
                 <span className="hero__sinta">Sinta o</span>
                 <RotatingText
@@ -111,11 +115,11 @@ export default function Home() {
               <span className="hero__brand">Mikka Home</span>
             </h1>
 
-            <p className="hero__sub rise rise-2">
+            <p className="hero__sub">
               Decoração, mesa posta e almofadas com <em>elegância</em> — da nossa casa para seu lar!
             </p>
 
-            <div className="hero__cta rise rise-3">
+            <div className="hero__cta">
               <button className="btn btn-primary cursor-target" onClick={() => navigate('/catalogo')}>
                 Ver catálogo <FiArrowRight />
               </button>
@@ -125,21 +129,12 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Camada 2 — revela no meio do scroll */}
-          <div className="container hero__inner hero__layer hero__layer--2" aria-hidden="true">
+          <div className="hero-intro__statement container">
             <span className="hero__kicker">Da nossa casa para seu lar</span>
             <h2 className="hero__statement">
               Cada detalhe <em className="h-serif">faz</em><br />a sua casa brilhar.
             </h2>
           </div>
-
-          <div className="hero__scrollcue">
-            <span className="hero__scrollcue-track"><span /></span>
-            <span>Role para descobrir</span>
-          </div>
-
-          <GradualBlur target="parent" position="bottom" height="8rem" strength={2.4} divCount={6} curve="bezier" exponential opacity={1} />
-        </div>
       </section>
 
       {/* ===================== PILARES ===================== */}
@@ -159,12 +154,12 @@ export default function Home() {
         </LiquidGlass>
       </section>
 
-      {/* ===================== GALERIA 3D ===================== */}
+      {/* ===================== GALERIA ===================== */}
       <section className="section home-showcase">
         <div className="container home-showcase__head reveal">
           <p className="eyebrow" style={{ marginBottom: 18 }}>Direto da nossa casa</p>
-          <h2 className="h2">Gire e <em className="h-serif">escolha</em> o seu</h2>
-          <p className="lead" style={{ marginTop: 14 }}>Passe o mouse para parar o carrossel e toque numa foto para ver o produto.</p>
+          <h2 className="h2">Escolha o <em className="h-serif">seu</em></h2>
+          <p className="lead" style={{ marginTop: 14 }}>Mesas postas, árvores e almofadas pensadas para a sua casa.</p>
         </div>
         <Showcase3D />
       </section>
@@ -236,23 +231,8 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ===================== FAIXA CUBES / CTA ===================== */}
+      {/* ===================== FAIXA CTA ===================== */}
       <section className="section home-cta">
-        <div className="home-cta__cubes" aria-hidden="true">
-          <Cubes
-            gridSize={9}
-            maxAngle={55}
-            radius={4}
-            cellGap={6}
-            borderStyle="1px solid rgba(150, 112, 50,0.18)"
-            faceColor="#fffaf0"
-            shadow={false}
-            autoAnimate
-            rippleOnClick
-            rippleColor="#b98a3c"
-            rippleSpeed={1.6}
-          />
-        </div>
         <div className="container">
           <LiquidGlass className="home-cta__glass reveal" radius={30} blur={12}>
             <div className="home-cta__content">
