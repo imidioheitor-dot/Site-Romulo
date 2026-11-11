@@ -412,7 +412,7 @@ function Estoque() {
   /* As alterações valem na hora no aparelho; se o envio ao servidor falhar,
      o lojista precisa saber que ainda não está compartilhado. */
   const avisarSync = sync => {
-    if (sync && sync.ok === false && sync.erro && !sync.erro.offline) {
+    if (sync && sync.ok === false && sync.erro) {
       toast(sync.erro.message || 'Salvo neste aparelho, mas não no servidor.', 'danger');
     }
   };
@@ -580,7 +580,7 @@ function ProdutoForm({ produto, onClose, onSaved }) {
 
     // falhou o envio da foto: mantém o formulário aberto para não perder o
     // que foi digitado, e diz o motivo
-    if (sync && sync.ok === false && sync.erro && !sync.erro.offline) {
+    if (sync && sync.ok === false && sync.erro && !sync.erro.offline && !sync.erro.salvoLocal) {
       toast(sync.erro.message || 'Não foi possível enviar a foto. Tente de novo.', 'danger');
       return;
     }

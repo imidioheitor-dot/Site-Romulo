@@ -17,7 +17,8 @@ const KEYS = {
   orders: 'mikka.orders.v1',
   cart: 'mikka.cart.v1',
   staff: 'rsf.staff.v1',
-  session: 'rsf.session.v1'
+  session: 'rsf.session.v1',
+  pendente: 'mikka.pendente.v1'
 };
 
 const EVENT = 'rsf-store-change';
@@ -267,6 +268,16 @@ export async function sincronizarCatalogo({ forcar = false } = {}) {
     }
 
     const publicado = Array.isArray(dados.produtos) && dados.produtos.length > 0;
+
+    // Mudanças feitas enquanto o servidor estava fora do ar têm prioridade:
+    // sobe elas em vez de apagá-las com a versão antiga do servidor.
+    if (publicado && pendentePublicar() && tokenEquipe()) {
+      const r = await publicarCatalogoAtual();
+      if (r.ok && r.remoto) {
+        atualizarInfo({ sincronizando: false });
+        return { ok: true, mudou: true, publicado: true };
+      }
+    }
     if (publicado) aplicarProdutosRemotos(dados.produtos);
 
     atualizarInfo({ sincronizando: false, rev: dados.rev, publicado, ultimaSync: Date.now(), erro: null });
@@ -313,9 +324,44 @@ async function converterFotosEmbutidas(lista) {
   return { lista: saida, ok: true, convertidas: true };
 }
 
+/* Se o aparelho achou que o servidor estava fora do ar (ou o login caiu no
+   modo local), tenta de novo antes de desistir — senão o produto fica só neste
+   aparelho e nunca chega ao catálogo de venda. */
+/* Marca que há mudanças só neste aparelho, esperando para ir ao servidor. */
+function pendentePublicar(valor) {
+  if (valor === undefined) return !!read(KEYS.pendente, false);
+  if (!!read(KEYS.pendente, false) !== valor) write(KEYS.pendente, valor ? true : null);
+  return valor;
+}
+
+async function reconectar() {
+  const sessao = read(KEYS.session, null);
+  try {
+    if (sessao && sessao.remoto === false && sessao.token) {
+      // no modo local o "token" é a própria senha: dá para entrar no servidor agora
+      const r = await api.entrar(sessao.token);
+      write(KEYS.session, { ...sessao, at: Date.now(), token: r.token, remoto: true, senhaFraca: !!r.senhaFraca, senhaNoAmbiente: !!r.senhaFixadaNoAmbiente });
+    } else {
+      await api.verificarBackend();
+    }
+  } catch { /* segue: o chamador avisa */ }
+  return api.backendAtivo() && !!tokenEquipe() && read(KEYS.session, null)?.remoto !== false;
+}
+
 async function enviarCatalogo(listaOriginal, mutacao) {
-  const token = tokenEquipe();
-  if (!api.backendAtivo() || !token) return { ok: true, remoto: false };
+  let token = tokenEquipe();
+  if (!token) return { ok: true, remoto: false };
+  if (!api.backendAtivo() || read(KEYS.session, null)?.remoto === false) {
+    const voltou = await reconectar();
+    if (!voltou) {
+      // não perde o produto (já está neste aparelho), mas avisa que a loja ainda não viu
+      pendentePublicar(true);
+      const erro = new Error('Salvo só neste aparelho: o servidor não respondeu, então o catálogo de venda ainda não foi atualizado. Tente salvar de novo em instantes.');
+      erro.salvoLocal = true;
+      return { ok: false, remoto: false, erro };
+    }
+    token = tokenEquipe();
+  }
 
   const convertido = await converterFotosEmbutidas(listaOriginal);
   if (!convertido.ok) return { ok: false, remoto: true, erro: convertido.erro };
@@ -326,6 +372,7 @@ async function enviarCatalogo(listaOriginal, mutacao) {
     const r = await api.publicarCatalogo(lista, { rev: catalogoRev, token });
     catalogoRev = r.rev;
     aplicarProdutosRemotos(r.produtos);
+    pendentePublicar(false);
     atualizarInfo({ rev: r.rev, publicado: true, ultimaSync: Date.now(), erro: null });
     return { ok: true, remoto: true };
   } catch (e) {
@@ -338,6 +385,7 @@ async function enviarCatalogo(listaOriginal, mutacao) {
         const r2 = await api.publicarCatalogo(refeita, { rev: catalogoRev, token });
         catalogoRev = r2.rev;
         aplicarProdutosRemotos(r2.produtos);
+        pendentePublicar(false);
         atualizarInfo({ rev: r2.rev, publicado: true, ultimaSync: Date.now(), erro: null });
         return { ok: true, remoto: true, refeito: true };
       } catch (e2) {
@@ -345,6 +393,7 @@ async function enviarCatalogo(listaOriginal, mutacao) {
         return { ok: false, remoto: true, erro: e2 };
       }
     }
+    if (e.offline || e.status >= 500) pendentePublicar(true);
     if (!e.offline) atualizarInfo({ erro: e.message });
     return { ok: false, remoto: true, erro: e };
   }
@@ -447,7 +496,7 @@ export function iniciarSincronizacao({ intervalo = 20000 } = {}) {
 }
 
 /* ---------- categorias (tipos de produto) ---------- */
-export const CATEGORIAS = ['Natal', 'Mesa Posta', 'Almofadas', 'Decoração'];
+export const CATEGORIAS = ['Natal', 'Mesa Posta', 'Almofadas', 'Decoração', 'Impressão 3D'];
 
 /* ---------- produtos / estoque ---------- */
 export const useProducts = () => useStoreKey('products', []);
