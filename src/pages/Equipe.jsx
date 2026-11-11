@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 import {
   FiLock, FiLogOut, FiPackage, FiBox, FiSettings, FiCheck, FiX, FiTruck,
   FiClock, FiPlus, FiMinus, FiEdit2, FiTrash2, FiEye, FiSave, FiSearch, FiExternalLink, FiUpload, FiDownload,
-  FiArrowUp, FiArrowDown, FiCloud, FiCloudOff, FiRefreshCw, FiUploadCloud, FiAlertTriangle, FiImage
+  FiArrowUp, FiArrowDown, FiArrowLeft, FiArrowRight, FiCloud, FiCloudOff, FiRefreshCw, FiUploadCloud, FiAlertTriangle, FiImage
 } from 'react-icons/fi';
 import LiquidGlass from '../components/fx/LiquidGlass';
 import AnimatedTitle from '../components/AnimatedTitle';
@@ -17,6 +17,7 @@ import {
   otimizarFotos, fotosEmbutidas
 } from '../lib/store';
 import { brl, dataBR } from '../lib/format';
+import { fotosDoProduto, fotoSrc, MAX_FOTOS } from '../lib/fotos';
 import { useToast } from '../components/Toast';
 import './Equipe.css';
 
@@ -478,7 +479,7 @@ function Estoque() {
             <div className="erow__actions">
               <button className="erow__btn cursor-target" disabled={!!busca || products[0] === p} onClick={() => moveProduct(p.id, -1).then(avisarSync)} aria-label="Subir no site" title="Subir no site"><FiArrowUp /></button>
               <button className="erow__btn cursor-target" disabled={!!busca || products[products.length - 1] === p} onClick={() => moveProduct(p.id, 1).then(avisarSync)} aria-label="Descer no site" title="Descer no site"><FiArrowDown /></button>
-              <button className="erow__btn cursor-target" onClick={() => setEditando({ ...p, tamanhos: (p.tamanhos || []).join(','), cores: (p.cores || []).join(','), precoAntigo: p.precoAntigo || '' })} aria-label="Editar"><FiEdit2 /></button>
+              <button className="erow__btn cursor-target" onClick={() => setEditando({ ...p, galeria: fotosDoProduto(p), tamanhos: (p.tamanhos || []).join(','), cores: (p.cores || []).join(','), precoAntigo: p.precoAntigo || '' })} aria-label="Editar"><FiEdit2 /></button>
               <button className="erow__btn erow__btn--del cursor-target" onClick={async () => { if (confirm(`Excluir ${p.nome}?`)) { avisarSync(await deleteProduct(p.id)); toast('Produto removido.', 'info'); } }} aria-label="Excluir"><FiTrash2 /></button>
             </div>
           </div>
@@ -497,7 +498,7 @@ function Estoque() {
 }
 
 function ProdutoForm({ produto, onClose, onSaved }) {
-  const [f, setF] = useState(produto);
+  const [f, setF] = useState(() => ({ ...produto, galeria: fotosDoProduto(produto) }));
   const [salvando, setSalvando] = useState(false);
   const toast = useToast();
 
@@ -510,12 +511,13 @@ function ProdutoForm({ produto, onClose, onSaved }) {
   const set = (k, v) => setF(prev => ({ ...prev, [k]: v }));
   const setCw = (k, v) => setF(prev => ({ ...prev, colorway: { ...prev.colorway, [k]: v } }));
 
-  // envia foto do computador/celular: redimensiona e guarda embutida no produto
-  const onPickFile = file => {
-    if (!file) return;
+  // lê e redimensiona uma foto do computador/celular (devolve data URL)
+  const lerFoto = file => new Promise(resolve => {
     const reader = new FileReader();
+    reader.onerror = () => resolve(null);
     reader.onload = ev => {
       const img = new Image();
+      img.onerror = () => resolve(null);
       img.onload = () => {
         const max = 1200;
         let { width, height } = img;
@@ -526,16 +528,36 @@ function ProdutoForm({ produto, onClose, onSaved }) {
         canvas.width = width;
         canvas.height = height;
         canvas.getContext('2d').drawImage(img, 0, 0, width, height);
-        set('img', canvas.toDataURL('image/jpeg', 0.82));
+        resolve(canvas.toDataURL('image/jpeg', 0.82));
       };
       img.src = ev.target.result;
     };
     reader.readAsDataURL(file);
-  };
+  });
 
-  const previewSrc = f.img
-    ? (/^(\/|data:|https?:|blob:)/.test(f.img) ? f.img : `${import.meta.env.BASE_URL}products/${f.img}`)
-    : null;
+  // aceita várias fotos de uma vez; cada uma entra no fim da lista
+  const onPickFiles = async files => {
+    const arquivos = Array.from(files || []);
+    if (!arquivos.length) return;
+    const novas = [];
+    for (const file of arquivos) {
+      const d = await lerFoto(file);
+      if (d) novas.push(d);
+    }
+    setF(prev => {
+      const atual = prev.galeria || [];
+      if (atual.length + novas.length > MAX_FOTOS) toast(`No máximo ${MAX_FOTOS} fotos por produto.`, 'danger');
+      return { ...prev, galeria: [...atual, ...novas].slice(0, MAX_FOTOS) };
+    });
+  };
+  const moverFoto = (i, passo) => setF(prev => {
+    const g = (prev.galeria || []).slice();
+    const j = i + passo;
+    if (j < 0 || j >= g.length) return prev;
+    [g[i], g[j]] = [g[j], g[i]];
+    return { ...prev, galeria: g };
+  });
+  const removerFoto = i => setF(prev => ({ ...prev, galeria: (prev.galeria || []).filter((_, k) => k !== i) }));
 
   const salvar = async e => {
     e.preventDefault();
@@ -548,7 +570,9 @@ function ProdutoForm({ produto, onClose, onSaved }) {
       tamanhos: String(f.tamanhos).split(',').map(t => t.trim()).filter(Boolean).map(t => (/^\d+$/.test(t) ? parseInt(t, 10) : t)),
       cores: String(f.cores).split(',').map(c => c.trim()).filter(Boolean),
       tag: f.tag || null,
-      destaque: !!f.destaque
+      destaque: !!f.destaque,
+      galeria: f.galeria || [],
+      img: (f.galeria || [])[0] || ''
     };
     setSalvando(true);
     const sync = await saveProduct(payload);
@@ -592,22 +616,28 @@ function ProdutoForm({ produto, onClose, onSaved }) {
             <div className="field"><label>Opções: cores ou modelos (vírgula)</label><input value={f.tamanhos} onChange={e => set('tamanhos', e.target.value)} /></div>
             <div className="field"><label>Cores hex (vírgula)</label><input value={f.cores} onChange={e => set('cores', e.target.value)} /></div>
             <div className="field field--photo">
-              <label>Foto do produto</label>
-              <div className="pform__photo">
-                <div className="pform__photo-preview">
-                  {previewSrc
-                    ? <img src={previewSrc} alt="Prévia" />
-                    : <span className="pform__photo-empty">Sem foto</span>}
-                </div>
-                <div className="pform__photo-actions">
-                  <label className="btn btn-ghost cursor-target pform__upload">
-                    <FiUpload /> Enviar foto
-                    <input type="file" accept="image/*" hidden onChange={e => onPickFile(e.target.files && e.target.files[0])} />
+              <label>Fotos do produto ({(f.galeria || []).length}/{MAX_FOTOS})</label>
+              <div className="pform__fotos">
+                {(f.galeria || []).map((g, i) => (
+                  <div className="pform__foto" key={g.slice(0, 80) + i}>
+                    <img src={fotoSrc(g)} alt={`Foto ${i + 1}`} />
+                    {i === 0 && <span className="pform__foto-capa">Capa</span>}
+                    <div className="pform__foto-bar">
+                      <button type="button" className="cursor-target" disabled={i === 0} onClick={() => moverFoto(i, -1)} aria-label="Mover para antes" title="Mover para antes"><FiArrowLeft size={14} /></button>
+                      <button type="button" className="cursor-target" disabled={i === (f.galeria || []).length - 1} onClick={() => moverFoto(i, 1)} aria-label="Mover para depois" title="Mover para depois"><FiArrowRight size={14} /></button>
+                      <button type="button" className="cursor-target pform__foto-del" onClick={() => removerFoto(i)} aria-label="Remover foto" title="Remover foto"><FiX size={14} /></button>
+                    </div>
+                  </div>
+                ))}
+                {(f.galeria || []).length < MAX_FOTOS && (
+                  <label className="pform__foto pform__foto--add cursor-target">
+                    <FiUpload size={20} />
+                    <span>{(f.galeria || []).length ? 'Adicionar fotos' : 'Enviar fotos'}</span>
+                    <input type="file" accept="image/*" multiple hidden onChange={e => { onPickFiles(e.target.files); e.target.value = ''; }} />
                   </label>
-                  {f.img && <button type="button" className="btn btn-quiet cursor-target" onClick={() => set('img', '')}>Remover</button>}
-                  <p className="muted pform__photo-hint">Envie do computador ou celular. A imagem fica salva junto do produto.</p>
-                </div>
+                )}
               </div>
+              <p className="muted pform__photo-hint">Envie uma ou mais fotos (do computador ou do celular). A primeira é a capa; use as setas para mudar a ordem.</p>
             </div>
             <div className="field field--check">
               <label className="pform__check cursor-target">

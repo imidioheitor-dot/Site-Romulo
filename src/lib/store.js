@@ -9,6 +9,7 @@
    ============================================================ */
 
 import { useSyncExternalStore } from 'react';
+import { fotosDoProduto, temFotoEmbutida } from './fotos';
 import * as api from './api';
 
 const KEYS = {
@@ -276,7 +277,7 @@ export async function sincronizarCatalogo({ forcar = false } = {}) {
 
     // Fotos embutidas vindas do formato antigo: conserta sozinho, senão o
     // catálogo continua engordando até travar todo cadastro.
-    if (publicado && dados.produtos.some(p => String(p.img || '').startsWith('data:'))) {
+    if (publicado && dados.produtos.some(temFotoEmbutida)) {
       if (await consertarCatalogoPesado()) return { ok: true, mudou: true, publicado: true, otimizado: true };
     }
 
@@ -301,13 +302,13 @@ export async function sincronizarCatalogo({ forcar = false } = {}) {
    o endereço dela. Sem isso, o catálogo cresce ~200 KB por foto e, passando de
    ~30, o envio inteiro é recusado pela hospedagem — e aí NADA mais salva. */
 async function converterFotosEmbutidas(lista) {
-  if (!lista.some(p => String(p.img || '').startsWith('data:'))) return { lista, ok: true };
+  if (!lista.some(temFotoEmbutida)) return { lista, ok: true };
   const saida = [];
   for (const p of lista) {
-    if (!String(p.img || '').startsWith('data:')) { saida.push(p); continue; }
-    const r = await guardarFoto(p.img);
+    if (!temFotoEmbutida(p)) { saida.push(p); continue; }
+    const r = await guardarFotos(p);
     if (!r.ok) return { lista, ok: false, erro: r.erro };
-    saida.push({ ...p, img: r.img });
+    saida.push(r.produto);
   }
   return { lista: saida, ok: true, convertidas: true };
 }
@@ -470,13 +471,27 @@ async function guardarFoto(img) {
   }
 }
 
+/* Sobe todas as fotos do produto (capa + galeria) e devolve o produto com
+   `galeria` = lista completa e `img` = capa. Produto de uma foto só fica sem
+   `galeria`, como antes. */
+async function guardarFotos(produto) {
+  const fotos = [];
+  for (const f of fotosDoProduto(produto)) {
+    const r = await guardarFoto(f);
+    if (!r.ok) return { ok: false, erro: r.erro };
+    if (r.img && !fotos.includes(r.img)) fotos.push(r.img);
+  }
+  const { galeria: _antiga, ...resto } = produto;
+  return { ok: true, produto: { ...resto, img: fotos[0] || '', ...(fotos.length > 1 ? { galeria: fotos } : {}) } };
+}
+
 export async function saveProduct(product) {
   const id = product.id || 'rsf-' + Math.random().toString(36).slice(2, 8);
 
-  const foto = await guardarFoto(product.img);
-  if (!foto.ok) return { ok: false, erro: foto.erro };
+  const fotos = await guardarFotos(product);
+  if (!fotos.ok) return { ok: false, erro: fotos.erro };
 
-  const produto = { ...product, id, img: foto.img };
+  const produto = { ...fotos.produto, id };
   return alterarProdutos(lista => {
     const i = lista.findIndex(p => p.id === id);
     const nova = lista.slice();
@@ -504,7 +519,7 @@ export async function otimizarFotos() {
 
 /* quantas fotos ainda viajam dentro do catálogo */
 export function fotosEmbutidas() {
-  return getProducts().filter(p => String(p.img || '').startsWith('data:')).length;
+  return getProducts().filter(temFotoEmbutida).length;
 }
 
 export function deleteProduct(id) {
