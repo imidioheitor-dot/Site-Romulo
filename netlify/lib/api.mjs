@@ -237,23 +237,36 @@ async function rotaCatalogoGet(req, ctx) {
    antigo mande a imagem dentro do JSON, o que fica gravado é só a referência. */
 async function extrairFotos(produtos, armazem) {
   let convertidas = 0;
-  const saida = [];
-  for (const p of produtos) {
-    if (!String(p.img || '').startsWith('data:')) { saida.push(p); continue; }
+  // devolve a referência curta de uma foto embutida; '' se a imagem for inválida
+  const guardar = async valor => {
+    if (!String(valor || '').startsWith('data:')) return valor;
     try {
-      const foto = lerDataUrlDeImagem(p.img);
+      const foto = lerDataUrlDeImagem(valor);
       const existe = await armazem.ler(CHAVES.foto(foto.id));
       if (!existe || !existe.valor) {
         await armazem.gravar(CHAVES.foto(foto.id), {
           tipo: foto.tipo, base64: foto.base64, criadoEm: new Date().toISOString()
         }, {});
       }
-      saida.push({ ...p, img: CAMINHO_FOTO(foto.id) });
       convertidas++;
+      return CAMINHO_FOTO(foto.id);
     } catch {
-      // foto inválida: deixa o produto sem imagem em vez de perder o produto
-      saida.push({ ...p, img: '' });
+      // foto inválida: some só ela, o produto fica
+      return '';
     }
+  };
+  const saida = [];
+  for (const p of produtos) {
+    const lista = Array.isArray(p.galeria) && p.galeria.length ? p.galeria : [p.img];
+    if (!lista.some(f => String(f || '').startsWith('data:'))) { saida.push(p); continue; }
+    const fotos = [];
+    for (const f of lista) {
+      const ref = await guardar(f);
+      if (ref && !fotos.includes(ref)) fotos.push(ref);
+    }
+    const novo = { ...p, img: fotos[0] || '' };
+    if (fotos.length > 1) novo.galeria = fotos; else delete novo.galeria;
+    saida.push(novo);
   }
   return { produtos: saida, convertidas };
 }

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import ArteProduto from './ArteProduto';
+import { fotoSrc } from '../lib/fotos';
 
 /**
  * Mostra a foto real do produto (public/products/<img>) e, caso o
@@ -7,13 +8,10 @@ import ArteProduto from './ArteProduto';
  * ilustração vetorial gerada a partir do colorway.
  */
 export default function ProductMedia({ produto, className = '', style, artStyle, foto }) {
-  const [failed, setFailed] = useState(false);
+  const [falhou, setFalhou] = useState(null);
   const raw = foto || produto?.img;
-  /* aceita: foto guardada no servidor (/api/foto?id=…), foto enviada
-     localmente (data:), URL externa (http/blob) ou arquivo em public/products/ */
-  const src = raw
-    ? (/^(\/|data:|https?:|blob:)/.test(raw) ? raw : `${import.meta.env.BASE_URL}${raw.startsWith('fotos/') ? '' : 'products/'}${raw}`)
-    : null;
+  const src = fotoSrc(raw);
+  const failed = falhou === src;
 
   if (!src || failed) {
     return (
@@ -25,7 +23,7 @@ export default function ProductMedia({ produto, className = '', style, artStyle,
 
   return (
     <div className={`product-media ${className}`} style={style}>
-      <img key={src} src={src} alt={produto?.nome || ''} loading="lazy" onError={() => setFailed(true)} />
+      <img key={src} src={src} alt={produto?.nome || ''} loading="lazy" onError={() => setFalhou(src)} />
     </div>
   );
 }

@@ -510,6 +510,24 @@ await grupo('Fotos de produto com endereço próprio', async () => {
   ok(JSON.stringify(cat.dados.produtos).length < 400,
     `catálogo continua pequeno mesmo com foto (${JSON.stringify(cat.dados.produtos).length} bytes)`);
 
+  // várias fotos: galeria completa, capa = primeira, embutidas viram referência
+  const tiny = n => 'data:image/png;base64,' + Buffer.from('fotoMulti' + n).toString('base64');
+  const multi = await chamar('PUT', 'catalogo', {
+    corpo: { produtos: [
+      { ...PRODUTOS[0], img: tiny(1), galeria: [tiny(1), tiny(2), tiny(3), tiny(2)] },
+      { ...PRODUTOS[0], id: 'so-img', img: 'foto-antiga.jpg' },
+      { ...PRODUTOS[0], id: 'so-uma', img: tiny(4), galeria: [tiny(4)] }
+    ] }, token: SENHA
+  });
+  const [m1, m2, m3] = multi.dados.produtos;
+  ok(multi.status === 200 && m1.galeria.length === 3, 'produto com 3 fotos distintas guarda as 3 (repetida some)');
+  ok(m1.galeria.every(g => /^\/api\/foto\?id=/.test(g)), 'todas as fotos da galeria viram referência curta');
+  ok(m1.img === m1.galeria[0], 'a capa é a primeira foto da galeria');
+  ok(m2.img === 'foto-antiga.jpg' && !m2.galeria, 'produto antigo com uma foto só continua igual');
+  ok(/^\/api\/foto\?id=/.test(m3.img) && !m3.galeria, 'galeria de uma foto não cria campo extra');
+  const segunda = await chamar('GET', 'foto?id=' + m1.galeria[1].split('=')[1]);
+  ok(segunda.status === 200, 'a segunda foto pode ser baixada pela vitrine');
+
   // e o cliente busca a imagem direto, sem senha
   const publica = await (async () => {
     const armazem = armazemMemoria();

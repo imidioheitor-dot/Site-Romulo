@@ -1,12 +1,13 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { FiArrowLeft, FiShoppingBag, FiCheck, FiTruck, FiShield, FiRefreshCw } from 'react-icons/fi';
+import { FiArrowLeft, FiChevronLeft, FiChevronRight, FiShoppingBag, FiCheck, FiTruck, FiShield, FiRefreshCw } from 'react-icons/fi';
 import LiquidGlass from '../components/fx/LiquidGlass';
 import ProductMedia from '../components/ProductMedia';
 import ProductCard from '../components/ProductCard';
 import { useProducts, addToCart } from '../lib/store';
 import { useToast } from '../components/Toast';
 import { brl } from '../lib/format';
+import { fotosDoProduto, fotoSrc } from '../lib/fotos';
 import { useReveal } from '../lib/useReveal';
 import './Produto.css';
 
@@ -46,6 +47,10 @@ export default function Produto() {
   }
 
   const esgotado = produto.estoque <= 0;
+  const fotos = fotosDoProduto(produto);
+  const fotoPrincipal = fotoAtual || (tamanho && produto.fotoOpcao?.[tamanho]) || produto.img;
+  const idxAtual = Math.max(0, fotos.indexOf(fotoPrincipal));
+  const irFoto = passo => setFotoAtual(fotos[(idxAtual + passo + fotos.length) % fotos.length]);
 
   const handleAdd = () => {
     if (!tamanho) {
@@ -69,20 +74,27 @@ export default function Produto() {
           <LiquidGlass radius={28} className="produto__glass" blur={6}>
             <div className="produto__stage">
               {produto.tag && <span className="tag" style={{ position: 'absolute', top: 20, left: 20, zIndex: 5 }}>{produto.tag}</span>}
-              <ProductMedia produto={produto} foto={fotoAtual || (tamanho && produto.fotoOpcao?.[tamanho]) || produto.img} artStyle={{ padding: '4%' }} />
+              <ProductMedia produto={produto} foto={fotoPrincipal} artStyle={{ padding: '4%' }} />
+              {fotos.length > 1 && (
+                <>
+                  <button type="button" className="produto__nav produto__nav--prev cursor-target" onClick={() => irFoto(-1)} aria-label="Foto anterior"><FiChevronLeft /></button>
+                  <button type="button" className="produto__nav produto__nav--next cursor-target" onClick={() => irFoto(1)} aria-label="Próxima foto"><FiChevronRight /></button>
+                  <span className="produto__count">{idxAtual + 1} / {fotos.length}</span>
+                </>
+              )}
             </div>
           </LiquidGlass>
           <div className="produto__thumbs">
-            {(produto.galeria && produto.galeria.length > 1)
-              ? produto.galeria.map(g => (
+            {fotos.length > 1
+              ? fotos.map((g, i) => (
                   <button
                     key={g}
                     type="button"
-                    className={`produto__thumb produto__thumb--foto cursor-target ${(fotoAtual || produto.img) === g ? 'is-on' : ''}`}
+                    className={`produto__thumb produto__thumb--foto cursor-target ${idxAtual === i ? 'is-on' : ''}`}
                     onClick={() => setFotoAtual(g)}
-                    aria-label="Ver foto"
+                    aria-label={`Ver foto ${i + 1}`}
                   >
-                    <img src={`${import.meta.env.BASE_URL}${g}`} alt="" loading="lazy" />
+                    <img src={fotoSrc(g)} alt="" loading="lazy" />
                   </button>
                 ))
               : (produto.cores || []).map((c, i) => (
